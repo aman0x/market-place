@@ -27,6 +27,6 @@ class BazarViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
-    queryset = Bazaar.objects.all()
+    queryset = Bazaar.objects.all().order_by('id')
     serializer_class = BazaarSerializer
     permission_classes = [permissions.IsAuthenticated]
