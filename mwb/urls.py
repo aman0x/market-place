@@ -1,0 +1,52 @@
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from .views import index
+from django.conf.urls.static import static
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView
+)
+from rest_framework import routers
+from bazaarApp.api.views import UserViewSet, GroupViewSet, BazarViewSet
+from agentApp.api.views import AgentViewSet
+from wholesellerApp.api.views import WholesellerViewSet
+from parentCategoryApp.api.views import ParentCategoryAPIView
+from categoryApp.api.views import CategoryAPIView
+from subCategoryApp.api.views import SubCategoryAPIView
+
+admin.site.site_header = settings.ADMIN_SITE_HEADER
+router = routers.DefaultRouter()
+router.register(r'users', UserViewSet, 'Users')
+router.register(r'groups', GroupViewSet, 'Groups')
+router.register(r'bazaar', BazarViewSet, 'Bazaar')
+router.register(r'agent', AgentViewSet, 'Agent')
+router.register(r'woleseller', WholesellerViewSet, 'Wholeseller')
+router.register(r'parentcategory', ParentCategoryAPIView, 'ParentCategory')
+router.register(r'category', CategoryAPIView, 'Category')
+router.register(r'subcategory', SubCategoryAPIView, 'SubCategory')
+
+urlpatterns = [
+    path(r'api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path(r'api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path(r'api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path(r'api/bazaar/', include('bazaarApp.api.urls')),
+    path(r'api/agent/', include('agentApp.api.urls')),
+    path(r'api/wholeseller/', include('wholesellerApp.api.urls')),
+    path(r'api/parentcategory/', include('parentCategoryApp.api.urls')),
+    path(r'api/category/', include('categoryApp.api.urls')),
+    path(r'api/subcategory/', include('subCategoryApp.api.urls')),
+    # path(r'api/account/', include('account.api.urls')),
+    # path(r'api/bucket/', include('bucket.api.urls'),  name='site_info'),
+    # path(r'api/item/', include('item.api.urls')),
+    # path(r'api/itemmaster/', include('itemmaster.api.urls')),
+    # path(r'api/category/', include('category.api.urls')),
+    # path(r'api/subcategory/', include('subcategory.api.urls')),
+    # path(r'api/locality/', include('locality.api.urls')),
+    # path(r'api/order/', include('order.api.urls')),
+    # path(r'api/invoice/', include('invoice.api.urls')),
+    # path(r'api/dashboard/', include('dashboard.api.urls')),
+    path('admin/', admin.site.urls),
+    path('', include(router.urls))
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
