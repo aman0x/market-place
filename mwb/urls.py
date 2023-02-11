@@ -3,6 +3,8 @@ from django.urls import path, include
 from django.conf import settings
 from .views import index
 from django.conf.urls.static import static
+from rest_framework_simplejwt import views as jwt_views
+
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -16,6 +18,8 @@ from parentCategoryApp.api.views import ParentCategoryAPIView
 from categoryApp.api.views import CategoryAPIView
 from subCategoryApp.api.views import SubCategoryAPIView
 
+
+
 admin.site.site_header = settings.ADMIN_SITE_HEADER
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet, 'Users')
@@ -28,9 +32,9 @@ router.register(r'category', CategoryAPIView, 'Category')
 router.register(r'subcategory', SubCategoryAPIView, 'SubCategory')
 
 urlpatterns = [
-    path(r'api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path(r'api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path(r'api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path(r'api/login/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    #path(r'api/login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    #path(r'api/login/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path(r'api/bazaar/', include('bazaarApp.api.urls')),
     path(r'api/agent/', include('agentApp.api.urls')),
     path(r'api/wholeseller/', include('wholesellerApp.api.urls')),

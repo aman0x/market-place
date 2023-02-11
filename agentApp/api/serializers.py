@@ -7,4 +7,4 @@ from agentApp.models import Agent
 class AgentSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Agent
-        fields = ['url', 'agent_name']
+        fields = '__all__'
