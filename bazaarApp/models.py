@@ -14,3 +14,8 @@ class Bazaar(models.Model):
 
     def username(self):
         return self.user.username
+
+
+
+
+

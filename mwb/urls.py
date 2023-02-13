@@ -22,14 +22,6 @@ from subCategoryApp.api.views import SubCategoryAPIView
 
 admin.site.site_header = settings.ADMIN_SITE_HEADER
 router = routers.DefaultRouter()
-router.register(r'users', UserViewSet, 'Users')
-router.register(r'groups', GroupViewSet, 'Groups')
-router.register(r'bazaar', BazarViewSet, 'Bazaar')
-router.register(r'agent', AgentViewSet, 'Agent')
-router.register(r'woleseller', WholesellerViewSet, 'Wholeseller')
-router.register(r'parentcategory', ParentCategoryAPIView, 'ParentCategory')
-router.register(r'category', CategoryAPIView, 'Category')
-router.register(r'subcategory', SubCategoryAPIView, 'SubCategory')
 
 urlpatterns = [
     path(r'api/login/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),

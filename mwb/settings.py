@@ -41,16 +41,16 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.gis',
     'rest_framework',
+    'phonenumber_field',
     'bazaarApp',
     'agentApp',
     'wholesellerApp',
     'parentCategoryApp',
     'categoryApp',
     'subCategoryApp',
-    
-    
+
     # 'leaflet',
-    #'phonenumber_field'
+
     # 'corsheaders',
     # 'fcm_django',
     # 'bucket',
