@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from subCategoryApp.models import SubCategory
+from productApp.models import Product
 
 
-class SubCategorySerializer(serializers.ModelSerializer):
+class ProductSerializer(serializers.ModelSerializer):
     class Meta:
-        model = SubCategory
-        fields = ('id', 'subcategory_name')
+        model = Product
+        fields = '__all__'

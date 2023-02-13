@@ -1,11 +1,11 @@
 from rest_framework import viewsets
 from rest_framework import permissions
-from subCategoryApp.models import SubCategory
+from productApp.models import Product
 
-from .serializers import SubCategorySerializer
+from .serializers import ProductSerializer
 
 
-class SubCategoryAPIView(viewsets.ModelViewSet):
+class ProductAPIView(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = SubCategory.objects.all()
-    serializer_class = SubCategorySerializer
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer

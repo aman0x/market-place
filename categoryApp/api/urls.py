@@ -3,7 +3,7 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
-router.register(r'category', views.CategoryAPIView)
+router.register(r'', views.CategoryAPIView)
 
 
 # Wire up our API using automatic URL routing.

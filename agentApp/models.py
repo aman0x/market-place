@@ -36,7 +36,5 @@ class Agent(models.Model):
     is_active = ()
 
 
-    def __str__(self):
-        return '%d: %s' % (self.agent_name, )
 
 

@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     'parentCategoryApp',
     'categoryApp',
     'subCategoryApp',
-
+    'productApp',
     # 'leaflet',
 
     # 'corsheaders',
