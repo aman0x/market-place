@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from rest_framework import permissions
-from .serializers import UserSerializer, GroupSerializer, BazaarSerializer
+from .serializers import UserSerializer, GroupSerializer, BazaarSerializer, BazaarAgentSerializer, BazaarWholesellerSerializer, BazaarProductSerializer
 from bazaarApp.models import Bazaar
 
 
@@ -29,4 +29,28 @@ class BazarViewSet(viewsets.ModelViewSet):
     """
     queryset = Bazaar.objects.all().order_by('id')
     serializer_class = BazaarSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class BazarAgentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Bazaar.objects.all().order_by('id')
+    serializer_class = BazaarAgentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class BazarWholesellerViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Bazaar.objects.all().order_by('id')
+    serializer_class = BazaarWholesellerSerializer
+    permission_classes = [permissions.IsAuthenticated]    
+
+class BazarProductViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Bazaar.objects.all().order_by('id')
+    serializer_class = BazaarProductSerializer
     permission_classes = [permissions.IsAuthenticated]

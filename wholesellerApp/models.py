@@ -21,13 +21,13 @@ WHOLESELLER_STATUS = (
 class Wholeseller(models.Model):
     wholeseller_description = models.TextField(blank=True, null=True)
     wholeseller_name = models.CharField(max_length=200)
-    wholeseller_bazaar = models.ManyToManyField(Bazaar)
+    wholeseller_bazaar = models.ManyToManyField(Bazaar, 'wholeseller')
     wholeseller_type = models.CharField(max_length=11,
                   choices=WHOLESELLER_TYPE,
                   default="INDIVIDUAL"
                 )
-    wholeseller_agent = models.ManyToManyField(Agent, related_name='w_agent')
-    wholeseller_contact_per = models.ManyToManyField(Agent, related_name='w_contact_person')
+    wholeseller_agent = models.ManyToManyField(Agent, related_name='agent')
+    wholeseller_contact_per = models.ManyToManyField(Agent, related_name='contact_person')
     wholeseller_number = PhoneNumberField(blank=True , null=True)
     wholeseller_state = models.CharField(max_length=200, null=True)
     wholeseller_district = models.CharField(max_length=200, null=True)

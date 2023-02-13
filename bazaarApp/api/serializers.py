@@ -1,6 +1,9 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from bazaarApp.models import Bazaar
+from agentApp.models import Agent
+from agentApp.api.serializers import AgentSerializer
+from wholesellerApp.api.serializers import WholesellerSerializer
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -14,13 +17,25 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'name']
 
 
-class HighScoreSerializer(serializers.BaseSerializer):
-    def to_representation(self, instance):
-        return {
-            'score': instance.score,
-            'player_name': instance.player_name
-        }
+class BazaarAgentSerializer(serializers.ModelSerializer):
+    agent = AgentSerializer(many=True, read_only=True)
+    class Meta:
+        model = Bazaar
+        fields = "__all__"
 
+class BazaarWholesellerSerializer(serializers.ModelSerializer):
+    wholeseller = WholesellerSerializer(many=True, read_only=True)
+    class Meta:
+        model = Bazaar
+        fields = "__all__"
+
+class BazaarProductSerializer(serializers.ModelSerializer):
+    agent = serializers.StringRelatedField(many=True)
+    class Meta:
+        model = Bazaar
+        fields = "__all__"
+
+    
 
 class BazaarSerializer(serializers.HyperlinkedModelSerializer):
     wholesellers = serializers.SerializerMethodField(read_only=True)

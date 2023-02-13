@@ -16,7 +16,7 @@ from agentApp.api.views import AgentViewSet
 from wholesellerApp.api.views import WholesellerViewSet
 from parentCategoryApp.api.views import ParentCategoryAPIView
 from categoryApp.api.views import CategoryAPIView
-from subCategoryApp.api.views import SubCategoryAPIView
+#from subCategoryApp.api.views import SubCategoryAPIView
 
 
 
@@ -32,7 +32,7 @@ urlpatterns = [
     path(r'api/wholeseller/', include('wholesellerApp.api.urls')),
     path(r'api/parentcategory/', include('parentCategoryApp.api.urls')),
     path(r'api/category/', include('categoryApp.api.urls')),
-    path(r'api/subcategory/', include('subCategoryApp.api.urls')),
+    #path(r'api/subcategory/', include('subCategoryApp.api.urls')),
     # path(r'api/account/', include('account.api.urls')),
     # path(r'api/bucket/', include('bucket.api.urls'),  name='site_info'),
     # path(r'api/item/', include('item.api.urls')),

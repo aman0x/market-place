@@ -20,7 +20,7 @@ AGENT_STATUS = (
 
 class Agent(models.Model):
     
-    agent_bazaar = models.ManyToManyField(Bazaar)
+    agent_bazaar = models.ManyToManyField(Bazaar, related_name="agent")
     agent_description = models.TextField(blank=True, null=True)
     agent_name = models.CharField(max_length=200)
     agent_type = models.CharField(max_length=11,
@@ -34,4 +34,9 @@ class Agent(models.Model):
     agent_image = models.ImageField(upload_to='images/agent/', null=True)
     agent_status = models.CharField(max_length=20, choices= AGENT_STATUS, default="CREATED")
     is_active = ()
+
+
+    def __str__(self):
+        return '%d: %s' % (self.agent_name, )
+
 
