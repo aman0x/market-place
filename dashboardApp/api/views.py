@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from rest_framework import permissions
 from .serializers import UserSerializer, GroupSerializer, BazaarSerializer
 from bazaarApp.models import Bazaar
+from rest_framework import filters
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -30,3 +31,5 @@ class BazarViewSet(viewsets.ModelViewSet):
     queryset = Bazaar.objects.all()
     serializer_class = BazaarSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['bazaar_name']
