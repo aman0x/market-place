@@ -62,4 +62,3 @@ class BazaarSerializer(serializers.HyperlinkedModelSerializer):
     
     def get_bills(self, task):
         return '52'
-    
