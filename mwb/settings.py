@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'django.contrib.gis',
     'rest_framework',
     'phonenumber_field',
     'bazaarApp',
@@ -49,6 +48,7 @@ INSTALLED_APPS = [
     'categoryApp',
     'subCategoryApp',
     'productApp',
+    'agencyApp',
     # 'leaflet',
 
     # 'corsheaders',
@@ -140,10 +140,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'mwb',
-        'USER': 'postgres',
-        'PASSWORD': '',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'tstdb',
+        'USER': 'admin',
+        'PASSWORD': 'admin@1234',
         'HOST': 'localhost',
         'PORT': '5432',
     }

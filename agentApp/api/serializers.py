@@ -2,6 +2,7 @@ from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from agentApp.models import Agent, ManageCommision
 from bazaarApp.models import Bazaar
+from agencyApp.models import Agency
 
 
 
@@ -29,7 +30,7 @@ class AgentSerializer(serializers.HyperlinkedModelSerializer):
         agent_bazaar = validated_data.pop('agent_bazaar')
         
         for bazaar in agent_bazaar:
-            Agent.agent_bazaar.add(bazaar)
+            Agent.agent_bazaar.add(bazaar) 
         agent_commision.objects.create(
             user=agent_bazaar, **agent_commision_data)
         return agent_bazaar
