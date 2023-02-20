@@ -140,10 +140,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'mwb',
-        'USER': 'postgres',
-        'PASSWORD': '',
+        'USER': 'ravi',
+        'PASSWORD': 'ravi@123',
         'HOST': 'localhost',
         'PORT': '5432',
     }

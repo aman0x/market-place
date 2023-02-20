@@ -44,7 +44,7 @@ urlpatterns = [
     # path(r'api/locality/', include('locality.api.urls')),
     # path(r'api/order/', include('order.api.urls')),
     # path(r'api/invoice/', include('invoice.api.urls')),
-    # path(r'api/dashboard/', include('dashboard.api.urls')),
+    path(r'api/dashboard/', include('dashboardApp.api.urls')),
     path('admin/', admin.site.urls),
     path('', include(router.urls))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
