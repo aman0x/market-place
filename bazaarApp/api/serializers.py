@@ -35,8 +35,6 @@ class BazaarProductSerializer(serializers.ModelSerializer):
         model = Bazaar
         fields = "__all__"
 
-    
-
 class BazaarSerializer(serializers.HyperlinkedModelSerializer):
     wholesellers = serializers.SerializerMethodField(read_only=True)
     agents = serializers.SerializerMethodField(read_only=True)
