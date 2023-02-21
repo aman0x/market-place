@@ -8,6 +8,7 @@ from subCategoryApp.models import SubCategory
 from productApp.models import Product
 
 
+    
 
 class Bazaar(models.Model):
     bazaar_description = models.TextField(blank=True, null=True)
@@ -22,18 +23,19 @@ class Bazaar(models.Model):
         default=datetime.now, blank=True)
     bazaar_updated_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='bazaar_updated_by')
-
+    bazaar_gorup_category = models.ManyToManyField(ParentCategory, related_name='bazaar_group_category')
+    bazaar_category = models.ManyToManyField(
+        Category, related_name='bazaar_category')
+    bazaar_subcategory = models.ManyToManyField(
+        SubCategory, related_name='bazaar_subcategory')
+    bazaar_product = models.ManyToManyField(
+        Product, related_name='bazaar_product')
     is_active = ()
 
     def username(self):
         return self.user.username
 
 
-class BazaarData(models.Model):
-    bazaar_gorup_category = models.ManyToManyField(ParentCategory)
-    bazaar_category = models.ManyToManyField(Category)
-    bazaar_subcategory = models.ManyToManyField(SubCategory)
-    bazaar_product = models.ManyToManyField(Product)
 
 
 
