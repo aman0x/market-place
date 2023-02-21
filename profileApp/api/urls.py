@@ -3,10 +3,9 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
-
-router.register(r'summary', views.SummaryViewSet, 'bazaar-summary')
-router.register(r'report', views.BazaarReportViewSet, 'bazaar-report')
-router.register(r'plan', views.PlansViewSet, 'bazaar-plans')
+router.register(r'users', views.UserViewSet, 'user')
+# router.register(r'groups', views.GroupViewSet, 'user-groups')
+# router.register(r'list', views.GroupViewSet, 'user-list')
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

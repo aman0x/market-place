@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'subCategoryApp',
     'productApp',
     'agencyApp',
+    'profileApp'
     # 'leaflet',
 
     # 'corsheaders',
@@ -141,9 +142,9 @@ AUTH_PASSWORD_VALIDATORS = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'tstdb',
-        'USER': 'admin',
-        'PASSWORD': 'admin@1234',
+        'NAME': 'mwb',
+        'USER': 'postgres',
+        'PASSWORD': 'Mwb@123',
         'HOST': 'localhost',
         'PORT': '5432',
     }

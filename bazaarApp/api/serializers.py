@@ -1,20 +1,8 @@
-from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from bazaarApp.models import Bazaar
-from agentApp.models import Agent
 from agentApp.api.serializers import AgentSerializer
 from wholesellerApp.api.serializers import WholesellerSerializer
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ['url', 'username', 'email', 'groups']
-
-
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Group
-        fields = ['url', 'name']
 
 
 class BazaarAgentSerializer(serializers.ModelSerializer):
@@ -35,7 +23,7 @@ class BazaarProductSerializer(serializers.ModelSerializer):
         model = Bazaar
         fields = "__all__"
 
-class BazaarSerializer(serializers.HyperlinkedModelSerializer):
+class BazaarSerializer(serializers.ModelSerializer):
     wholesellers = serializers.SerializerMethodField(read_only=True)
     agents = serializers.SerializerMethodField(read_only=True)
     states = serializers.SerializerMethodField(read_only=True)
