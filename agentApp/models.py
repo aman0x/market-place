@@ -28,6 +28,15 @@ AGENT_GENDER=(
     ("MALE","Male"),
     ("FEMALE","Female")
 )
+
+
+class ManageCommision(models.Model):
+    
+    agent_manage_commision = models.CharField(
+        max_length=15, choices=AGENT_COMMISION, default="PERPLAN")
+    agent_commision_value = models.IntegerField(blank=True, null=True)
+
+
 class Agent(models.Model):
     
     agent_bazaar = models.ManyToManyField(Bazaar, related_name="agent")
@@ -49,7 +58,7 @@ class Agent(models.Model):
     agent_city = models.CharField(max_length=200, null=True)
     agent_pincode=models.IntegerField(null=True)
     agent_commision = models.ForeignKey(
-        "ManageCommision", on_delete=models.CASCADE, null=True)
+        ManageCommision, on_delete=models.CASCADE, null=True)
     agent_adharcard_no = models.IntegerField(null=True)
     agent_adhar_front_image=models.ImageField(upload_to="image/agent/",null=True)
     agent_adhar_back_image=models.ImageField(upload_to="image/agent/",default=None ,null=True)
@@ -61,9 +70,4 @@ class Agent(models.Model):
 
 
 
-class ManageCommision(models.Model):
-    
-    agent_manage_commision = models.CharField(
-        max_length=15, choices=AGENT_COMMISION, default="PERPLAN")
-    agent_commision_value = models.IntegerField(blank=True, null=True)
 

@@ -2,6 +2,7 @@ from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from agentApp.models import Agent, ManageCommision
 from bazaarApp.models import Bazaar
+from agencyApp.models import Agency
 
 
 
@@ -13,27 +14,53 @@ class AgentManageCommisionSerializer(serializers.ModelSerializer):
 
 
 
+#class AgentSerializer(serializers.HyperlinkedModelSerializer):
+ #   agent_commision = AgentManageCommisionSerializer()
+
 class AgentSerializer(serializers.HyperlinkedModelSerializer):
-    agent_commision = AgentManageCommisionSerializer()
-
-    
-
+    agent_commision=AgentManageCommisionSerializer()
     class Meta:
-        model = Agent
-        fields = '__all__'
-    
-    
+        model=Agent
+        fields= "__all__"
+
     
     def create(self, validated_data):
-        agent_commision_data = validated_data.pop('agent_commision')
-        agent_bazaar = validated_data.pop('agent_bazaar')
-        
-        for bazaar in agent_bazaar:
-            Agent.agent_bazaar.add(bazaar)
-        agent_commision.objects.create(
-            user=agent_bazaar, **agent_commision_data)
-        return agent_bazaar
+            agent_commision_data = validated_data.pop('agent_commision')
+            agent_bazaar_data = validated_data.pop('agent_bazaar')
+            agent_bazaar = []
 
+            for bazaar_data in agent_bazaar_data:
+                bazaar = Bazaar.objects.create(agent_commision_data,bazaar_data)
+                agent_bazaars.append(bazaar)
+                agent = Agent.objects.create(agent_bazaar=agent_bazaar, **validated_data)
+                agent_commision.objects.create(user=agent, **agent_commision_data)
+            return agent    
+
+
+    
+
+
+
+
+
+
+    
+    
+    
+    #def create(self, validated_data):
+     #   agent_commision_data = validated_data.pop('agent_commision')
+      #  agent_bazaar = validated_data.pop('agent_bazaar')
+        #obj=super().create(validated_data)
+        
+        #for bazaar in agent_bazaar:
+         #   Agent.agent_bazaar.set(bazaar)
+          #  agent_commision.objects.create(
+           # user=agent_bazaar, **agent_commision_data)
+            #Agent.agent_bazaar.set(bazaar)
+        #return agent_bazaar
+
+
+        
     def update(self, instance, validated_data):
         status = validated_data.pop('agent_commision')
         instance.status_id = status.id

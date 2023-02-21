@@ -4,6 +4,8 @@ from rest_framework import permissions
 from .serializers import UserSerializer, GroupSerializer, BazaarSerializer, BazaarAgentSerializer, BazaarWholesellerSerializer, BazaarProductSerializer
 from bazaarApp.models import Bazaar
 from rest_framework import filters
+from django.db.models import Q
+from wholesellerApp.models import Wholeseller
 
 
 
@@ -59,3 +61,6 @@ class BazarProductViewSet(viewsets.ModelViewSet):
     queryset = Bazaar.objects.all().order_by('id')
     serializer_class = BazaarProductSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class WhollsellerDetailViewset(viewsets.ModelViewSet):
