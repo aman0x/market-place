@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'subCategoryApp',
     'productApp',
     'agencyApp',
+    'planApp',
+    'adsApp',
     # 'leaflet',
 
     # 'corsheaders',
@@ -141,7 +143,7 @@ AUTH_PASSWORD_VALIDATORS = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'tstdb',
+        'NAME': 'mwb',
         'USER': 'admin',
         'PASSWORD': 'admin@1234',
         'HOST': 'localhost',

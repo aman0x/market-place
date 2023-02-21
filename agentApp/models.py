@@ -3,6 +3,7 @@ from django.db import models
 from bazaarApp.models import Bazaar
 from phonenumber_field.modelfields import PhoneNumberField
 from categoryApp.models import Category
+from agencyApp.models import Agency
 
 
 AGENT_TYPE = (
@@ -40,6 +41,7 @@ class ManageCommision(models.Model):
 class Agent(models.Model):
     
     agent_bazaar = models.ManyToManyField(Bazaar, related_name="agent")
+    agency=models.ForeignKey(Agency,on_delete=models.CASCADE)
     agent_description = models.TextField(blank=True, null=True)
     agent_name = models.CharField(max_length=200)
     agent_type = models.CharField(max_length=11,

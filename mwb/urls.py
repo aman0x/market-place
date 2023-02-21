@@ -36,7 +36,8 @@ urlpatterns = [
     path(r'api/subcategory/', include('subCategoryApp.api.urls')),
     path(r'api/product/', include('productApp.api.urls')),
     path(r'api/agency/',include('agencyApp.api.urls')),
-    #path(r'')
+    path(r'api/plan/',include('planApp.api.urls')),
+    path(r'api/ads/',include('adsApp.api.urls')),
     
     # path(r'api/account/', include('account.api.urls')),
     # path(r'api/bucket/', include('bucket.api.urls'),  name='site_info'),
