@@ -5,15 +5,19 @@ from bazaarApp.models import Bazaar
 from agencyApp.models import Agency
 
 
-
 class AgentManageCommisionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ManageCommision
         fields = '__all__'
     
 
+class AgentBazaarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bazaar
+        fields = '__all__'
 
 
+<<<<<<< Updated upstream
 #class AgentSerializer(serializers.HyperlinkedModelSerializer):
  #   agent_commision = AgentManageCommisionSerializer()
 
@@ -67,3 +71,10 @@ class AgentSerializer(serializers.HyperlinkedModelSerializer):
         # ... plus any other fields you may want to update
         return instance
     
+=======
+class AgentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Agent
+        fields = '__all__'
+
+>>>>>>> Stashed changes

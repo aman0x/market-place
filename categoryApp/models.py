@@ -2,9 +2,11 @@ from django.conf import settings
 from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
+from parentCategoryApp.models import ParentCategory
 
 
 class Category(models.Model):
+    category_group = models.ForeignKey(ParentCategory, on_delete=models.CASCADE)
     category_name = models.CharField(max_length=200)
     category_description = models.TextField(blank=True)
     category_ref_image = models.ImageField(
@@ -16,6 +18,7 @@ class Category(models.Model):
         default=datetime.now, blank=True)
     category_updated_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='category_updated_by')
+    
 
     class Meta:
         verbose_name_plural = "categories"
