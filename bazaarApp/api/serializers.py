@@ -48,3 +48,10 @@ class BazaarSerializer(serializers.ModelSerializer):
     
     def get_bills(self, task):
         return '52'
+
+
+
+
+
+
+    
