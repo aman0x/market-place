@@ -10,4 +10,4 @@ venv
 /static
 /media
 migrations/
-*/settings.py
+mwb/settings.py
