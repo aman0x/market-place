@@ -1,7 +1,14 @@
 # Create your models here.
 from django.db import models
 from django.contrib.auth.models import User
+from parentCategoryApp.models import ParentCategory
+from datetime import datetime
+from categoryApp.models import Category
+from subCategoryApp.models import SubCategory
+from productApp.models import Product
 
+
+    
 
 class Bazaar(models.Model):
     bazaar_description = models.TextField(blank=True, null=True)
@@ -10,6 +17,19 @@ class Bazaar(models.Model):
     bazaar_district = models.CharField(max_length=200, null=True)
     bazaar_city = models.CharField(max_length=200, null=True)
     bazaar_image = models.ImageField(upload_to='images/', null=True)
+    bazaar_added_date = models.DateTimeField(
+        default=datetime.now, blank=True)
+    bazaar_updated_date = models.DateTimeField(
+        default=datetime.now, blank=True)
+    bazaar_updated_by = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='bazaar_updated_by')
+    bazaar_gorup_category = models.ManyToManyField(ParentCategory, related_name='bazaar_group_category')
+    bazaar_category = models.ManyToManyField(
+        Category, related_name='bazaar_category')
+    bazaar_subcategory = models.ManyToManyField(
+        SubCategory, related_name='bazaar_subcategory')
+    bazaar_product = models.ManyToManyField(
+        Product, related_name='bazaar_product')
     is_active = ()
 
     def username(self):

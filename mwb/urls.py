@@ -11,13 +11,16 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView
 )
 from rest_framework import routers
-from bazaarApp.api.views import UserViewSet, GroupViewSet, BazarViewSet
+from bazaarApp.api.views import BazarViewSet
 from agentApp.api.views import AgentViewSet
 from wholesellerApp.api.views import WholesellerViewSet
 from parentCategoryApp.api.views import ParentCategoryAPIView
 from categoryApp.api.views import CategoryAPIView
 from subCategoryApp.api.views import SubCategoryAPIView
 from productApp.api.views import ProductAPIView
+from profileApp.api.views import UserViewSet
+
+
 
 
 
@@ -38,7 +41,8 @@ urlpatterns = [
     path(r'api/agency/',include('agencyApp.api.urls')),
     path(r'api/plan/',include('planApp.api.urls')),
     path(r'api/ads/',include('adsApp.api.urls')),
-    
+    path(r'api/user/',include('profileApp.api.urls')),
+
     # path(r'api/account/', include('account.api.urls')),
     # path(r'api/bucket/', include('bucket.api.urls'),  name='site_info'),
     # path(r'api/itemmaster/', include('itemmaster.api.urls')),
