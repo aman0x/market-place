@@ -14,10 +14,10 @@ PLAN_CHOICE=(
 class Plan(models.Model):
     plan_choice=models.CharField(max_length=20,choices=PLAN_CHOICE,default="Paid")
     firm_name=models.CharField(max_length=100,default=None,null=True)
-    start_date=models.DateField(auto_now_add=False,default=None,null=True)
-    start_time=models.DateTimeField(auto_now_add=False,default=None,null=True)
-    end_date=models.DateField(auto_now_add=False,default=None,null=True)
-    end_time=models.DateTimeField(auto_now_add=False,default=None,null=True)
+    start_date=models.DateField(auto_now=False)
+    start_time=models.TimeField(auto_now_add=False)
+    end_date=models.DateField(auto_now=False)
+    end_time=models.TimeField(auto_now_add=False)
     plan_features=models.ManyToManyField(PlanFeatures,related_name="plan_features")
 
     
