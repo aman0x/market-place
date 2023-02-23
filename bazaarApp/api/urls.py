@@ -14,6 +14,12 @@ router.register(r'data', views.BazarViewSet)
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
+    path('data/<int:pk>/total-orders/', views.BazarViewReportTotalOrdersViewSet.as_view({'get': 'list'}),name="total-orders"),
+    path('data/<int:pk>/total-income/', views.BazarViewReportTotalIncomeViewSet.as_view({'get': 'list'}),name="total-income"),
+    path('data/<int:pk>/city-wise/', views.BazarViewReportCityWiseViewSet.as_view({'get': 'list'}),name="city-wise"),
+    path('data/<int:pk>/top-wholesellers/', views.BazarViewReportTopWholesellersViewSet.as_view({'get': 'list'}),name="top-wholesellers"),
+    path('data/<int:pk>/top-products/', views.BazarViewReportTopProductsViewSet.as_view({'get': 'list'}),name="top-products"),
+    path('data/<int:pk>/new-wholesellers/', views.BazarViewReportNewWholesellersViewSet.as_view({'get': 'list'}),name="new-wholesellers"),
 ]
 
 
