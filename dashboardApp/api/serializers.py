@@ -3,85 +3,25 @@ from rest_framework import serializers
 from bazaarApp.models import Bazaar
 
 
-
-class SummarySerializer(serializers.HyperlinkedModelSerializer):
-    bazaars = serializers.SerializerMethodField(read_only=True)
-    wholesellers = serializers.SerializerMethodField(read_only=True)
-    revenue = serializers.SerializerMethodField(read_only=True)
-    bills = serializers.SerializerMethodField(read_only=True)
-    agents = serializers.SerializerMethodField(read_only=True)
-    commission = serializers.SerializerMethodField(read_only=True)
-    customers = serializers.SerializerMethodField(read_only=True)
-    class Meta:
-
-        model = Bazaar
-        fields = ['bazaars','wholesellers','revenue','bills','agents','commission','customers']
-
-    def get_bazaars(self, task):
-        return '15'
+class SummarySerializer(serializers.Serializer):
+    bazaar = serializers.IntegerField(read_only=True)
+    wholeseller = serializers.IntegerField(read_only=True)
+    revenue = serializers.IntegerField(read_only=True)
+    bill = serializers.IntegerField(read_only=True)
+    agent = serializers.IntegerField(read_only=True)
+    commission = serializers.IntegerField(read_only=True)
+    customer = serializers.IntegerField(read_only=True)
     
-    def get_wholesellers(self, task):
-        return '60'
-    
-    def get_revenue(self, task):
-        return '194000'
-    
-    def get_bills(self, task):
-        return '56'
-    
-    def get_agents(self, task):
-        return '52'
-    
-    def get_commission(self, task):
-        return '45000'
-    
-    def get_customers(self, task):
-        return '1100'
 
 class BazaarReportSerializer(serializers.HyperlinkedModelSerializer):
-    wholesellers = serializers.SerializerMethodField(read_only=True)
+    wholeseller = serializers.SerializerMethodField(read_only=True)
     revenue = serializers.SerializerMethodField(read_only=True)
-    bills = serializers.SerializerMethodField(read_only=True)
-    agents = serializers.SerializerMethodField(read_only=True)
+    bill = serializers.SerializerMethodField(read_only=True)
+    agent = serializers.SerializerMethodField(read_only=True)
     commission = serializers.SerializerMethodField(read_only=True)
-    customers = serializers.SerializerMethodField(read_only=True)
-    class Meta:
-
-        model = Bazaar
-        fields = ['wholesellers','revenue','bills','agents','commission','customers']
-    
-    def get_wholesellers(self, task):
-        return '55'
-    
-    def get_revenue(self, task):
-        return '189000'
-    
-    def get_bills(self, task):
-        return '54'
-    
-    def get_agents(self, task):
-        return '51'
-    
-    def get_commission(self, task):
-        return '46000'
-    
-    def get_customers(self, task):
-        return '1000'
+    customer = serializers.SerializerMethodField(read_only=True)
     
 class PlansSerializer(serializers.HyperlinkedModelSerializer):
     plans = serializers.SerializerMethodField(read_only=True)
     subscribers = serializers.SerializerMethodField(read_only=True)
     revenue = serializers.SerializerMethodField(read_only=True)
-    class Meta:
-
-        model = Bazaar
-        fields = ['plans','subscribers','revenue']
-    
-    def get_plans(self, task):
-        return '8'
-
-    def get_subscribers(self, task):
-        return '10000'
-    
-    def get_revenue(self, task):
-        return '150000'
