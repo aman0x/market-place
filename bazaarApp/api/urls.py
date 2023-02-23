@@ -20,6 +20,9 @@ urlpatterns = [
     path('data/<int:pk>/top-wholesellers/', views.BazarViewReportTopWholesellersViewSet.as_view({'get': 'list'}),name="top-wholesellers"),
     path('data/<int:pk>/top-products/', views.BazarViewReportTopProductsViewSet.as_view({'get': 'list'}),name="top-products"),
     path('data/<int:pk>/new-wholesellers/', views.BazarViewReportNewWholesellersViewSet.as_view({'get': 'list'}),name="new-wholesellers"),
+    path('data/<int:pk>/wholesellers-list/', views.BazarWholesellersListViewSet.as_view({'get': 'list'}),name="wholesellers-List"),
+    path('data/<int:pk>/agents-list/', views.BazarAgentsListViewSet.as_view({'get': 'list'}),name="agents-List"),
+    path('data/<int:pk>/products-list/', views.BazarProductsListViewSet.as_view({'get': 'list'}),name="products-List"),
 ]
 
 

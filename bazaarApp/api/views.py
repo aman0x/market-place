@@ -131,3 +131,54 @@ class BazarViewReportNewWholesellersViewSet(viewsets.ModelViewSet):
         if pk:
             queryset=queryset.filter(pk=pk)
         return queryset
+
+class BazarWholesellersListViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Bazaar.objects.all().order_by('id')
+    serializer_class = BazaarWholesellersListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['bazaar_name']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        pk = self.kwargs.get('pk')
+        if pk:
+            queryset=queryset.filter(pk=pk)
+        return queryset
+
+class BazarAgentsListViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Bazaar.objects.all().order_by('id')
+    serializer_class = BazaarAgentsListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['bazaar_name']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        pk = self.kwargs.get('pk')
+        if pk:
+            queryset=queryset.filter(pk=pk)
+        return queryset
+
+class BazarProductsListViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Bazaar.objects.all().order_by('id')
+    serializer_class = BazaarProductsListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['bazaar_name']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        pk = self.kwargs.get('pk')
+        if pk:
+            queryset=queryset.filter(pk=pk)
+        return queryset
