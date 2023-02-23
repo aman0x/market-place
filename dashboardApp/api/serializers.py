@@ -13,7 +13,7 @@ class SummarySerializer(serializers.Serializer):
     customer = serializers.IntegerField(read_only=True)
     
 
-class BazaarReportSerializer(serializers.HyperlinkedModelSerializer):
+class BazaarReportSerializer(serializers.Serializer):
     wholeseller = serializers.SerializerMethodField(read_only=True)
     revenue = serializers.SerializerMethodField(read_only=True)
     bill = serializers.SerializerMethodField(read_only=True)
@@ -21,7 +21,8 @@ class BazaarReportSerializer(serializers.HyperlinkedModelSerializer):
     commission = serializers.SerializerMethodField(read_only=True)
     customer = serializers.SerializerMethodField(read_only=True)
     
-class PlansSerializer(serializers.HyperlinkedModelSerializer):
+
+class PlansSerializer(serializers.Serializer):
     plans = serializers.SerializerMethodField(read_only=True)
     subscribers = serializers.SerializerMethodField(read_only=True)
     revenue = serializers.SerializerMethodField(read_only=True)

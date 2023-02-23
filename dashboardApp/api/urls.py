@@ -9,8 +9,8 @@ router = routers.DefaultRouter()
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('summary/', views.SummaryViewSet.as_view(), name='bazaar-summary'),
-    path('report/', views.SummaryViewSet.as_view(), name='report'),
-    path('plan/', views.SummaryViewSet.as_view(), name='plan'),
+    path('report/', views.BazaarReportViewSet.as_view(), name='report'),
+    path('plan/', views.PlansViewSet.as_view(), name='plan'),
     path('', include(router.urls)),
 ]
 
