@@ -10,7 +10,7 @@ class ParentCategory(models.Model):
     parent_category_ref_image = models.ImageField(
         upload_to="photos/%Y/%m/%d", blank=True)
     parent_category_active = models.BooleanField(default=True)
-    parent_category_added_date = models.DateTimeField(
+    parent_category_added_date = models.DateTimeField(          
         default=datetime.now, blank=True)
     parent_category_updated_date = models.DateTimeField(
         default=datetime.now, blank=True)

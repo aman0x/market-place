@@ -4,6 +4,7 @@ from rest_framework import permissions
 from .serializers import *
 from bazaarApp.models import Bazaar
 from rest_framework import filters
+from wholesellerApp.models import Wholeseller
 
 
 class BazarViewSet(viewsets.ModelViewSet):
