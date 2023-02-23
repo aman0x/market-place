@@ -1,13 +1,26 @@
 from django.db import models
 
-Status_Choice=(
-    ("ACTIVE",'Active'),
-    ('EXPIRED','Expired')
+
+commission_choice=(
+    ("FIXED","Fixed"),
+    ("PERCENTAGE","Percentage")
 )
+class Referral(models.Model):
+    referred_by=models.CharField(max_length=100,default=None,null=True)
+    commission=models.CharField(max_length=20,choices=commission_choice,default="Percentage")
+    enter_percentage=models.CharField(max_length=20,default=None,null=True)
+
+class Selectstate(models.Model):
+    state_name=models.CharField(max_length=30,default=None,null=True)
+    city_name=models.CharField(max_length=30,default=None,null=True)
+
 class Ads(models.Model):
-    Ad_Name=models.CharField(max_length=50,default=None,null=True)
-    Start_Date=models.DateTimeField(auto_now_add=False)
-    End_Date=models.DateTimeField(auto_now_add=False)
-    Created_for=models.CharField(max_length=50,default=None,null=True)
-    Active_for=models.CharField(max_length=50,default=None,null=True)
-    Status=models.CharField(max_length=20,choices=Status_Choice,default="Active")
+    ad_title=models.CharField(max_length=50,default=None,null=True)
+    select_state=models.ManyToManyField(Selectstate,related_name="select_state")
+    created_for=models.CharField(max_length=50,null=True,default=None)
+    start_date=models.DateField(auto_now=False)
+    start_time=models.TimeField(auto_now_add=False)
+    choose_plan=models.CharField(max_length=50,default=True,null=True)
+    gst=models.CharField(max_length=20,default=None,null=True)
+    media=models.ImageField(upload_to="images/agent/",null=True)
+    referral=models.ForeignKey(Referral,on_delete=models.CASCADE)
