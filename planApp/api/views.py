@@ -4,7 +4,7 @@ from.serializers import PlanSerializers,PlanFeatureSerializers
 from planApp.models import Plan,PlanFeatures
 from rest_framework import filters
 
-class Planviewset(viewsets.ModelViewSet):
+class PlanFreeViewSet(viewsets.ModelViewSet):
     queryset=Plan.objects.all().order_by("id")
     serializer_class=PlanSerializers
     filter_backends=[filters.SearchFilter]
