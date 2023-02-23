@@ -1,7 +1,7 @@
 from rest_framework import viewsets, views
 
 from rest_framework import permissions
-from .serializers import BazaarReportSerializer, PlansSerializer, SummarySerializer
+from .serializers import *
 from bazaarApp.models import Bazaar
 from rest_framework.response import Response
 
@@ -40,3 +40,20 @@ class PlansViewSet(views.APIView):
         data = {"plan": 10, "subscriber": 130, "revenue": 10}
         results = PlansSerializer(data).data
         return Response(results)
+
+class PlanListViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    # """
+    queryset = Bazaar.objects.all().order_by('id')
+    serializer_class = PlanListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    
+class BazaarListViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    # """
+    queryset = Bazaar.objects.all().order_by('id')
+    serializer_class = BazaarListSerializer
+    permission_classes = [permissions.IsAuthenticated]

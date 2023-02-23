@@ -15,8 +15,7 @@ class PlanFeatureSerializers(serializers.ModelSerializer):
 
 
 class PlanSerializers(serializers.HyperlinkedModelSerializer):
-    plan_paid=PaidSerializers()
-    plan_features=PlanFeatureSerializers()
+    plan_features=PlanFeatureSerializers(read_only=True)
     class Meta:
         model=Plan
         fields="__all__"
