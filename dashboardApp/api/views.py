@@ -37,6 +37,6 @@ class PlansViewSet(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        data = {"plans": 10, "subscribers": 130, "revenue": 10}
+        data = {"plan": 10, "subscriber": 130, "revenue": 10}
         results = PlansSerializer(data).data
         return Response(results)
