@@ -39,7 +39,11 @@ urlpatterns = [
     path(r'api/subcategory/', include('subCategoryApp.api.urls')),
     path(r'api/product/', include('productApp.api.urls')),
     path(r'api/agency/',include('agencyApp.api.urls')),
+<<<<<<< Updated upstream
     path(r'api/plan/',include('planApp.api.urls')),
+=======
+    path(r'api/plans/',include('planApp.api.urls')),
+>>>>>>> Stashed changes
     path(r'api/ads/',include('adsApp.api.urls')),
     path(r'api/user/',include('profileApp.api.urls')),
 

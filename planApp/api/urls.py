@@ -3,7 +3,7 @@ from rest_framework import routers
 from.import views
 
 router=routers.DefaultRouter()
-router.register(r'data',views.PlanFreeViewSet),
+router.register(r'data',views.Planviewset),
 
 
 urlpatterns=[
