@@ -1,9 +1,9 @@
 from rest_framework import viewsets, views
-
 from rest_framework import permissions
 from .serializers import *
 from bazaarApp.models import Bazaar
 from rest_framework.response import Response
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class SummaryViewSet(views.APIView):
@@ -22,6 +22,8 @@ class BazaarReportViewSet(views.APIView):
     API endpoint that allows groups to be viewed or edited.
     """
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['bazaar', 'state', 'district', 'cities']
 
     def get(self, request):
         data = {"wholeseller": 10, "revenue": 130, "bill": 10,
@@ -48,6 +50,8 @@ class PlanListViewSet(viewsets.ModelViewSet):
     queryset = Bazaar.objects.all().order_by('id')
     serializer_class = PlanListSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['bazaar_name', 'bazaar_state', 'bazaar_district']
 
     
 class BazaarListViewSet(viewsets.ModelViewSet):
