@@ -1,4 +1,5 @@
 from django.db import models
+from locationApp.models import *
 
 
 commission_choice=(
@@ -10,13 +11,10 @@ class Referral(models.Model):
     commission=models.CharField(max_length=20,choices=commission_choice,default="Percentage")
     enter_percentage=models.CharField(max_length=20,default=None,null=True)
 
-class Selectstate(models.Model):
-    state_name=models.CharField(max_length=30,default=None,null=True)
-    city_name=models.CharField(max_length=30,default=None,null=True)
 
 class Ads(models.Model):
     ad_title=models.CharField(max_length=50,default=None,null=True)
-    select_state=models.ManyToManyField(Selectstate,related_name="select_state")
+    select_state=models.ManyToManyField(State,related_name="ads_state")
     created_for=models.CharField(max_length=50,null=True,default=None)
     start_date=models.DateField(auto_now=False)
     start_time=models.TimeField(auto_now_add=False)

@@ -2,16 +2,16 @@ from rest_framework import serializers
 from adsApp.models import Ads,Referral
 
 
-class Referral(serializers.ModelSerializer):
+class ReferralSerializers(serializers.ModelSerializer):
     class Meta:
         model=Referral
-        fields="__all__"
+        fields=["referred_by","commission","enter_percentage"]
 
 
-class AdsSerializer(serializers.HyperlinkedModelSerializer):
+
+
+class AdsSerializers(serializers.ModelSerializer):
     class Meta:
         model=Ads
         fields="__all__"
-
-
     

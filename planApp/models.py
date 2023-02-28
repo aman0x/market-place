@@ -1,10 +1,15 @@
 from django.db import models
 from bazaarApp.models import Bazaar
+from locationApp.models import *
 
 
-class PlanFeatures(models.Model):
+
+class PlanFeaturesProject(models.Model):
     projects=models.CharField(max_length=50,default=None,null=True)
-    subscribes=models.CharField(max_length=50,default=None,null=True)
+
+class PlanFeaturesSubscribers(models.Model):
+    subscribers=models.CharField(max_length=50,default=None,null=True)
+
 
 PLAN_CHOICE=(
     ("PAID","Paid"),
@@ -18,17 +23,15 @@ class Plan(models.Model):
     start_time=models.TimeField(auto_now_add=False)
     end_date=models.DateField(auto_now=False)
     end_time=models.TimeField(auto_now_add=False)
-    plan_features=models.ManyToManyField(PlanFeatures,related_name="plan_features")
-
-    
-class Paid(models.Model):
-    plan=models.ForeignKey(Plan,on_delete=models.CASCADE)
     amount=models.IntegerField(null=True,default=None)
     branches=models.IntegerField(null=True,default=None)
     user_per_branch=models.IntegerField(null=True)
-    bazaar=models.ForeignKey(Bazaar,on_delete=models.CASCADE)
-    state=models.CharField(max_length=100,default=None,null=True)
-    district=models.CharField(max_length=100,default=None,null=True)
-    city=models.CharField(max_length=100,default=None,null=True)
+    bazaar=models.ManyToManyField(Bazaar,related_name="bazaar")
+    state=models.ManyToManyField(State,related_name="plan_state")
+    city=models.ManyToManyField(City,related_name="plan_city")
+    district=models.ManyToManyField(District,related_name="plan_district")
+    plan_features_project=models.ForeignKey(PlanFeaturesProject,on_delete=models.CASCADE)
+    plan_features_subscriber=models.ForeignKey(PlanFeaturesSubscribers,on_delete=models.CASCADE)
 
-
+def __str__(self):
+    return self.firm_name

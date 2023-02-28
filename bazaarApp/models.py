@@ -6,16 +6,18 @@ from datetime import datetime
 from categoryApp.models import Category
 from subCategoryApp.models import SubCategory
 from productApp.models import Product
+from locationApp.models import *
 
-
-    
 
 class Bazaar(models.Model):
     bazaar_description = models.TextField(blank=True, null=True)
     bazaar_name = models.CharField(max_length=200, null=True)
-    bazaar_state = models.CharField(max_length=200, null=True)
-    bazaar_district = models.CharField(max_length=200, null=True)
-    bazaar_city = models.CharField(max_length=200, null=True)
+    bazaar_state = models.ManyToManyField(
+        State, related_name='bazaar_state')
+    bazaar_city = models.ManyToManyField(
+        City, related_name='bazaar_city')
+    bazaar_district = models.ManyToManyField(
+        District, related_name='bazaar_district')
     bazaar_image = models.ImageField(upload_to='images/', null=True)
     bazaar_added_date = models.DateTimeField(
         default=datetime.now, blank=True)

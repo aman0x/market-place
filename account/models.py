@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.dispatch import receiver
 from phonenumber_field.modelfields import PhoneNumberField
 from django.conf import settings
-from locality.models import Locality
+#from locality.models import Locality
 
 import os
 
@@ -14,6 +14,8 @@ def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
     return "user_{id}/{file}".format(id=instance.pk, file=filename)
 
+class Locality(models.Model):
+    locality_name=models.CharField(max_length=50,null=True,default=None)
 
 class Account(models.Model):
     user = models.OneToOneField(
@@ -106,7 +108,12 @@ class Vendor(models.Model):
         return address
 
 
+PAYMENT_CHOICE=(
+    ("CASH","Cash"),
+    ("CREDIT","Credit"),
+)
 class UserPayment(models.Model):
+    payment_choice=models.CharField(max_length=50,choices=PAYMENT_CHOICE,default="Cash")
     payment_user = models.ForeignKey(Account, related_name='payment_account', on_delete=models.CASCADE )
     payment_ref = models.ImageField(
         upload_to=user_directory_path, blank=True)

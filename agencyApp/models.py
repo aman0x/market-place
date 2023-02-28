@@ -1,14 +1,14 @@
 from django.db import models
-
+from locationApp.models import *
 
 class Agency(models.Model):
-    Firm_name=models.CharField(max_length=100,default=None,blank=True)
-    Gst_Number=models.IntegerField()
-    Pan_Number=models.CharField(max_length=20,default=None,blank=True)
-    Address=models.CharField(max_length=50,default=None,blank=True)
-    Landmark=models.CharField(max_length=50,default=None,blank=True)
-    State=models.CharField(max_length=50,default=None,blank=True)
-    City=models.CharField(max_length=50,default=None,blank=True)
-    Pin_code=models.CharField(max_length=20,default=None,blank=True)
-    Gst_image=models.ImageField(upload_to="image/agency/",null=True)
-    PanCard_image=models.ImageField(upload_to='image/agent/',null=True)
+    firm_name=models.CharField(max_length=100,default=None,blank=True)
+    gst_number=models.IntegerField()
+    pan_number=models.CharField(max_length=20,default=None,blank=True)
+    address=models.CharField(max_length=50,default=None,blank=True)
+    landmark=models.CharField(max_length=50,default=None,blank=True)
+    state=models.ManyToManyField(State,related_name="agency_state")
+    city=models.ManyToManyField(City,related_name="agency_city")
+    pin_code=models.CharField(max_length=20,default=None,blank=True)
+    gst_image=models.ImageField(upload_to="image/agency/",null=True)
+    pancard_image=models.ImageField(upload_to='image/agent/',null=True)

@@ -4,6 +4,7 @@ from bazaarApp.models import Bazaar
 from phonenumber_field.modelfields import PhoneNumberField
 from categoryApp.models import Category
 from agencyApp.models import Agency
+from locationApp.models import *
 
 
 AGENT_TYPE = (
@@ -55,9 +56,9 @@ class Agent(models.Model):
     agent_date_of_birth = models.DateTimeField(auto_now_add=False, null=True)
     agent_address=models.CharField(max_length=100,default=None, blank=True, null=True)
     agent_landmark=models.CharField(max_length=100,default=None,blank=True, null=True)
-    agent_state = models.CharField(max_length=200, null=True)
-    agent_district = models.CharField(max_length=200, null=True)
-    agent_city = models.CharField(max_length=200, null=True)
+    agent_state = models.ManyToManyField(State,related_name="agent_state")
+    agent_city = models.ManyToManyField(City,related_name="agent_city")
+    agent_district = models.ManyToManyField(District,related_name="agent_district")
     agent_pincode=models.IntegerField(null=True)
     agent_commision = models.ForeignKey(
         ManageCommision, on_delete=models.CASCADE, null=True)
