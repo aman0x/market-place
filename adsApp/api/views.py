@@ -1,15 +1,17 @@
 from rest_framework import viewsets
-from .serializers import AdsSerializer,SlectStateSerializers,ReferralSerializers
-from adsApp.models import Ads,Selectstate,Referral
+from .serializers import AdsSerializers,ReferralSerializers
+from adsApp.models import Referral,Ads
 from rest_framework import permissions
 
-class AdsViewSets(viewsets.ModelViewSet):   
-    queryset=Ads.objects.all()
-    serializer_class=AdsSerializer
+
+class AdsViewset(viewsets.ModelViewSet):
+    queryset=Ads.objects.all().order_by("id")
+    serializer_class=AdsSerializers
     permission_classes=[permissions.IsAuthenticated]
 
 
-class StateViewSet(viewsets.ModelViewSet):
-    queryset=Selectstate.objects.all()
-    serializer_class=SlectStateSerializers
 
+class ReferralViewsets(viewsets.ModelViewSet):
+    queryset=Referral.objects.all().order_by("id")
+    serializer_class=ReferralSerializers
+    permission_classes=[permissions.IsAuthenticated]
