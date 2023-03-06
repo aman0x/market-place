@@ -52,7 +52,8 @@ class Agent(models.Model):
     agent_number = PhoneNumberField(blank=True , null=True)
     agent_altranate_mobile_number=PhoneNumberField(blank=True,null=True)
     agent_email = models.EmailField(null=True)
-    agent_gender=models.CharField(max_length=10,choices=AGENT_GENDER,default="Male")
+    agent_gender = models.CharField(
+        max_length=10, choices=AGENT_GENDER, default="MALE")
     agent_date_of_birth = models.DateTimeField(auto_now_add=False, null=True)
     agent_address=models.CharField(max_length=100,default=None, blank=True, null=True)
     agent_landmark=models.CharField(max_length=100,default=None,blank=True, null=True)

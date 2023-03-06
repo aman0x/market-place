@@ -1,7 +1,7 @@
 from rest_framework import viewsets,status,generics
 from rest_framework import permissions
-from account.models import User,Account,UserPayment
-from.serializers import UserPaymentSerializer,AccountSerializer,SendPasswordSerializers,LoginSerializer,UserPasswordResetSerialzer
+from account.models import User,Account
+from.serializers import AccountSerializer,SendPasswordSerializers,LoginSerializer,UserPasswordResetSerialzer
 from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -48,11 +48,6 @@ class OTPLoginView(APIView):
 
 
 
-class UserPaymentViewset(viewsets.ModelViewSet):
-    queryset=UserPayment.objects.all().order_by("id")
-    serializer_class=UserPaymentSerializer
-    permission_classes=[permissions.IsAuthenticated]
-    
 
 
 
