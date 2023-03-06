@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework import permissions
-from .serializers import AgentSerializer
-from agentApp.models import Agent
+from .serializers import AgentSerializer,AgentManageCommisionSerializer
+from agentApp.models import Agent,ManageCommision
 from rest_framework import filters
 
 class AgentViewSet(viewsets.ModelViewSet):
@@ -13,3 +13,8 @@ class AgentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = ['agent_name']
+
+class AgentCommisionViewset(viewsets.ModelViewSet):
+    queryset=ManageCommision.objects.all()
+    serializer_class=AgentManageCommisionSerializer
+    permission_classes=[permissions.IsAuthenticated]

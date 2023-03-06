@@ -42,10 +42,10 @@ urlpatterns = [
     path(r'api/plans/',include('planApp.api.urls')),
     path(r'api/ads/',include('adsApp.api.urls')),
     path(r'api/user/',include('profileApp.api.urls')),
-    path(r'api/login_otp/',include('account.urls')),
+    path(r'api/account/',include('account.api.urls')),
     path(r'api/orders/',include("orderApp.api.urls")),
     path(r'api/location/',include("locationApp.api.urls")),
-
+    
     # path(r'api/account/', include('account.api.urls')),
     # path(r'api/bucket/', include('bucket.api.urls'),  name='site_info'),
     # path(r'api/itemmaster/', include('itemmaster.api.urls')),

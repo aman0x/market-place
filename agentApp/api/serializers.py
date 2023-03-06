@@ -11,10 +11,10 @@ class AgentManageCommisionSerializer(serializers.ModelSerializer):
         fields = '__all__'
     
 
-class AgentBazaarSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Bazaar
-        fields = '__all__'
+# class AgentBazaarSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Bazaar
+#         fields = '__all__'
 
 
 class AgentSerializer(serializers.ModelSerializer):
