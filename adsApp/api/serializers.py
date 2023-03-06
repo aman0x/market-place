@@ -5,7 +5,7 @@ from adsApp.models import Ads,Referral
 class ReferralSerializers(serializers.ModelSerializer):
     class Meta:
         model=Referral
-        fields=["referred_by","commission","enter_percentage"]
+        fields="__all__"
 
 
 
