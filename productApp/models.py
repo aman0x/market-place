@@ -19,9 +19,9 @@ class Product(models.Model):
     product_gst_no=models.IntegerField(null=True)
     product_hsn_code=models.IntegerField(null=True)
     product_upload_front_image = models.ImageField(
-        upload_to="photos/%Y/%m/%d", blank=True)
-    product_upload_back_image=models.ImageField(upload_to="photos/%Y/%m/%d",blank=True)
-    product_upload_mrp_label_image=models.ImageField(upload_to="photos/%Y/%m/%d",blank=True)
+        upload_to="photos/%Y/%m/%d", null=True)
+    product_upload_back_image=models.ImageField(upload_to="photos/%Y/%m/%d",null=True)
+    product_upload_mrp_label_image=models.ImageField(upload_to="photos/%Y/%m/%d",null=True)
     product_active = models.BooleanField(default=True)
     product_added_date = models.DateTimeField(
         default=datetime.now, blank=True)
