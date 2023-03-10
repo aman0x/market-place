@@ -9,8 +9,6 @@ class StateSerializer(serializers.ModelSerializer):
         fields="__all__"
 
 class DistrictSerializer(serializers.ModelSerializer):
-    # state = serializers.CharField(source='state.state', read_only=True)
-    
     class Meta:
         model = District
         fields = "__all__"
