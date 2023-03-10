@@ -276,13 +276,6 @@ class BazaarAgentsListSerializer(serializers.ModelSerializer):
             return 'Unknown'
 
 
-    # def get_mobile_number(self, obj):
-    #     agents = obj.agent.all()
-    #     if agents.exists():
-    #         return str(', '.join(agent.agent_number for agent in agents.all()))
-    #     else:
-    #         return ''
-    #       return str(obj.mobile_number) if obj.mobile_number else ''
     def get_mobile_number(self,obj):
            return str(obj.mobile_number) if obj.mobile_number else ''
 
