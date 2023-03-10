@@ -109,10 +109,6 @@ class PlanListViewSet(viewsets.ModelViewSet):
 
          return queryset
 
-
-
-
-
 # class PlanListViewSet(viewsets.ModelViewSet):
 # #     """
 # #     API endpoint that allows groups to be viewed or edited.

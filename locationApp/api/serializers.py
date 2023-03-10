@@ -1,14 +1,14 @@
 from rest_framework import serializers
 from locationApp.models import *
 
+
+
 class StateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = State
-        fields = "__all__"
+        model=State
+        fields="__all__"
 
 class DistrictSerializer(serializers.ModelSerializer):
-    # state = serializers.CharField(source='state.state', read_only=True)
-    
     class Meta:
         model = District
         fields = "__all__"

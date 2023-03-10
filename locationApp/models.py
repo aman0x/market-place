@@ -6,6 +6,7 @@ class State(models.Model):
 
     def __str__(self):
         return self.state
+    
 class District(models.Model):
     district=models.CharField(max_length=30,null=True,default=None)
     state=models.ForeignKey(

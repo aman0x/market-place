@@ -36,7 +36,16 @@ class Bazaar(models.Model):
 
     def username(self):
         return self.user.username
+    
 
+    # def __str__(self):
+    #     return self.bazaar_city+""+self.bazaar_state 
+
+
+    def __str__(self):
+        city_names = ", ".join(str(city) for city in self.bazaar_city.all())
+        state_names = ", ".join(str(state) for state in self.bazaar_state.all())
+        return f"{city_names}, {state_names}"
 
 
 

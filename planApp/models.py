@@ -37,7 +37,6 @@ class Plan(models.Model):
         PlanFeaturesProject, on_delete=models.CASCADE)
     plan_features_subscriber = models.ForeignKey(
         PlanFeaturesSubscribers, on_delete=models.CASCADE)
-
-
-def __str__(self):
-    return self.firm_name
+    
+    def __str__(self):
+        return self.firm_name

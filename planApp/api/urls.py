@@ -3,8 +3,8 @@ from rest_framework import routers
 from.import views
 
 router=routers.DefaultRouter()
-router.register(r'',views.PlanViewSet)
-router.register(r'projects',views.FeaturesProjectViewSet)
+router.register(r'data',views.PlanViewSet),
+router.register(r'projects',views.FeaturesProjectViewSet),
 router.register(r'subscribers',views.FeaturesSubscribersViewSet)
 
 
