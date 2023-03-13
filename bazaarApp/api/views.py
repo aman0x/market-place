@@ -1,5 +1,5 @@
     
-from rest_framework import viewsets
+from rest_framework import viewsets,status
 from rest_framework import permissions
 from .serializers import *
 from bazaarApp.models import Bazaar
@@ -7,10 +7,13 @@ from rest_framework import filters
 from wholesellerApp.models import Wholeseller
 from agentApp.models import Agent
 from locationApp.models import State
-from rest_framework.response import Response
 from django.db.models import Count
 from django.db import models
-
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from django.core.files.base import ContentFile
+from django.core.files.storage import FileSystemStorage
+import csv
 
 class BazarViewSet(viewsets.ModelViewSet):
     """
@@ -182,6 +185,8 @@ class BazarWholesellersListViewSet(viewsets.ModelViewSet):
             queryset=queryset.filter(pk=pk)
         return queryset
 
+
+
 class BazarAgentsListViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
@@ -215,3 +220,54 @@ class BazarProductsListViewSet(viewsets.ModelViewSet):
         if pk:
             queryset=queryset.filter(pk=pk)
         return queryset
+    
+fs=FileSystemStorage(location="temp/")
+
+
+class ProductCsvViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for viewing and editing Product.
+    """
+    queryset = Product.objects.all()
+    serializer_class = ProductBulkUploadSerializer
+
+    @action(detail=False, methods=['POST'])
+    def upload_data(self, request):
+        """Upload data from CSV"""
+        file = request.FILES["file"]
+
+        content = file.read() 
+        file_content = ContentFile(content)
+        file_name = fs.save(
+            "_tmp.csv", file_content
+        )
+        tmp_file = fs.path(file_name)
+
+        csv_file = open(tmp_file, errors="ignore")
+        reader = csv.reader(csv_file)
+        next(reader)
+        
+        product_list = []
+        for id_, row in enumerate(reader):
+            (
+                product_name, 
+                product_brand_name,
+                product_total_weight,
+                product_unit,
+                product_total_mrp,
+                product_per_unit_weight
+            ) = row
+            product_list.append(
+                Product(
+                
+                product_name,
+                product_brand_name,
+                product_per_unit_weight,
+                product_total_weight,
+                product_unit,
+                product_total_mrp,
+
+                )
+            )
+            Product.objects.bulk_create(product_list)
+            return Response("upload sucessfully")

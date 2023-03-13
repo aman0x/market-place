@@ -2,10 +2,8 @@ from rest_framework import serializers
 from bazaarApp.models import Bazaar
 from agentApp.api.serializers import AgentSerializer
 from wholesellerApp.api.serializers import WholesellerSerializer
-from rest_framework import filters
-from django.db.models import Count,Sum
 from agentApp.models  import Agent
-
+from productApp.models import Product
 
 
 class BazaarAgentSerializer(serializers.ModelSerializer):
@@ -189,7 +187,12 @@ class BazaarViewReportNewWholesellersSerializer(serializers.ModelSerializer):
 
     def get_customer_id(self, task):
         return '00010'
-
+    
+class AgentSerializers(serializers.ModelSerializer):
+    agent=serializers.ReadOnlyField(source='agent_name')
+    class Meta:
+        model=Agent
+        field=['id','agent']
 
 class BazaarWholesellersListSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
@@ -204,52 +207,37 @@ class BazaarWholesellersListSerializer(serializers.ModelSerializer):
     class Meta:
 
         model = Bazaar
-        fields = ['id', 'name', 'contact_person',
-                  'city', 'bazaar', 'type','agent',
+        fields = ['id', 'name', 'contact_person','agent',
+                  'city', 'bazaar', 'type',
                   'status', 'enable']
 
     def get_name(self, obj):
-            return obj.wholeseller.all().values_list('wholeseller_name', flat=True)
-
-
+        return obj.wholeseller.all().values_list('wholeseller_name', flat=True)
+    
     def get_contact_person(self, obj):
-            wholesellers = obj.wholeseller.all()
-
-            if wholesellers.exists():
-                return wholesellers.first().wholeseller_contact_per.all()
-            return None
-
-
+        return obj.wholeseller.all().values_list('wholeseller_contact_per', flat=True)
 
     def get_city(self, obj):
-         wholesellers = obj.wholeseller.all()
-         cities = wholesellers.values_list('wholeseller_city', flat=True)
-         return cities
-
+        wholesellers = obj.wholeseller.all()
+        cities = wholesellers.values_list('wholeseller_city', flat=True)
+        return cities
 
     def get_bazaar(self, obj):
         return obj.bazaar_name
-
 
     def get_type(self, obj):
         wholesellers=obj.wholeseller.all()
         wholeseller_type=wholesellers.values_list('wholeseller_type',flat=True)
         return list(set(wholeseller_type))
         
-
     def get_agent(self, obj):
-       wholesellers = obj.wholeseller.all()
-       agent_name = wholesellers.values_list('wholeseller_agent', flat=True)
-       agent_serializer = AgentSerializer(agent_name, many=True)
-       return agent_serializer.data
-          
+        return obj.wholeseller.all().values_list('wholeseller_agent', flat=True)
+
     def get_status(self, task):
         return 'Created'
 
     def get_enable(self, task):
         return True
-
-
 
 class BazaarAgentsListSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
@@ -264,52 +252,42 @@ class BazaarAgentsListSerializer(serializers.ModelSerializer):
 
         model = Bazaar
         fields = ['id', 'name', 'mobile_number',
-                  'city', 'bazaar', 'type',
+                   'bazaar', 'city','type',
                   'status', 'enable']
-
-    
+        
     def get_name(self, obj):
         agents = obj.agent.all()
-        if agents.exists():
-            return ', '.join(agent.agent_name for agent in agents.all())
-        else:
-            return 'Unknown'
+        name = []
+        for agent in agents:
+            name.append(agent.agent_name)
+        return name
 
-
-    # def get_mobile_number(self, obj):
-    #     agents = obj.agent.all()
-    #     if agents.exists():
-    #         return str(', '.join(agent.agent_number for agent in agents.all()))
-    #     else:
-    #         return ''
-    #       return str(obj.mobile_number) if obj.mobile_number else ''
     def get_mobile_number(self,obj):
-           return str(obj.mobile_number) if obj.mobile_number else ''
-
+        agents = obj.agent.all()
+        number = []
+        for agent in agents:
+             number.append(str(agent.agent_number.country_code) 
+                           + str(agent.agent_number.national_number))
+        return number
 
     def get_city(self, obj):
         agents = obj.agent.all()
-        if agents.exists():
-            return ', '.join(agent.agent_city.city_name for agent in agents.all())
-        else:
-            return ''
+        cities = agents.values_list('agent_city', flat=True)
+        return cities
 
-
+    def get_type(self, obj):
+        agents=obj.agent.all()
+        agent_type=agents.values_list('agent_type',flat=True)
+        return list(set(agent_type))
 
     def get_bazaar(self, obj):
         return obj.bazaar_name
 
-    def get_type(self, obj):
-        return obj.agent_type if obj.agent_type else 'Unknown'
-
-        
-
     def get_status(self, task):
         return 'Created'
-
+    
     def get_enable(self, task):
         return True
-
 
 class BazaarProductsListSerializer(serializers.ModelSerializer):
     product_name = serializers.SerializerMethodField(read_only=True)
@@ -328,26 +306,50 @@ class BazaarProductsListSerializer(serializers.ModelSerializer):
                   'group_category', 'category', 'sub_category',
                   'weight', 'mrp', 'active']
 
-    def get_product_name(self, task):
-        return 'Amazon Echo'
+    def get_product_name(self, obj):
+        products = obj.bazaar_product.all()
+        name = []
+        for product in products:
+            name.append(product.product_name)
+        return name
 
-    def get_brand(self, task):
-        return 'amazon'
+    def get_brand(self, obj):
+        products = obj.bazaar_product.all()
+        brand = []
+        for product in products:
+            brand.append(product.product_brand_name)
+        return brand
 
-    def get_group_category(self, task):
-        return 'electronics'
+    def get_group_category(self, obj):
+        products = obj.bazaar_product.all()
+        group_category = products.values_list('product_category_group', flat=True)
+        return group_category
+    
+    def get_category(self, obj):
+        products = obj.bazaar_product.all()
+        category = products.values_list('product_category', flat=True)
+        return category
+    
+    def get_sub_category(self, obj):
+        products = obj.bazaar_product.all()
+        sub_category = products.values_list('product_subcategory', flat=True)
+        return sub_category
 
-    def get_category(self, task):
-        return 'electronics'
-
-    def get_sub_category(self, task):
-        return 'electronics'
-
-    def get_weight(self, task):
-        return '1 Kg'
+    def get_weight(self, tsk):
+        return '10kg'
 
     def get_mrp(self, task):
-        return '15302'
+        return '100'
 
-    def get_active(self, task):
-        return True
+    def get_active(self, obj):
+        products = obj.bazaar_product.all()
+        active = []
+        for product in products:
+            active.append(product.product_active)
+        return active
+
+class ProductBulkUploadSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Product
+        fields = "__all__"
