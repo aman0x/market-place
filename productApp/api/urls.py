@@ -4,7 +4,7 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register(r'data', views.ProductAPIView)
-router.register(r'filter', views.FilterListAPIView)
+router.register(r'filter', views.ProductFilterAPIView)
 
 
 # Wire up our API using automatic URL routing.

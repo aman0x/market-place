@@ -12,10 +12,10 @@ class ProductAPIView(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['product_name']
 
-class FilterListAPIView(viewsets.ModelViewSet):
+class ProductFilterAPIView(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Product.objects.all()
     serializer_class = FilterListSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['product_subcategory','product_category','product_category_group']
+    filterset_fields = ['product_subcategory']
 
