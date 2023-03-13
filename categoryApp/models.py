@@ -10,7 +10,7 @@ class Category(models.Model):
     category_name = models.CharField(max_length=200)
     category_description = models.TextField(blank=True)
     category_ref_image = models.ImageField(
-        upload_to="photos/%Y/%m/%d", blank=True)
+        upload_to="photos/%Y/%m/%d",  null=True)
     category_active = models.BooleanField(default=True)
     category_added_date = models.DateTimeField(
         default=datetime.now, blank=True)
