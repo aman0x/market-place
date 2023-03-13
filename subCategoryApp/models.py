@@ -1,7 +1,7 @@
 from django.db import models
 from datetime import datetime
 from django.conf import settings
-from categoryApp.models import Category
+from categoryApp.models import Category,ParentCategory
 from django.contrib.auth.models import User
 
 
@@ -13,6 +13,7 @@ class SubCategory(models.Model):
     subcategory_active = models.BooleanField(default=True)
     category = models.ForeignKey(
         Category, on_delete=models.CASCADE, related_name='subcategory')
+    category_group = models.ForeignKey(ParentCategory, on_delete=models.CASCADE)
     subcategory_added_date = models.DateTimeField(
         default=datetime.now, blank=True)
     subcategory_updated_date = models.DateTimeField(default=datetime.now, blank=True)
