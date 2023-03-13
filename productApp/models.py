@@ -2,12 +2,16 @@ from django.conf import settings
 from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
-from subCategoryApp.models import SubCategory
+from subCategoryApp.models import SubCategory,Category,ParentCategory
 
 
 class Product(models.Model):
     product_subcategory = models.ForeignKey(
         SubCategory, on_delete=models.CASCADE)
+    product_category = models.ForeignKey(
+        Category, on_delete=models.CASCADE)
+    product_category_group = models.ForeignKey(
+        ParentCategory, on_delete=models.CASCADE)
     product_name = models.CharField(max_length=200)
     product_brand_name=models.CharField(max_length=200)
     product_description = models.TextField(blank=True)

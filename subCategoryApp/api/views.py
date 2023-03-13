@@ -10,4 +10,5 @@ class SubCategoryAPIView(viewsets.ModelViewSet):
     queryset = SubCategory.objects.all()
     serializer_class = SubCategorySerializer
     filter_backends = [filters.SearchFilter]
-    search_fields = ['subcategory_name']
+    search_fields = ['subcategory_name']    
+
