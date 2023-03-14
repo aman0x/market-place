@@ -1,12 +1,10 @@
     
-from rest_framework import viewsets,status
+from rest_framework import viewsets
 from rest_framework import permissions
 from .serializers import *
 from bazaarApp.models import Bazaar
 from rest_framework import filters
-from wholesellerApp.models import Wholeseller
-from agentApp.models import Agent
-from locationApp.models import State
+from productApp.models import Product
 from django.db.models import Count
 from django.db import models
 from rest_framework.response import Response
@@ -255,19 +253,31 @@ class ProductCsvViewSet(viewsets.ModelViewSet):
                 product_total_weight,
                 product_unit,
                 product_total_mrp,
-                product_per_unit_weight
+                product_per_unit_weight,
+                product_mrp,
+                product_updated_by,
+                product_subcategory,
+                product_category,
+                product_category_group
+
             ) = row
             product_list.append(
                 Product(
                 
-                product_name,
-                product_brand_name,
-                product_per_unit_weight,
-                product_total_weight,
-                product_unit,
-                product_total_mrp,
+                product_name=product_name,
+                product_brand_name=product_brand_name,
+                product_per_unit_weight=product_per_unit_weight,
+                product_total_weight=product_total_weight,
+                product_unit=product_unit,
+                product_total_mrp=product_total_mrp,
+                product_mrp=product_mrp,
+                product_updated_by_id=product_updated_by,
+                product_subcategory_id=product_subcategory,
+                product_category_id=product_category,
+                product_category_group_id=product_category_group
+
 
                 )
             )
-            Product.objects.bulk_create(product_list)
-            return Response("upload sucessfully")
+        Product.objects.bulk_create(product_list)
+        return Response("upload sucessfully")
