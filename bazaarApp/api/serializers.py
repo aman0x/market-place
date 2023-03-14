@@ -352,4 +352,6 @@ class ProductBulkUploadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = "__all__"
+        fields =  ["product_name","product_brand_name","product_total_weight",
+                  "product_unit","product_total_mrp","product_per_unit_weight","product_mrp",
+                  "product_updated_by","product_subcategory","product_category","product_category_group"]
