@@ -53,8 +53,10 @@ class Bazaar(models.Model):
     class Meta:
         verbose_name_plural = "bazaars"
 
-    def username(self):
-        return self.user.username
+    def __str__(self):
+        if self.bazaar_name==None:
+            return "Null"
+        return self.bazaar_name
 
 
 
