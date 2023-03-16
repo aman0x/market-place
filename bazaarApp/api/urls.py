@@ -4,19 +4,15 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register(r'data', views.BazarViewSet),
+router.register(r'csv',views.ProductCsvViewSet),
 
 # router.register(r'agent', views.BazarAgentViewSet, 'agent-list')
 # router.register(r'wholeseller', views.BazarWholesellerViewSet, 'wholeseller-list')
-#router.register(r'product', views.BazarProductViewSet, 'product-list')
-# router.register(r'product-list', views.BazarViewReportTopProductsViewSet, 'product-list'),
-# router.register(r'wholesellers-list',views.BazarWholesellersListViewSet,'wholeseller-list'),
-#router.register(r'agent-list',views.BazarAgentsListViewSet,'agent-list')
-# router.register(r'agent-list',views.BazarAgentsListViewSet,'agent-list'),
-router.register(r'csv',views.ProductCsvViewSet)
+# router.register(r'product', views.BazarProductViewSet, 'product-list')
 # router.register(r'top-product',views.BazarProductsListViewSet)
-
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
+
 urlpatterns = [
     path('data/<int:pk>/total-orders/', views.BazarViewReportTotalOrdersViewSet.as_view({'get': 'list'}),name="total-orders"),
     path('data/<int:pk>/total-income/', views.BazarViewReportTotalIncomeViewSet.as_view({'get': 'list'}),name="total-income"),

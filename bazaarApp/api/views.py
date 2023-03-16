@@ -13,6 +13,31 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage
 import csv
 
+# class BazarAgentViewSet(viewsets.ModelViewSet):
+#     """
+#     API endpoint that allows groups to be viewed or edited.
+#     """
+#     queryset = Bazaar.objects.all().order_by('id')
+#     serializer_class = BazaarAgentSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+
+# class BazarWholesellerViewSet(viewsets.ModelViewSet):
+#     """
+#     API endpoint that allows groups to be viewed or edited.
+#     """
+#     queryset = Bazaar.objects.all().order_by('id')
+#     serializer_class = BazaarWholesellerSerializer
+#     permission_classes = [permissions.IsAuthenticated]    
+
+# class BazarProductViewSet(viewsets.ModelViewSet):
+#     """
+#     API endpoint that allows groups to be viewed or edited.
+#     """
+#     queryset = Bazaar.objects.all().order_by('id')
+#     serializer_class = BazaarProductSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+
+
 class BazarViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
@@ -34,32 +59,6 @@ class BazarViewSet(viewsets.ModelViewSet):
         return qs
 
 
-class BazarAgentViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Bazaar.objects.all().order_by('id')
-    serializer_class = BazaarAgentSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-class BazarWholesellerViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Bazaar.objects.all().order_by('id')
-    serializer_class = BazaarWholesellerSerializer
-    permission_classes = [permissions.IsAuthenticated]    
-
-class BazarProductViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Bazaar.objects.all().order_by('id')
-    serializer_class = BazaarProductSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    
-
 class BazarViewReportTotalOrdersViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
@@ -75,6 +74,7 @@ class BazarViewReportTotalOrdersViewSet(viewsets.ModelViewSet):
             queryset=queryset.filter(pk=pk)
         return queryset
 
+
 class BazarViewReportTotalIncomeViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
@@ -89,6 +89,7 @@ class BazarViewReportTotalIncomeViewSet(viewsets.ModelViewSet):
         if pk:
             queryset=queryset.filter(pk=pk)
         return queryset
+
 
 class BazarViewReportCityWiseViewSet(viewsets.ModelViewSet):
     """
@@ -135,6 +136,7 @@ class BazarViewReportTopWholesellersViewSet(viewsets.ModelViewSet):
             queryset=queryset.filter(pk=pk)
         return queryset
 
+
 class BazarViewReportTopProductsViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
@@ -166,6 +168,7 @@ class BazarViewReportNewWholesellersViewSet(viewsets.ModelViewSet):
             queryset=queryset.filter(pk=pk)
         return queryset
 
+
 class BazarWholesellersListViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
@@ -182,7 +185,6 @@ class BazarWholesellersListViewSet(viewsets.ModelViewSet):
         if pk:
             queryset=queryset.filter(pk=pk)
         return queryset
-
 
 
 class BazarAgentsListViewSet(viewsets.ModelViewSet):
@@ -202,6 +204,7 @@ class BazarAgentsListViewSet(viewsets.ModelViewSet):
             queryset=queryset.filter(pk=pk)
         return queryset
 
+
 class BazarProductsListViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
@@ -219,8 +222,8 @@ class BazarProductsListViewSet(viewsets.ModelViewSet):
             queryset=queryset.filter(pk=pk)
         return queryset
     
-fs=FileSystemStorage(location="temp/")
 
+fs=FileSystemStorage(location="temp/")
 
 class ProductCsvViewSet(viewsets.ModelViewSet):
     """
