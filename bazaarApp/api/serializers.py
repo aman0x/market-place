@@ -311,46 +311,28 @@ class BazaarProductsListSerializer(serializers.ModelSerializer):
                   'weight', 'mrp', 'active']
 
     def get_product_name(self, obj):
-        products = obj.bazaar_product.all()
-        name = []
-        for product in products:
-            name.append(product.product_name)
-        return name
-
+        return obj.product_bazaar.all().values_list('product_name', flat=True)
+    
     def get_brand(self, obj):
-        products = obj.bazaar_product.all()
-        brand = []
-        for product in products:
-            brand.append(product.product_brand_name)
-        return brand
-
+        return obj.product_bazaar.all().values_list('product_brand_name', flat=True)
+    
     def get_group_category(self, obj):
-        products = obj.bazaar_product.all()
-        group_category = products.values_list('product_category_group', flat=True)
-        return group_category
+        return obj.parent_category_bazaar.all().values_list('parent_category_name', flat=True)
     
     def get_category(self, obj):
-        products = obj.bazaar_product.all()
-        category = products.values_list('product_category', flat=True)
-        return category
+        return obj.category_bazaar.all().values_list('category_name', flat=True)
     
     def get_sub_category(self, obj):
-        products = obj.bazaar_product.all()
-        sub_category = products.values_list('product_subcategory', flat=True)
-        return sub_category
+        return obj.subcategory_bazaar.all().values_list('subcategory_name', flat=True)
 
     def get_weight(self, tsk):
         return '10kg'
 
     def get_mrp(self, task):
         return '100'
-
+    
     def get_active(self, obj):
-        products = obj.bazaar_product.all()
-        active = []
-        for product in products:
-            active.append(product.product_active)
-        return active
+        return obj.product_bazaar.all().values_list('product_active', flat=True)
 
 
 class ProductBulkUploadSerializer(serializers.ModelSerializer):
