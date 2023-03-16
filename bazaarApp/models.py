@@ -53,8 +53,8 @@ class Bazaar(models.Model):
     class Meta:
         verbose_name_plural = "bazaars"
 
-    def __str__(self):
-        return self.bazaar_name
+    def username(self):
+        return self.user.username
 
 
 
