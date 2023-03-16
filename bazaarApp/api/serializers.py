@@ -4,33 +4,35 @@ from agentApp.api.serializers import AgentSerializer
 from wholesellerApp.api.serializers import WholesellerSerializer
 from agentApp.models  import Agent
 from productApp.models import Product
+from parentCategoryApp.models import ParentCategory
 
 
-class BazaarAgentSerializer(serializers.ModelSerializer):
-    agent = AgentSerializer(many=True, read_only=True)
+# class BazaarAgentSerializer(serializers.ModelSerializer):
+#     agent = AgentSerializer(many=True, read_only=True)
 
-    class Meta:
-        model = Bazaar
-        fields = "__all__"
-
-
-class BazaarWholesellerSerializer(serializers.ModelSerializer):
-    wholeseller = WholesellerSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Bazaar
-        fields = "__all__"
+#     class Meta:
+#         model = Bazaar
+#         fields = "__all__"
 
 
-class BazaarProductSerializer(serializers.ModelSerializer):
-    agent = serializers.StringRelatedField(many=True)
+# class BazaarWholesellerSerializer(serializers.ModelSerializer):
+#     wholeseller = WholesellerSerializer(many=True, read_only=True)
 
-    class Meta:
-        model = Bazaar
-        fields = "__all__"
+#     class Meta:
+#         model = Bazaar
+#         fields = "__all__"
+
+
+# class BazaarProductSerializer(serializers.ModelSerializer):
+#     agent = serializers.StringRelatedField(many=True)
+
+#     class Meta:
+#         model = Bazaar
+#         fields = "__all__"
 
 
 class BazaarSerializer(serializers.ModelSerializer):
+    category_group = serializers.SerializerMethodField(read_only=True)
     wholesellers = serializers.SerializerMethodField(read_only=True)
     agents = serializers.SerializerMethodField(read_only=True)
     states = serializers.SerializerMethodField(read_only=True)
@@ -57,10 +59,10 @@ class BazaarSerializer(serializers.ModelSerializer):
 
     def get_bills(self, obj):
         return
-    #     bills = obj.bill.all()
-    #     serializer = BillSerializer(bills, many=True)
-    #     return serializer.data
-
+    
+    def get_category_group(self, obj):
+        return obj.parent_category_bazaar.all().values_list('parent_category_name', flat=True)
+    
 
 class BazaarViewReportTotalOrdersSerializer(serializers.ModelSerializer):
     total_orders = serializers.SerializerMethodField(read_only=True)
@@ -106,8 +108,6 @@ class BazaarViewReportCityWiseSerializer(serializers.ModelSerializer):
         return
         
 
-
-
 class BazaarViewReportTopWholesellersSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
     city = serializers.SerializerMethodField(read_only=True)
@@ -126,7 +126,7 @@ class BazaarViewReportTopWholesellersSerializer(serializers.ModelSerializer):
         return obj.bazaar_city.name
 
     def get_orders(self, obj):
-        orders = obj.orders.all()
+        orders = obj.bazaar_product.all()
         total_orders = orders.count()  
         return total_orders
 
@@ -187,12 +187,14 @@ class BazaarViewReportNewWholesellersSerializer(serializers.ModelSerializer):
 
     def get_customer_id(self, task):
         return '00010'
-    
+
+
 class AgentSerializers(serializers.ModelSerializer):
     agent=serializers.ReadOnlyField(source='agent_name')
     class Meta:
         model=Agent
         field=['id','agent']
+
 
 class BazaarWholesellersListSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
@@ -238,6 +240,7 @@ class BazaarWholesellersListSerializer(serializers.ModelSerializer):
 
     def get_enable(self, task):
         return True
+
 
 class BazaarAgentsListSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField(read_only=True)
@@ -288,6 +291,7 @@ class BazaarAgentsListSerializer(serializers.ModelSerializer):
     
     def get_enable(self, task):
         return True
+
 
 class BazaarProductsListSerializer(serializers.ModelSerializer):
     product_name = serializers.SerializerMethodField(read_only=True)
@@ -347,6 +351,7 @@ class BazaarProductsListSerializer(serializers.ModelSerializer):
         for product in products:
             active.append(product.product_active)
         return active
+
 
 class ProductBulkUploadSerializer(serializers.ModelSerializer):
 
