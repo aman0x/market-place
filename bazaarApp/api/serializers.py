@@ -61,7 +61,7 @@ class BazaarSerializer(serializers.ModelSerializer):
         return
     
     def get_category_group(self, obj):
-        return obj.parent_category_bazaar.all().values_list('parent_category_name', flat=True)
+        return obj.parent_category_bazaar.all().values('id','parent_category_name')
     
 
 class BazaarViewReportTotalOrdersSerializer(serializers.ModelSerializer):
