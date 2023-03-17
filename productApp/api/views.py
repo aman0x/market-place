@@ -17,5 +17,5 @@ class ProductFilterAPIView(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = FilterListSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['product_subcategory']
+    filterset_fields = ['bazaar','category_group','category','subcategory']
 
