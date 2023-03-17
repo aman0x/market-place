@@ -59,6 +59,22 @@ class BazarViewSet(viewsets.ModelViewSet):
         return qs
 
 
+class BazarDashboardViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    # """
+    queryset = Bazaar.objects.all().order_by('id')
+    serializer_class = BazaarDashboardSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        pk = self.kwargs.get('pk')
+        if pk:
+            queryset=queryset.filter(pk=pk)
+        return queryset
+
+
 class BazarViewReportTotalOrdersViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
@@ -106,19 +122,19 @@ class BazarViewReportCityWiseViewSet(viewsets.ModelViewSet):
             queryset=queryset.filter(pk=pk)
         return queryset
     
-    def get_queryset(self):
-        return Bazaar.objects.prefetch_related('bazaar_city', 'bazaar_product')
+    # def get_queryset(self):
+    #     return Bazaar.objects.prefetch_related('bazaar_city')
 
-    def list_cities(self, request):
-        queryset = self.filter_queryset(self.get_queryset())
-        cities = queryset.annotate(order_count=Count('bazaar_product')).values_list('bazaar_city__name', 'order_count')
-        data = {}
-        for city, order_count in cities:
-            if city in data:
-                data[city] += order_count
-            else:
-                data[city] = order_count
-        return Response(data)
+    # def list_cities(self, request):
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #     cities = queryset.annotate(order_count=Count('bazaar_product')).values_list('bazaar_city__name', 'order_count')
+    #     data = {}
+    #     for city, order_count in cities:
+    #         if city in data:
+    #             data[city] += order_count
+    #         else:
+    #             data[city] = order_count
+    #     return Response(data)
 
 
 class BazarViewReportTopWholesellersViewSet(viewsets.ModelViewSet):
