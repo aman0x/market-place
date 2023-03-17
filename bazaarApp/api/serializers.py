@@ -64,6 +64,38 @@ class BazaarSerializer(serializers.ModelSerializer):
         return obj.parent_category_bazaar.all().values('id','parent_category_name')
     
 
+class BazaarDashboardSerializer(serializers.ModelSerializer):
+    wholesellers = serializers.SerializerMethodField(read_only=True)
+    earnings = serializers.SerializerMethodField(read_only=True)
+    bills = serializers.SerializerMethodField(read_only=True)
+    agents = serializers.SerializerMethodField(read_only=True)
+    commission = serializers.SerializerMethodField(read_only=True)
+    customer = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+
+        model = Bazaar
+        fields = '__all__'
+
+    def get_wholesellers(self, obj):
+        return obj.wholeseller.count()
+
+    def get_earnings(self,obj):
+        return
+
+    def get_bills(self, obj):
+        return
+    
+    def get_agents(self, obj):
+        return obj.agent.count()
+    
+    def get_commission(self, obj):
+        return
+   
+    def get_customer(self, obj):
+        return
+
+
 class BazaarViewReportTotalOrdersSerializer(serializers.ModelSerializer):
     total_orders = serializers.SerializerMethodField(read_only=True)
 
@@ -102,10 +134,10 @@ class BazaarViewReportCityWiseSerializer(serializers.ModelSerializer):
         return obj.bazaar_city.count()
 
     def get_orders(self, obj):
-        return obj.bazaar_product.count()
+        return 12000
 
     def get_sales(self, obj):
-        return
+        return 10000
         
 
 class BazaarViewReportTopWholesellersSerializer(serializers.ModelSerializer):
@@ -120,15 +152,18 @@ class BazaarViewReportTopWholesellersSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'city', 'orders', 'sales']
 
     def get_name(self,obj):
-        return obj.name
+        return obj.wholeseller.all().values_list('wholeseller_name')
 
     def get_city(self, obj):
-        return obj.bazaar_city.name
-
+        return obj.wholeseller.all().values_list('wholeseller_city__city')
+    
     def get_orders(self, obj):
-        orders = obj.bazaar_product.all()
-        total_orders = orders.count()  
-        return total_orders
+        return 10000
+
+    # def get_orders(self, obj):
+    #     orders = obj.bazaar_product.all()
+    #     total_orders = orders.count()  
+    #     return total_orders
 
 
     def get_sales(self, obj):
@@ -146,23 +181,14 @@ class BazaarViewReportTopProductsSerializer(serializers.ModelSerializer):
         model = Bazaar
         fields = ['id', 'item', 'price', 'sold', 'sales']
 
+    # def get_item(self, obj):
+    #     return [product.product_name for product in obj.bazaar_product.all()]
+
     def get_item(self, obj):
-        return [product.product_name for product in obj.bazaar_product.all()]
-
-
-    def get_price(self, task):
-        return "100"
-        # order_products = obj.orders_set.first().Product.all()  # get all products in the first order associated with the Bazaar object
-        # total_price = sum([product.price for product in order_products])  # calculate the total price of all products in the order
-        # return total_price if order_products else None
-
-        # products = obj.bazaar_product.all()
-        # return [product.price for product in products]
-     
-    # def get_price(self, obj):
-    #     product = obj.bazaar_product.first()
-    #     return product.price if product else None
-
+        return obj.product_bazaar.all().values_list('product_name')
+    
+    def get_price(self, obj):
+        return obj.product_bazaar.all().values_list('product_mrp')
     
     def get_sold(self, task):
         # products = obj.bazaar_product.all()
