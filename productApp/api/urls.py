@@ -11,5 +11,7 @@ router.register(r'filter', views.ProductFilterAPIView)
 # Additionally, we include login URLs for the browsable API.
 
 urlpatterns = [
+    path('unit/', views.ProductUnitAPIView.as_view(), name="unit"),
+    path('weight/', views.ProductWeightAPIView.as_view(), name="weight"),
     path('', include(router.urls)),
 ]
