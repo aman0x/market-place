@@ -31,6 +31,10 @@ AGENT_GENDER=(
     ("FEMALE","Female")
 )
 
+AGENT_CATEGORY=(
+    ("AGENT","Agent"),
+)
+
 
 class ManageCommision(models.Model):
     
@@ -49,12 +53,16 @@ class Agent(models.Model):
                   choices=AGENT_TYPE,
                   default="INDIVIDUAL"
                 )
+    agent_category = models.CharField(max_length=11,
+                  choices=AGENT_CATEGORY,
+                  default="AGENT"
+                )
     agent_number = PhoneNumberField(blank=True , null=True)
     agent_altranate_mobile_number=PhoneNumberField(blank=True,null=True)
     agent_email = models.EmailField(null=True)
     agent_gender = models.CharField(
         max_length=10, choices=AGENT_GENDER, default="MALE")
-    agent_date_of_birth = models.DateTimeField(auto_now_add=False, null=True)
+    agent_date_of_birth = models.DateField(auto_now_add=False, null=True)
     agent_address=models.CharField(max_length=100,default=None, blank=True, null=True)
     agent_landmark=models.CharField(max_length=100,default=None,blank=True, null=True)
     agent_state = models.ManyToManyField(State,related_name="agent_state")
@@ -63,7 +71,7 @@ class Agent(models.Model):
     agent_pincode=models.IntegerField(null=True)
     agent_commision = models.ForeignKey(
         ManageCommision, on_delete=models.CASCADE, null=True)
-    agent_adharcard_no = models.IntegerField(null=True)
+    agent_adharcard_no = models.CharField(max_length=12,default=None, blank=True, null=True)
     agent_adhar_front_image=models.ImageField(upload_to="image/agent/",null=True)
     agent_adhar_back_image=models.ImageField(upload_to="image/agent/",default=None ,null=True)
     agent_pancard_image=models.ImageField(upload_to="image/agent/",default=None, null=True)
