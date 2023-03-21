@@ -31,9 +31,9 @@ AGENT_GENDER=(
     ("FEMALE","Female")
 )
 
-AGENT_CATEGORY=(
-    ("AGENT","Agent"),
-)
+# AGENT_CATEGORY=(
+#     ("AGENT","Agent"),
+# )
 
 
 class ManageCommision(models.Model):
@@ -53,10 +53,10 @@ class Agent(models.Model):
                   choices=AGENT_TYPE,
                   default="INDIVIDUAL"
                 )
-    agent_category = models.CharField(max_length=11,
-                  choices=AGENT_CATEGORY,
-                  default="AGENT"
-                )
+    # agent_category = models.CharField(max_length=11,
+    #               choices=AGENT_CATEGORY,
+    #               default="AGENT"
+    #             )
     agent_number = PhoneNumberField(blank=True , null=True)
     agent_altranate_mobile_number=PhoneNumberField(blank=True,null=True)
     agent_email = models.EmailField(null=True)
