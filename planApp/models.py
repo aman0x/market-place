@@ -7,7 +7,7 @@ class PlanFeatures(models.Model):
     feature = models.CharField(max_length=50, default=None, null=True)
 
     def __str__(self):
-        return self.projects
+        return self.feature
 
 PLAN_CHOICE = (
     ("PAID", "Paid"),
