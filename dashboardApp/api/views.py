@@ -9,7 +9,7 @@ from agentApp.models import Agent
 from django.db.models import Sum,Count
 from planApp.models import Plan
 from decimal import Decimal
-from planApp.models import PlanFeaturesSubscribers
+# from planApp.models import PlanFeaturesSubscribers
 from django.db import models
 
 
@@ -72,12 +72,12 @@ class PlansViewSet(views.APIView):
 
     def get(self, request):
         plans_count = Plan.objects.count()
-        subscribers_count = PlanFeaturesSubscribers.objects.values('plan').annotate(count=Count('subscribers')).count()
+        # subscribers_count = PlanFeaturesSubscribers.objects.values('plan').annotate(count=Count('subscribers')).count()
         #revenue_sum = PlanFeaturesSubscribers.objects.aggregate(sum=Sum('amount'))['sum'] or 0
         
         data = {
             'plan': plans_count,
-            'subscriber': subscribers_count,
+            # 'subscriber': subscribers_count,
             #'revenue': revenue_sum
         }
         
