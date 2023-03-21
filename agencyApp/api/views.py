@@ -8,4 +8,4 @@ from agencyApp.models import Agency
 class AgencyViewset(viewsets.ModelViewSet):
     queryset=Agency.objects.all()
     serializer_class=AgencySerializers
-    permission_classes=[permissions.IsAuthenticated]
+    permission_classes=[permissions.AllowAny]

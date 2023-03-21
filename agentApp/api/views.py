@@ -10,11 +10,11 @@ class AgentViewSet(viewsets.ModelViewSet):
     """
     queryset = Agent.objects.all()
     serializer_class = AgentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     filter_backends = [filters.SearchFilter]
     search_fields = ['agent_name']
 
 class AgentCommisionViewset(viewsets.ModelViewSet):
     queryset=ManageCommision.objects.all()
     serializer_class=AgentManageCommisionSerializer
-    permission_classes=[permissions.IsAuthenticated]
+    permission_classes=[permissions.AllowAny]
