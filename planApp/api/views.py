@@ -10,7 +10,7 @@ class PlanViewSet(viewsets.ModelViewSet):
     filter_backends=[filters.SearchFilter]
     serializer_class=PlanSerializer
     permission_classes=[permissions.IsAuthenticated]
-    search_fields=['']
+    search_fields=['firm_name']
     
 
     # def get_queryset(self):
