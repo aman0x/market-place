@@ -31,10 +31,6 @@ AGENT_GENDER=(
     ("FEMALE","Female")
 )
 
-# AGENT_CATEGORY=(
-#     ("AGENT","Agent"),
-# )
-
 
 class ManageCommision(models.Model):
     
@@ -44,7 +40,6 @@ class ManageCommision(models.Model):
 
 
 class Agent(models.Model):  
-    
     agent_bazaar = models.ManyToManyField(Bazaar, related_name="agent")
     agency=models.ForeignKey(Agency,on_delete=models.CASCADE)
     agent_description = models.TextField(blank=True, null=True)
@@ -53,10 +48,6 @@ class Agent(models.Model):
                   choices=AGENT_TYPE,
                   default="INDIVIDUAL"
                 )
-    # agent_category = models.CharField(max_length=11,
-    #               choices=AGENT_CATEGORY,
-    #               default="AGENT"
-    #             )
     agent_number = PhoneNumberField(blank=True , null=True)
     agent_altranate_mobile_number=PhoneNumberField(blank=True,null=True)
     agent_email = models.EmailField(null=True)
@@ -65,9 +56,15 @@ class Agent(models.Model):
     agent_date_of_birth = models.DateField(auto_now_add=False, null=True)
     agent_address=models.CharField(max_length=100,default=None, blank=True, null=True)
     agent_landmark=models.CharField(max_length=100,default=None,blank=True, null=True)
-    agent_state = models.ManyToManyField(State,related_name="agent_state")
-    agent_city = models.ManyToManyField(City,related_name="agent_city")
-    agent_district = models.ManyToManyField(District,related_name="agent_district")
+    agent_state = models.ForeignKey(
+        State, on_delete=models.CASCADE, null=True, related_name="agent_state")
+    agent_city = models.ForeignKey(
+        City,  on_delete=models.CASCADE, null=True, related_name="agent_city")
+    agent_district = models.ForeignKey(
+        District,  on_delete=models.CASCADE, null=True, related_name="agent_district")
+    agent_assigned_state = models.ManyToManyField(State,related_name="agent_assigned_state")
+    agent_assigned_city = models.ManyToManyField(City,related_name="agent_assigned_city")
+    agent_assigned_district = models.ManyToManyField(District,related_name="agent_assigned_district")
     agent_pincode=models.IntegerField(null=True)
     agent_commision = models.ForeignKey(
         ManageCommision, on_delete=models.CASCADE, null=True)
@@ -78,7 +75,7 @@ class Agent(models.Model):
     agent_pancard_no = models.CharField(max_length=50, default=None, blank=True, null=True)
     agent_image = models.ImageField(upload_to='images/agent/', null=True)
     agent_status = models.CharField(max_length=20, choices= AGENT_STATUS, default="CREATED")
-    is_active = ()
+    agent_active = models.BooleanField(default=False)
 
 
 

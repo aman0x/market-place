@@ -2,6 +2,7 @@ from rest_framework import viewsets
 from rest_framework import permissions
 from .serializers import *
 from locationApp.models import *
+from bazaarApp.models import Bazaar
 
 
 
@@ -69,3 +70,18 @@ class CityGroupByViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+class StateGroupByBazaarViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Bazaar.objects.all().order_by('id')
+    serializer_class = StateGroupByBazaarSerializer
+    permission_classes = [permissions.IsAuthenticated]
+        
+    def get_queryset(self):
+        ids = self.request.query_params.get('ids')
+        if ids:
+            ids = ids.split(',')
+            return self.queryset.filter(id__in=ids)
+        return self.queryset.none()
+       
