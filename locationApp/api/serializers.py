@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from locationApp.models import *
+from bazaarApp.models import Bazaar
 
 
 
@@ -35,3 +36,9 @@ class CityGroupBySerializer(serializers.ModelSerializer):
         fields = ['district', 'district_name', 'city']
     def get_city(self, obj):
         return list(City.objects.filter(district= obj.district).values("id", "city"))
+    
+class StateGroupByBazaarSerializer(serializers.ModelSerializer):
+    bazaar = serializers.ReadOnlyField(source='id')
+    class Meta:
+        model = Bazaar
+        fields = ['bazaar','bazaar_name','bazaar_state']

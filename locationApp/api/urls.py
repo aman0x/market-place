@@ -8,6 +8,7 @@ router.register(r'city', views.CityViewSet)
 router.register(r'district', views.DistrictViewSet)
 router.register(r'g-dist', views.DistrictGroupByViewSet)
 router.register(r'g-city', views.CityGroupByViewSet)
+router.register(r'g-state', views.StateGroupByBazaarViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
