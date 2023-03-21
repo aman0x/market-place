@@ -41,7 +41,8 @@ class ManageCommision(models.Model):
 
 class Agent(models.Model):  
     agent_bazaar = models.ManyToManyField(Bazaar, related_name="agent")
-    agency=models.ForeignKey(Agency,on_delete=models.CASCADE)
+    agency=models.ForeignKey(
+        Agency,on_delete=models.CASCADE, null=True, related_name="agent_agency")
     agent_description = models.TextField(blank=True, null=True)
     agent_name = models.CharField(max_length=200)
     agent_type = models.CharField(max_length=11,
