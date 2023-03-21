@@ -4,13 +4,12 @@ from.import views
 
 router=routers.DefaultRouter()
 router.register(r'data',views.PlanViewSet),
-router.register(r'projects',views.FeaturesProjectViewSet),
-router.register(r'subscribers',views.FeaturesSubscribersViewSet)
+router.register(r'features',views.FeaturesViewSet),
 
 
 
 urlpatterns=[
     path('',include(router.urls)),
-    path('plans/<str:type>/', views.PlanViewSet.as_view({'get': 'list'})),
+    # path('plans/<str:type>/', views.PlanViewSet.as_view({'get': 'list'})),
 
 ]

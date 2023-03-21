@@ -3,19 +3,16 @@ from bazaarApp.models import Bazaar
 from locationApp.models import *
 import datetime
 
-class PlanFeaturesProject(models.Model):
+class PlanFeatures(models.Model):
     projects = models.CharField(max_length=50, default=None, null=True)
 
-
-class PlanFeaturesSubscribers(models.Model):
-    subscribers = models.CharField(max_length=50, default=None, null=True)
-
+    def __str__(self):
+        return self.projects
 
 PLAN_CHOICE = (
     ("PAID", "Paid"),
     ("FREE", "Free")
 )
-
 
 class Plan(models.Model):
     plan_choice = models.CharField(
@@ -33,10 +30,9 @@ class Plan(models.Model):
     state = models.ManyToManyField(State, related_name="plan_state")
     city = models.ManyToManyField(City, related_name="plan_city")
     district = models.ManyToManyField(District, related_name="plan_district")
-    plan_features_project = models.ForeignKey(
-        PlanFeaturesProject, on_delete=models.CASCADE)
-    plan_features_subscriber = models.ForeignKey(
-        PlanFeaturesSubscribers, on_delete=models.CASCADE)
+    plan_features = models.ManyToManyField(
+        PlanFeatures,  related_name="plan_features")
+
     
     def __str__(self):
         return self.firm_name

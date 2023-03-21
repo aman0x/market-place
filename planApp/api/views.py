@@ -8,8 +8,9 @@ from rest_framework.response import Response
 class PlanViewSet(viewsets.ModelViewSet):
     queryset=Plan.objects.all().order_by("id")
     filter_backends=[filters.SearchFilter]
-    search_fields=['']
+    serializer_class=PlanSerializer
     permission_classes=[permissions.IsAuthenticated]
+    search_fields=['']
     
 
     # def get_queryset(self):
@@ -21,20 +22,15 @@ class PlanViewSet(viewsets.ModelViewSet):
     #     return queryset
    
 
-    def get_serializer_class(self):
-        plan_type = self.request.query_params.get('type', None)
-        if plan_type == 'free':
-            return PlanFreeSerializer
-        elif plan_type == 'paid':
-            return PlanPaidSerializer
-        return PlanPaidSerializer
+    # def get_serializer_class(self):
+    #     plan_type = self.request.query_params.get('type', None)
+    #     if plan_type == 'free':
+    #         return PlanFreeSerializer
+    #     elif plan_type == 'paid':
+    #         return PlanPaidSerializer
+    #     return PlanPaidSerializer
 
-class FeaturesProjectViewSet(viewsets.ModelViewSet):
-    queryset=PlanFeaturesProject.objects.all().order_by("id")
-    serializer_class=FeaturesProjectSerializer
-    permission_classes=[permissions.IsAuthenticated]
-
-class FeaturesSubscribersViewSet(viewsets.ModelViewSet):
-    queryset=PlanFeaturesSubscribers.objects.all().order_by("id")
-    serializer_class=FeaturesSubscribersSerializer
+class FeaturesViewSet(viewsets.ModelViewSet):
+    queryset=PlanFeatures.objects.all().order_by("id")
+    serializer_class=FeaturesSerializer
     permission_classes=[permissions.IsAuthenticated]
