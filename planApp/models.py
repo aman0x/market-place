@@ -4,7 +4,7 @@ from locationApp.models import *
 import datetime
 
 class PlanFeatures(models.Model):
-    projects = models.CharField(max_length=50, default=None, null=True)
+    feature = models.CharField(max_length=50, default=None, null=True)
 
     def __str__(self):
         return self.projects
