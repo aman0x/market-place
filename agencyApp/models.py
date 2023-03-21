@@ -3,7 +3,7 @@ from locationApp.models import *
 
 class Agency(models.Model):
     firm_name=models.CharField(max_length=100,default=None,blank=True)
-    gst_number=models.IntegerField()
+    gst_number=models.CharField(max_length=15,default=None, blank=True, null=True)
     pan_number=models.CharField(max_length=20,default=None,blank=True)
     address=models.CharField(max_length=50,default=None,blank=True)
     landmark=models.CharField(max_length=50,default=None,blank=True)
