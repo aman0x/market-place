@@ -9,6 +9,10 @@ class Language(models.Model):
     updated_date = models.DateTimeField(default=datetime.now, blank=True)
     updated_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='language_updated_by', default='')
+    
+
+    def __str__(self):
+        return self.name
 
 
 

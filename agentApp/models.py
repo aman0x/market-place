@@ -38,6 +38,9 @@ class ManageCommision(models.Model):
         max_length=15, choices=AGENT_COMMISION, default="PERPLAN")
     agent_commision_value = models.IntegerField(blank=True, null=True)
 
+    def __str__(self):
+        return self.agent_manage_commision
+
 
 class Agent(models.Model):  
     agent_bazaar = models.ManyToManyField(Bazaar, related_name="agent")
@@ -77,6 +80,10 @@ class Agent(models.Model):
     agent_image = models.ImageField(upload_to='images/agent/', null=True)
     agent_status = models.CharField(max_length=20, choices= AGENT_STATUS, default="CREATED")
     agent_active = models.BooleanField(default=False)
+
+
+    def __str__(self):
+        return self.agent_name
 
 
 
