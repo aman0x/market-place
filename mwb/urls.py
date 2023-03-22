@@ -32,6 +32,7 @@ urlpatterns = [
     path(r'api/location/',include("locationApp.api.urls")),
     path(r'api/lan/', include('languageApp.api.urls')),
     path(r'api/dashboard/', include('dashboardApp.api.urls')),
+    path(r'api/payment/',include('paymentApp.api.urls')),
     path('admin/', admin.site.urls),
     path('', include(router.urls))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

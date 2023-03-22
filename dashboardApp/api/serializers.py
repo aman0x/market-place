@@ -1,6 +1,7 @@
-
 from rest_framework import serializers
 from bazaarApp.models import Bazaar
+from datetime import timedelta
+
 
 
 class SummarySerializer(serializers.Serializer):
@@ -64,13 +65,19 @@ class PlanListSerializer(serializers.ModelSerializer):
     
     def get_duration(self, obj):
         duration = obj.end_date - obj.start_date
-        return duration
+        duration_days = duration / timedelta(days=1)
+        return f"{int(duration_days)} days" 
     
     def get_plan_price(self, obj):
         return obj.amount
     
     def get_subscribers_active(self, obj):
+<<<<<<< Updated upstream
        return 
+=======
+        return '12000'
+       #return obj.plan_features_subscriber.subscribers
+>>>>>>> Stashed changes
 
     
     def get_subscribers_expired(self, obj):

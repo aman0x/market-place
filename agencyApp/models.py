@@ -13,3 +13,7 @@ class Agency(models.Model):
     pin_code=models.CharField(max_length=20,default=None,blank=True)
     gst_image=models.ImageField(upload_to="image/agency/",null=True)
     pancard_image=models.ImageField(upload_to='image/agent/',null=True)
+
+    def __str__(self):
+        return self.firm_name
+
