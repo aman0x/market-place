@@ -74,6 +74,8 @@ class PlanListSerializer(serializers.ModelSerializer):
     def get_subscribers_active(self, obj):
        return 
 
+        return '12000'
+       #return obj.plan_features_subscriber.subscribers
     
     def get_subscribers_expired(self, obj):
         return '100'
