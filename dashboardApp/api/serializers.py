@@ -72,8 +72,6 @@ class PlanListSerializer(serializers.ModelSerializer):
         return obj.amount
     
     def get_subscribers_active(self, obj):
-       return 
-
         return '12000'
        #return obj.plan_features_subscriber.subscribers
     

@@ -24,3 +24,5 @@ class AgentCommisionRedeemViewset(viewsets.ModelViewSet):
     queryset=AgentCommisionRedeem.objects.all()
     serializer_class=AgentCommisionRedeemSerializer
     permission_classes=[permissions.AllowAny]
+    filter_backends = [filters.SearchFilter]
+    search_fields=['id']
