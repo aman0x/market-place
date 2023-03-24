@@ -1,8 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from agentApp.models import Agent, ManageCommision
-from bazaarApp.models import Bazaar
-from agencyApp.models import Agency
+from agentApp.models import Agent, ManageCommision,AgentCommisionRedeem
 
 
 class AgentManageCommisionSerializer(serializers.ModelSerializer):
@@ -22,3 +20,8 @@ class AgentSerializer(serializers.ModelSerializer):
         model = Agent
         fields = '__all__'
 
+
+class AgentCommisionRedeemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=AgentCommisionRedeem
+        fields="__all__"

@@ -72,12 +72,7 @@ class PlanListSerializer(serializers.ModelSerializer):
         return obj.amount
     
     def get_subscribers_active(self, obj):
-<<<<<<< Updated upstream
        return 
-=======
-        return '12000'
-       #return obj.plan_features_subscriber.subscribers
->>>>>>> Stashed changes
 
     
     def get_subscribers_expired(self, obj):

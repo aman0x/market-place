@@ -6,6 +6,6 @@ from paymentApp.models import Payment
 
 
 class PaymentViewset(viewsets.ModelViewSet):
-    queryset=Payment.objects.all()
+    queryset=Payment.objects.all().order_by('id')
     serializer_class=PaymentSerializer
     permission_classes=[permissions.IsAuthenticated]

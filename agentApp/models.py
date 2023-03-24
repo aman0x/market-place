@@ -85,6 +85,18 @@ class Agent(models.Model):
     def __str__(self):
         return self.agent_name
 
+PLAN_CHOICE=(
+    ("FREEPLAN","FreePlan"),
+    ("PLANPAID","PlanPaid"),
+)
 
+class AgentCommisionRedeem(models.Model):
+    plan=models.CharField(max_length=15,choices=PLAN_CHOICE,default="PLANPAID")
+    minimum_no_of_invoice_genrated=models.IntegerField(null=True)
+    amount_reimbursed_on_particular_days_percent=models.IntegerField(null=True)
+    no_of_days_between_redemption=models.IntegerField(null=True)
 
+    def __str__(self):
+        return self.plan
+    
 

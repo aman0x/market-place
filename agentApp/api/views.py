@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework import permissions
-from .serializers import AgentSerializer,AgentManageCommisionSerializer
-from agentApp.models import Agent,ManageCommision
+from .serializers import AgentSerializer,AgentManageCommisionSerializer,AgentCommisionRedeemSerializer
+from agentApp.models import Agent,ManageCommision,AgentCommisionRedeem
 from rest_framework import filters
 
 class AgentViewSet(viewsets.ModelViewSet):
@@ -17,4 +17,10 @@ class AgentViewSet(viewsets.ModelViewSet):
 class AgentCommisionViewset(viewsets.ModelViewSet):
     queryset=ManageCommision.objects.all()
     serializer_class=AgentManageCommisionSerializer
+    permission_classes=[permissions.AllowAny]
+
+
+class AgentCommisionRedeemViewset(viewsets.ModelViewSet):
+    queryset=AgentCommisionRedeem.objects.all()
+    serializer_class=AgentCommisionRedeemSerializer
     permission_classes=[permissions.AllowAny]

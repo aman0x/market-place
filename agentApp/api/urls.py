@@ -5,6 +5,7 @@ from . import views
 router = routers.DefaultRouter()
 router.register(r'data', views.AgentViewSet)
 router.register(r'commision',views.AgentCommisionViewset)
+router.register(r'agent-commision-redeem',views.AgentCommisionRedeemViewset)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
