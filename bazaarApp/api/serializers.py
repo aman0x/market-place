@@ -5,30 +5,7 @@ from wholesellerApp.api.serializers import WholesellerSerializer
 from agentApp.models  import Agent
 from productApp.models import Product
 from parentCategoryApp.models import ParentCategory
-
-
-# class BazaarAgentSerializer(serializers.ModelSerializer):
-#     agent = AgentSerializer(many=True, read_only=True)
-
-#     class Meta:
-#         model = Bazaar
-#         fields = "__all__"
-
-
-# class BazaarWholesellerSerializer(serializers.ModelSerializer):
-#     wholeseller = WholesellerSerializer(many=True, read_only=True)
-
-#     class Meta:
-#         model = Bazaar
-#         fields = "__all__"
-
-
-# class BazaarProductSerializer(serializers.ModelSerializer):
-#     agent = serializers.StringRelatedField(many=True)
-
-#     class Meta:
-#         model = Bazaar
-#         fields = "__all__"
+from drf_extra_fields.fields import Base64ImageField
 
 
 class BazaarSerializer(serializers.ModelSerializer):
@@ -38,12 +15,16 @@ class BazaarSerializer(serializers.ModelSerializer):
     states = serializers.SerializerMethodField(read_only=True)
     earnings = serializers.SerializerMethodField(read_only=True)
     bills = serializers.SerializerMethodField(read_only=True)
-
+    bazaar_image = Base64ImageField()
     class Meta:
 
         model = Bazaar
         fields = '__all__'
 
+    def update(self, validated_data):
+        bazaar_image = validated_data.pop('bazaar_image')
+        return Bazaar.objects.create(bazaar_image=bazaar_image)
+   
     def get_wholesellers(self, obj):
         return obj.wholeseller.count()
 

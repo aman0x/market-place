@@ -1,10 +1,12 @@
 # Create your models here.
 from django.db import models
+from django.contrib.auth.models import User
 from bazaarApp.models import Bazaar
 from phonenumber_field.modelfields import PhoneNumberField
 from categoryApp.models import Category
 from agencyApp.models import Agency
 from locationApp.models import *
+
 
 
 AGENT_TYPE = (
@@ -79,9 +81,10 @@ class Agent(models.Model):
     agent_pancard_no = models.CharField(max_length=50, default=None, blank=True, null=True)
     agent_image = models.ImageField(upload_to='images/agent/', null=True)
     agent_status = models.CharField(max_length=20, choices= AGENT_STATUS, default="CREATED")
+    agent_otp = models.IntegerField(blank=True, null=True)
+    agent_user= models.ForeignKey(User, related_name="agent_user", on_delete=models.CASCADE, null=True, blank= True)
+    is_active = ()
     agent_active = models.BooleanField(default=False)
-
-
     def __str__(self):
         return self.agent_name
 

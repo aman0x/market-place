@@ -13,30 +13,6 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage
 import csv
 
-# class BazarAgentViewSet(viewsets.ModelViewSet):
-#     """
-#     API endpoint that allows groups to be viewed or edited.
-#     """
-#     queryset = Bazaar.objects.all().order_by('id')
-#     serializer_class = BazaarAgentSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-
-# class BazarWholesellerViewSet(viewsets.ModelViewSet):
-#     """
-#     API endpoint that allows groups to be viewed or edited.
-#     """
-#     queryset = Bazaar.objects.all().order_by('id')
-#     serializer_class = BazaarWholesellerSerializer
-#     permission_classes = [permissions.IsAuthenticated]    
-
-# class BazarProductViewSet(viewsets.ModelViewSet):
-#     """
-#     API endpoint that allows groups to be viewed or edited.
-#     """
-#     queryset = Bazaar.objects.all().order_by('id')
-#     serializer_class = BazaarProductSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-
 
 class BazarViewSet(viewsets.ModelViewSet):
     """
