@@ -3,10 +3,12 @@ from bazaarApp.models import Bazaar
 from agentApp.models  import Agent
 from productApp.models import Product
 from drf_extra_fields.fields import Base64ImageField
-
+from locationApp.api.serializers import *
+from locationApp.models import *
 
 
 class BazaarSerializer(serializers.ModelSerializer):
+    
     category_group = serializers.SerializerMethodField(read_only=True)
     wholesellers = serializers.SerializerMethodField(read_only=True)
     agents = serializers.SerializerMethodField(read_only=True)
@@ -14,21 +16,38 @@ class BazaarSerializer(serializers.ModelSerializer):
     earnings = serializers.SerializerMethodField(read_only=True)
     bills = serializers.SerializerMethodField(read_only=True)
     bazaar_image = Base64ImageField(required=False)
+    bazaar_state_names = serializers.SerializerMethodField()
+    bazaar_district_names = serializers.SerializerMethodField()
+    bazaar_city_names = serializers.SerializerMethodField()
+
     class Meta:
 
         model = Bazaar
         fields = '__all__'
     
-
+    def get_bazaar_state_names(self, obj):
+        state_ids = obj.bazaar_state.all()
+        states = State.objects.filter(id__in=state_ids)
+        serializer = StateSerializer(states, many=True)
+        return serializer.data
+    
+    def get_bazaar_district_names(self, obj):
+        district_ids = obj.bazaar_district.all()
+        district = District.objects.filter(id__in=district_ids)
+        serializer = DistrictSerializer(district, many=True)
+        return serializer.data
+    
+    def get_bazaar_city_names(self, obj):
+        city_ids = obj.bazaar_city.all()
+        city = City.objects.filter(id__in=city_ids)
+        serializer = CitySerializer(city, many=True)
+        return serializer.data
 
     def update(self, instance, validated_data):
         instance.bazaar_image = validated_data.get('bazaar_image')
         event = super().update(instance, validated_data)
         return event
     
-    # def put(self, validated_data):
-    #     bazaar_image = validated_data.pop('bazaar_image')
-    #     return Bazaar.objects.create(bazaar_image=bazaar_image)
 
     def get_wholesellers(self, obj):
         return obj.wholeseller.count()
