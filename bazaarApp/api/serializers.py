@@ -21,13 +21,14 @@ class BazaarSerializer(serializers.ModelSerializer):
     
 
 
-    def update(self, validated_data):
-        bazaar_image = validated_data.pop('bazaar_image')
-        return Bazaar.objects.create(bazaar_image=bazaar_image)
+    def update(self, instance, validated_data):
+        instance.bazaar_image = validated_data.get('bazaar_image')
+        event = super().update(instance, validated_data)
+        return event
     
-    def put(self, validated_data):
-        bazaar_image = validated_data.pop('bazaar_image')
-        return Bazaar.objects.create(bazaar_image=bazaar_image)
+    # def put(self, validated_data):
+    #     bazaar_image = validated_data.pop('bazaar_image')
+    #     return Bazaar.objects.create(bazaar_image=bazaar_image)
 
     def get_wholesellers(self, obj):
         return obj.wholeseller.count()
