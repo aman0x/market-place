@@ -1,8 +1,15 @@
-from rest_framework import viewsets
+import random
+from rest_framework import viewsets, views
+from rest_framework.response import Response
 from rest_framework import permissions
 from .serializers import AgentSerializer,AgentManageCommisionSerializer,AgentCommisionRedeemSerializer
 from agentApp.models import Agent,ManageCommision,AgentCommisionRedeem
 from rest_framework import filters
+from rest_framework_simplejwt.tokens import Token
+from django.contrib.auth.models import User
+
+
+
 
 class AgentViewSet(viewsets.ModelViewSet):
     """
@@ -13,6 +20,7 @@ class AgentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
     filter_backends = [filters.SearchFilter]
     search_fields = ['agent_name']
+
 
 class AgentCommisionViewset(viewsets.ModelViewSet):
     queryset=ManageCommision.objects.all()

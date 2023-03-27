@@ -27,13 +27,16 @@ class Wholeseller(models.Model):
     wholeseller_description = models.TextField(blank=True, null=True)
     wholeseller_name = models.CharField(max_length=200,blank=True)
     wholeseller_bazaar = models.ManyToManyField(Bazaar, 'wholeseller')
-    wholeseller_plan=models.ForeignKey(Plan,on_delete=models.CASCADE,related_name="chooseplan")
-    wholeseller_payment=models.ForeignKey(Payment,on_delete=models.CASCADE,related_name='payment_detail')
+    wholeseller_plan = models.ForeignKey(
+        Plan, on_delete=models.CASCADE, related_name="chooseplan", null=True, blank=True)
+    wholeseller_payment = models.ForeignKey(
+        Payment, on_delete=models.CASCADE, related_name='payment_detail', null=True, blank=True)
     wholeseller_type = models.CharField(max_length=11,
                                         choices=WHOLESELLER_TYPE,
                                         default="INDIVIDUAL"
                                         )
-    wholeseller_firm_name=models.ForeignKey(Agency,on_delete=models.CASCADE)
+    wholeseller_firm_name = models.ForeignKey(
+        Agency, on_delete=models.CASCADE, null=True , blank=True)
     wholeseller_agent = models.ManyToManyField(Agent, related_name='agent',blank=True)
     wholeseller_contact_per = models.ManyToManyField(
         Agent, related_name='contact_person')
