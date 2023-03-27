@@ -14,7 +14,7 @@ class ProductSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance.product_upload_front_image = validated_data.get(
             'product_upload_front_image')
-        instance.product_upload_front_image = validated_data.get(
+        instance.product_upload_back_image = validated_data.get(
             'product_upload_back_image')
         instance.product_upload_mrp_label_image = validated_data.get(
             'product_upload_mrp_label_image')
