@@ -3,9 +3,16 @@ from subCategoryApp.models import SubCategory
 
 
 class SubCategorySerializer(serializers.ModelSerializer):
+    subcategory_ref_image = Base64ImageField(required=False)
     class Meta:
         model = SubCategory
         fields = '__all__'
+    
+    def update(self, instance, validated_data):
+        instance.subcategory_ref_image = validated_data.get(
+            'subcategory_ref_image')
+        event = super().update(instance, validated_data)
+        return event
 
 class SubCategoryFilterSerializer(serializers.ModelSerializer):
     class Meta:
