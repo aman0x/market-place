@@ -19,4 +19,15 @@ class AgentSerializer(serializers.ModelSerializer):
 class AgentCommisionRedeemSerializer(serializers.ModelSerializer):
     class Meta:
         model=AgentCommisionRedeem
-        fields="__all__"
+        fields= "__all__"
+
+
+
+class NewRequestSerializers(serializers.Serializer):
+    firm_name_1=serializers.SerializerMethodField(read_only=True)
+
+    def get_firm_name(self):
+        return "vijay"
+
+
+
