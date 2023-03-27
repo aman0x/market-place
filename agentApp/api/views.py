@@ -34,3 +34,34 @@ class AgentCommisionRedeemViewset(viewsets.ModelViewSet):
     permission_classes=[permissions.AllowAny]
     filter_backends = [filters.SearchFilter]
     search_fields=['id']
+
+class AgentVerifyNumber(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    def post(self, request):
+        data = request.data
+        agent_number = data.get('agent_number')
+        password = data.get('agent_otp')
+        payload = {}
+        if agent_number != '':
+            agent_otp = random.randrange(1,  1000000)
+            
+            if agent_otp:
+                data = Agent.objects.get(agent_number=agent_number)
+                data.agent_otp= agent_otp
+                data.save(update_fields = ['agent_otp'])
+                if data != 0:
+                    print(data)
+                    user = User.objects.filter(id=data.agent_user_id
+                    ).distinct()
+
+                    refresh = Token.for_user(user)
+                    payload = {"otp": agent_otp, 'refresh': str(refresh),
+                               'access': str(refresh.access_token)}
+                    
+                else:
+                    payload = {
+                        "details": "No active account found with the given credentials"}
+            else:
+                data = "Something went wrong."
+            
+        return Response(payload)

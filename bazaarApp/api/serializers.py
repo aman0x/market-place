@@ -44,6 +44,8 @@ class BazaarSerializer(serializers.ModelSerializer):
     def get_category_group(self, obj):
         return obj.parent_category_bazaar.all().values('id','parent_category_name')
     
+    
+
 
 class BazaarDashboardSerializer(serializers.ModelSerializer):
     wholesellers = serializers.SerializerMethodField(read_only=True)
