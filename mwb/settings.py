@@ -49,7 +49,13 @@ INSTALLED_APPS = [
     'subCategoryApp',
     'productApp',
     'agencyApp',
-    'profileApp'
+    'profileApp',
+    'locationApp',
+    'planApp',
+    'paymentApp',
+    'adsApp',
+    'orderApp',
+    'languageApp',
     # 'leaflet',
 
     # 'corsheaders',
@@ -143,8 +149,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'mwb',
-        'USER': 'mwb',
-        'PASSWORD': 'mwb@123',
+        'USER': 'admin',
+        'PASSWORD': 'admin@1234',
         'HOST': 'localhost',
         'PORT': '5432',
     }

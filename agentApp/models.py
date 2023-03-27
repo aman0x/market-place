@@ -52,7 +52,7 @@ def generate_random_alphanumeric(length):
 
 class Agent(models.Model):
     
-    application_id = models.CharField(primary_key=True, max_length=12, default=generate_random_alphanumeric(12), editable=False)
+    application_id = models.CharField(max_length=12, default=generate_random_alphanumeric(12), editable=False)
     agent_bazaar = models.ManyToManyField(Bazaar, related_name="agent")
     agency = models.ForeignKey(
         Agency, on_delete=models.CASCADE, null=True, related_name="agent_agency")
