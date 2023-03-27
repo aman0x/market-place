@@ -1,11 +1,9 @@
 from rest_framework import serializers
 from bazaarApp.models import Bazaar
-from agentApp.api.serializers import AgentSerializer
-from wholesellerApp.api.serializers import WholesellerSerializer
 from agentApp.models  import Agent
 from productApp.models import Product
-from parentCategoryApp.models import ParentCategory
 from drf_extra_fields.fields import Base64ImageField
+
 
 
 class BazaarSerializer(serializers.ModelSerializer):
@@ -15,16 +13,22 @@ class BazaarSerializer(serializers.ModelSerializer):
     states = serializers.SerializerMethodField(read_only=True)
     earnings = serializers.SerializerMethodField(read_only=True)
     bills = serializers.SerializerMethodField(read_only=True)
-    bazaar_image = Base64ImageField()
+    bazaar_image = Base64ImageField(required=False)
     class Meta:
 
         model = Bazaar
         fields = '__all__'
+    
+
 
     def update(self, validated_data):
         bazaar_image = validated_data.pop('bazaar_image')
         return Bazaar.objects.create(bazaar_image=bazaar_image)
-   
+    
+    def put(self, validated_data):
+        bazaar_image = validated_data.pop('bazaar_image')
+        return Bazaar.objects.create(bazaar_image=bazaar_image)
+
     def get_wholesellers(self, obj):
         return obj.wholeseller.count()
 
