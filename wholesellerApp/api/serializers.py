@@ -6,3 +6,6 @@ class WholesellerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wholeseller
         fields = '__all__'
+
+
+
