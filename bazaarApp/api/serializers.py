@@ -25,6 +25,7 @@ class BazaarSerializer(serializers.ModelSerializer):
         model = Bazaar
         fields = '__all__'
     
+    
     def get_bazaar_state_names(self, obj):
         state_ids = obj.bazaar_state.all()
         states = State.objects.filter(id__in=state_ids)
