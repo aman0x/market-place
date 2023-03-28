@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from agentApp.models import Agent, ManageCommision
+from agentApp.models import Agent, ManageCommision, AgentCommisionRedeem
 from drf_extra_fields.fields import Base64ImageField
 
 
@@ -33,4 +33,20 @@ class AgentSerializer(serializers.ModelSerializer):
             'agent_pancard_image')
         event = super().update(instance, validated_data)
         return event
+
+
+class AgentCommisionRedeemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=AgentCommisionRedeem
+        fields= "__all__"
+
+
+
+class NewRequestSerializers(serializers.Serializer):
+    firm_name_1=serializers.SerializerMethodField(read_only=True)
+
+    def get_firm_name(self):
+        return "vijay"
+
+
 
