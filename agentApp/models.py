@@ -8,6 +8,8 @@ from agencyApp.models import Agency
 from locationApp.models import *
 import random
 import string
+#from jsonfield import JSONField
+import jsonfield
 
 
 
@@ -47,7 +49,8 @@ class ManageCommision(models.Model):
         return self.agent_manage_commision
 
 def generate_random_alphanumeric(length):
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=min(length, 12)))
+
 
 
 class Agent(models.Model):
@@ -105,6 +108,7 @@ class Agent(models.Model):
         User, related_name="agent_user", on_delete=models.CASCADE, null=True, blank=True)
     is_active = ()
     agent_active = models.BooleanField(default=False)
+    get_agent_location_json_data=jsonfield.JSONField()
 
     def __str__(self):
         return self.agent_name
