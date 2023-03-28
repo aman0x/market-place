@@ -11,5 +11,5 @@ venv
 /static
 /media
 /image
-
+/images
 migrations/
