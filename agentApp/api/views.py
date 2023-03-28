@@ -35,7 +35,6 @@ class AgentCommisionRedeemViewset(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields=['id']
 
-<<<<<<< Updated upstream
 class AgentVerifyNumber(views.APIView):
     permission_classes = [permissions.AllowAny]
     def post(self, request):
@@ -66,6 +65,3 @@ class AgentVerifyNumber(views.APIView):
                 data = "Something went wrong."
             
         return Response(payload)
-=======
-
->>>>>>> Stashed changes
