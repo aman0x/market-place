@@ -17,6 +17,7 @@ class AgentSerializer(serializers.ModelSerializer):
     agent_adhar_front_image = Base64ImageField(required=False)
     agent_adhar_back_image = Base64ImageField(required=False)
     product_upload_mrp_label_image = Base64ImageField(required=False)
+    agent_pancard_image = Base64ImageField(required=False)
     
     class Meta:
         model = Agent
@@ -39,13 +40,5 @@ class AgentCommisionRedeemSerializer(serializers.ModelSerializer):
     class Meta:
         model=AgentCommisionRedeem
         fields= "__all__"
-
-
-
-class NewRequestSerializers(serializers.Serializer):
-    firm_name_1=serializers.SerializerMethodField(read_only=True)
-
-    def get_firm_name(self):
-        return "vijay"
 
 
