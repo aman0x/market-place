@@ -23,7 +23,9 @@ class BazarViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = ['bazaar_name']
+        
 
+    
 
     def get_queryset(self):
         qs = super().get_queryset()

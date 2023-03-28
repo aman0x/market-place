@@ -15,6 +15,7 @@ class District(models.Model):
     def __str__(self):
         return self.district
 
+
 class City(models.Model):
     city=models.CharField(max_length=30,null=True,default=None)
     state=models.ForeignKey(

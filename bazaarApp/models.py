@@ -35,7 +35,8 @@ from locationApp.models import *
 class Bazaar(models.Model):
     bazaar_name = models.CharField(max_length=200, null=True)
     bazaar_description = models.TextField(blank=True, null=True)
-    bazaar_image = models.ImageField(upload_to='image/bazaar/%Y/%m/%d', null=True)
+    bazaar_image = models.ImageField(
+        upload_to='image/bazaar/%Y/%m/%d')
     bazaar_state = models.ManyToManyField(
         State, related_name='bazaar_state')
     bazaar_district = models.ManyToManyField(
@@ -47,11 +48,14 @@ class Bazaar(models.Model):
     bazaar_updated_date = models.DateTimeField(
         default=datetime.now, blank=True)
     bazaar_updated_by = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='bazaar_updated_by')
+        User, on_delete=models.CASCADE, related_name='bazaar_updated_by', null=True)
     bazaar_active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name_plural = "bazaars"
+    
+    def get_values(self):
+        return [self.bazaar_state, self.bazaar_district]
 
     def __str__(self):
         if self.bazaar_name==None:

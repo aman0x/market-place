@@ -8,7 +8,6 @@ from agencyApp.models import Agency
 from locationApp.models import *
 import random
 import string
-#from jsonfield import JSONField
 import jsonfield
 
 
