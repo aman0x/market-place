@@ -108,7 +108,7 @@ class Agent(models.Model):
         User, related_name="agent_user", on_delete=models.CASCADE, null=True, blank=True)
     is_active = ()
     agent_active = models.BooleanField(default=False)
-    get_agent_location_json_data=jsonfield.JSONField()
+    get_agent_location_json_data=jsonfield.JSONField(default={}, null=True,)
 
     def __str__(self):
         return self.agent_name
