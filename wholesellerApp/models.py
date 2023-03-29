@@ -12,6 +12,7 @@ from paymentApp.models import Payment
 WHOLESELLER_TYPE = (
     ("INDIVIDUAL", "Individual"),
     ("WHOLESELLER", "Wholeseller"),
+    ("SEMIWHOLESELLER","SemiWholeseller")
 )
 
 WHOLESELLER_STATUS = (
@@ -31,15 +32,13 @@ class Wholeseller(models.Model):
         Plan, on_delete=models.CASCADE, related_name="chooseplan", null=True, blank=True)
     wholeseller_payment = models.ForeignKey(
         Payment, on_delete=models.CASCADE, related_name='payment_detail', null=True, blank=True)
-    wholeseller_type = models.CharField(max_length=11,
+    wholeseller_type = models.CharField(max_length=15,
                                         choices=WHOLESELLER_TYPE,
                                         default="INDIVIDUAL"
                                         )
-    wholeseller_firm_name = models.ForeignKey(
-        Agency, on_delete=models.CASCADE, null=True , blank=True)
+    wholeseller_firm_name = models.CharField(max_length=20,null=True,default=None)
     wholeseller_agent = models.ManyToManyField(Agent, related_name='agent',blank=True)
-    wholeseller_contact_per = models.ManyToManyField(
-        Agent, related_name='contact_person')
+    wholeseller_contact_per = models.CharField(max_length=20,null=True,default=None)
     wholeseller_number = PhoneNumberField(blank=True, null=True)
     wholeseller_altranate_number=PhoneNumberField(blank=True,null=True)
     wholeseller_email_id=models.EmailField(max_length=25,null=True)
@@ -48,12 +47,9 @@ class Wholeseller(models.Model):
     wholeseller_firm_pan_no=models.CharField(max_length=20,null=True,default=None)
     wholeseller_address=models.CharField(max_length=30,null=True,default=None)
     wholeseller_landmark=models.CharField(max_length=30,null=True,default=None)
-    wholeseller_city = models.ManyToManyField(
-        City, related_name='wholeseller_city')
-    wholeseller_state = models.ManyToManyField(
-        State, related_name='wholeseller_state')
-    wholeseller_district = models.ManyToManyField(
-        District, related_name='wholeseller_district')
+    wholeseller_city=models.ForeignKey(City,on_delete=models.CASCADE, related_name='wholeseller_city')
+    wholeseller_state=models.ForeignKey(State,on_delete=models.CASCADE, related_name='wholeseller_state')
+    wholeseller_district=models.ForeignKey(District,on_delete=models.CASCADE, related_name='wholeseller_district')
     wholeseller_pincode_no=models.IntegerField(null=True)
     wholeseller_adhar_front_image=models.ImageField(upload_to="adhar-image/wholeseller/%y/%m/%d",null=True)
     wholeseller_adhar_back_image=models.ImageField(upload_to="adhar-image/wholeseller/%y/%m/%d",null=True)
