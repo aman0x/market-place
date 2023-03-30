@@ -42,6 +42,8 @@ class AgentCommisionRedeemViewset(viewsets.ModelViewSet):
 
 class AgentVerifyOTP(views.APIView):
     permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
     def post(self, request):
         agent_number = request.data.get('agent_number')
         agent_otp = request.data.get('agent_otp')
@@ -58,8 +60,6 @@ class AgentVerifyOTP(views.APIView):
                 access_token.set_exp(from_time=datetime.utcnow(), lifetime=timedelta(seconds=6400))
                 refresh_token = RefreshToken.for_user(user)
                 refresh_token.set_exp(from_time=datetime.utcnow(), lifetime=timedelta(seconds=166400))
-                
-
                 return Response({
                     "access_token": str(access_token),
                     "refresh_token": str(refresh_token)
@@ -73,6 +73,8 @@ class AgentVerifyOTP(views.APIView):
 
 class AgentVerifyNumber(views.APIView):
     permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
     def post(self, request):
         data = request.data
         agent_number = data.get('agent_number')
