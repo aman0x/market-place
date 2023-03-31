@@ -11,7 +11,13 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework import status
 
-
+common_status = {
+    "success": {"code": 200, "message": "Request processed successfully"},
+    "bad_request": {"code": 400, "message": "Bad request, please check your input data"},
+    "unauthorized": {"code": 401, "message": "You are not authorized to perform this action"},
+    "not_found": {"code": 404, "message": "The requested resource was not found"},
+    "internal_server_error": {"code": 500, "message": "An internal server error occurred"},
+}
 
 
 
@@ -65,11 +71,18 @@ class AgentVerifyOTP(views.APIView):
                     "refresh_token": str(refresh_token)
                 })
             else:
-                # Invalid OTP
-                return Response({"detail": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
+                status_code = common_status["unauthorized"]["code"]
+                payload = {
+                    "details": "Invalid OTP."
+                }
+                return Response(payload, status=status_code)
         except Agent.DoesNotExist:
             # Agent not found
-            return Response({"detail": "Agent not found."}, status=status.HTTP_404_NOT_FOUND)
+            payload = {
+                "details": "Agent not found"
+            }
+            status_code = common_status["unauthorized"]["code"]
+            return Response(payload, status=status_code)
 
 class AgentVerifyNumber(views.APIView):
     permission_classes = [permissions.AllowAny]
@@ -94,26 +107,33 @@ class AgentVerifyNumber(views.APIView):
                             "otp": agent_otp,
                             "details": "Agent OTP sent of registered mobile Number"
                         }
+                        status_code = common_status["success"]["code"]
                     else:
                         payload = {
                             "details": "No user found for the agent"
                         }
+                        status_code = common_status["not_found"]["code"]
                 else:
                     payload = {
                         "details": "No active account found with the given credentials"
                     }
+                    status_code = common_status["not_found"]["code"]
+
             except Agent.DoesNotExist:
                 payload = {
                     "details": "Agent not found"
                 }
+                status_code = common_status["unauthorized"]["code"]
 
 
         else:
             payload = {
                 "details": "Something went wrong."
             }
+            status_code = common_status["bad_request"]["code"]
+            status_message = common_status["bad_request"]["message"]
             
-        return Response(payload)
+        return Response(payload, status=status_code)
     
     
 
