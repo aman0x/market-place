@@ -3,9 +3,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from bazaarApp.models import Bazaar
 from phonenumber_field.modelfields import PhoneNumberField
-from categoryApp.models import Category
+from django.contrib.auth.models import User
 from agencyApp.models import Agency
 from locationApp.models import *
+from django.db import IntegrityError
 import random
 import string
 import jsonfield
@@ -64,7 +65,7 @@ class Agent(models.Model):
                                   choices=AGENT_TYPE,
                                   default="INDIVIDUAL"
                                   )
-    agent_number = PhoneNumberField(blank=True, null=True)
+    agent_number = PhoneNumberField(unique=True)
     agent_altranate_mobile_number = PhoneNumberField(blank=True, null=True)
     agent_email = models.EmailField(null=True)
     agent_gender = models.CharField(
@@ -112,7 +113,22 @@ class Agent(models.Model):
     def __str__(self):
         return self.agent_name
     
-
+    def save(self, *args, **kwargs):
+        if not self.pk:
+        # If the Agent object is being created for the first time
+            try:
+                user = User.objects.create_user(
+                    username=self.agent_number, password='Test@!Test123')
+                self.agent_user = user
+            except IntegrityError:
+                # If a user with the same username already exists, retrieve the existing user and update its fields
+                user = User.objects.get(username=self.agent_number)
+                user.set_password('Test@!Test123')
+                user.save()
+                self.agent_user = user
+        super().save(*args, **kwargs)
+    
+    
 PLAN_CHOICE = (
     ("FREEPLAN", "FreePlan"),
     ("PLANPAID", "PlanPaid"),
