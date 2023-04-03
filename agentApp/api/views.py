@@ -3,13 +3,14 @@ from datetime import timedelta, datetime
 from rest_framework import viewsets, views
 from rest_framework.response import Response
 from rest_framework import permissions
-from .serializers import AgentSerializer,AgentManageCommisionSerializer,AgentCommisionRedeemSerializer,ApplicationStatusSerializer
+from .serializers import AgentSerializer,AgentManageCommisionSerializer,AgentCommisionRedeemSerializer
 from agentApp.models import Agent,ManageCommision,AgentCommisionRedeem
 from rest_framework import filters
 from rest_framework_simplejwt.tokens import Token
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-from rest_framework import status
+from django.core.exceptions import ObjectDoesNotExist
+
 
 common_status = {
     "success": {"code": 200, "message": "Request processed successfully"},
@@ -137,19 +138,31 @@ class AgentVerifyNumber(views.APIView):
     
     
 
-class AgentApplicationStatusView(views.APIView):
-    def get(self, request, *args, **kwargs):
-        application_id = kwargs.get('application_id')
-        try:
+class AgentApplicationStatusViews(views.APIView):
+    permission_classes=[permissions.AllowAny]
+
+
+    def post(self, request):
+       application_id = request.data.get("application_id")
+       agent_status = request.data.get("agent_status")
+       try:
             agent = Agent.objects.get(application_id=application_id)
-        except Agent.DoesNotExist:
-            return Response({'error': 'Agent not found'}, status=status.HTTP_404_NOT_FOUND)
-        
-        if agent.agent_status == 'APPROVED':
-            message = f'Your application ({application_id}) has been approved. For any further query please contact {agent.agent_number} or email {agent.agent_email}.'
-        elif agent.agent_status == 'PENDING':
-            message = f'Your application ({application_id}) is still pending. For any further query please contact {agent.agent_number} or email {agent.agent_email}.'
-        else:
-            message = f'Your application ({application_id}) has been rejected.'
-        
-        return Response({'message': message}, status=status.HTTP_200_OK)
+            user = agent.agent_user
+            if user is None:
+                return Response({"message": "Agent user not found."})
+
+            if agent_status == "CREATED":
+                message = f"Your application_id {application_id} is approved. If you have any Query? Fell free to contact Us ."
+                return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
+            elif agent_status == "PENDING":
+             message = f"Your application_id {application_id} is In process./n we have received your Application, Our team is reviewing it. Thank You for your patience .if you have any Query? Fell free to contact Us."
+             return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
+            elif agent_status == "KYCREJECTED":
+                     message = f"Your application_id {application_id} is rejected ! Your pan image is very blurred and difficult to read. If you have any Query? Feel free to contact Us."
+                     return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
+            else:
+                return Response({"message": "Invalid agent status."})
+       except Agent.DoesNotExist:
+              return Response({"message": "Agent not found."})
+
+           

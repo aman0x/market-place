@@ -12,8 +12,6 @@ import string
 import jsonfield
 
 
-
-
 AGENT_TYPE = (
     ("INDIVIDUAL", "Individual"),
     ("AGENCY", "Agency"),
@@ -48,14 +46,15 @@ class ManageCommision(models.Model):
     def __str__(self):
         return self.agent_manage_commision
 
+
 def generate_random_alphanumeric(length):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=min(length, 12)))
 
 
-
 class Agent(models.Model):
-    
-    application_id = models.CharField(max_length=12, default=generate_random_alphanumeric(12), editable=False)
+
+    application_id = models.CharField(
+        max_length=12, default=generate_random_alphanumeric(12), editable=False)
     agent_bazaar = models.ManyToManyField(Bazaar, related_name="agent")
     agency = models.ForeignKey(
         Agency, on_delete=models.CASCADE, null=True, related_name="agent_agency")
@@ -108,14 +107,14 @@ class Agent(models.Model):
         User, related_name="agent_user", on_delete=models.CASCADE, null=True, blank=True)
     is_active = ()
     agent_active = models.BooleanField(default=False)
-    get_agent_location_json_data=jsonfield.JSONField(default={}, null=True,)
+    get_agent_location_json_data = jsonfield.JSONField(default={}, null=True,)
 
     def __str__(self):
         return self.agent_name
-    
+
     def save(self, *args, **kwargs):
         if not self.pk:
-        # If the Agent object is being created for the first time
+            # If the Agent object is being created for the first time
             try:
                 user = User.objects.create_user(
                     username=self.agent_number, password='Test@!Test123')
@@ -127,8 +126,8 @@ class Agent(models.Model):
                 user.save()
                 self.agent_user = user
         super().save(*args, **kwargs)
-    
-    
+
+
 PLAN_CHOICE = (
     ("FREEPLAN", "FreePlan"),
     ("PLANPAID", "PlanPaid"),
@@ -145,6 +144,3 @@ class AgentCommisionRedeem(models.Model):
 
     def __str__(self):
         return self.plan
-
-
-
