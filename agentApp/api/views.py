@@ -3,7 +3,7 @@ from datetime import timedelta, datetime
 from rest_framework import viewsets, views
 from rest_framework.response import Response
 from rest_framework import permissions
-from .serializers import AgentSerializer,AgentManageCommisionSerializer,AgentCommisionRedeemSerializer
+from .serializers import AgentSerializer,AgentManageCommisionSerializer,AgentCommisionRedeemSerializer,ApplicationStatusSerializer
 from agentApp.models import Agent,ManageCommision,AgentCommisionRedeem
 from rest_framework import filters
 from rest_framework_simplejwt.tokens import Token
@@ -137,3 +137,19 @@ class AgentVerifyNumber(views.APIView):
     
     
 
+class AgentApplicationStatusView(views.APIView):
+    def get(self, request, *args, **kwargs):
+        application_id = kwargs.get('application_id')
+        try:
+            agent = Agent.objects.get(application_id=application_id)
+        except Agent.DoesNotExist:
+            return Response({'error': 'Agent not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        if agent.agent_status == 'APPROVED':
+            message = f'Your application ({application_id}) has been approved. For any further query please contact {agent.agent_number} or email {agent.agent_email}.'
+        elif agent.agent_status == 'PENDING':
+            message = f'Your application ({application_id}) is still pending. For any further query please contact {agent.agent_number} or email {agent.agent_email}.'
+        else:
+            message = f'Your application ({application_id}) has been rejected.'
+        
+        return Response({'message': message}, status=status.HTTP_200_OK)
