@@ -36,6 +36,7 @@ urlpatterns = [
     path(r'api/agent/verify_number/', include('agentApp.api.urls')),
     path(r'api/agent/verify_otp/', include('agentApp.api.urls')),
     path(r'api/payment/', include('paymentApp.api.urls')),
+    path(r'api/master/', include('masterApp.api.urls')),
     
     path('admin/', admin.site.urls),
     path('', include(router.urls))
