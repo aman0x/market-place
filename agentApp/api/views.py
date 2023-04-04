@@ -1,6 +1,6 @@
 import random
 from datetime import timedelta, datetime
-from rest_framework import viewsets, views
+from rest_framework import viewsets, views ,status
 from rest_framework.response import Response
 from rest_framework import permissions
 from .serializers import AgentSerializer,AgentManageCommisionSerializer,AgentCommisionRedeemSerializer
@@ -9,7 +9,10 @@ from rest_framework import filters
 from rest_framework_simplejwt.tokens import Token
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-from django.core.exceptions import ObjectDoesNotExist
+from wholesellerApp.models import Wholeseller
+from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 
 
 common_status = {
@@ -143,26 +146,57 @@ class AgentApplicationStatusViews(views.APIView):
 
 
     def post(self, request):
-       application_id = request.data.get("application_id")
+       agent_number = request.data.get("agent_number")
        agent_status = request.data.get("agent_status")
        try:
-            agent = Agent.objects.get(application_id=application_id)
+            agent = Agent.objects.get(agent_number=agent_number)
             user = agent.agent_user
             if user is None:
                 return Response({"message": "Agent user not found."})
 
             if agent_status == "CREATED":
-                message = f"Your application_id {application_id} is approved. If you have any Query? Fell free to contact Us ."
+                message = f"Your application_id {agent_number} is approved. If you have any Query? Fell free to contact Us ."
                 return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
             elif agent_status == "PENDING":
-             message = f"Your application_id {application_id} is In process./n we have received your Application, Our team is reviewing it. Thank You for your patience .if you have any Query? Fell free to contact Us."
+             message = f"Your application_id {agent_number} is In process./n we have received your Application, Our team is reviewing it. Thank You for your patience .if you have any Query? Fell free to contact Us."
              return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
             elif agent_status == "KYCREJECTED":
-                     message = f"Your application_id {application_id} is rejected ! Your pan image is very blurred and difficult to read. If you have any Query? Feel free to contact Us."
+                     message = f"Your application_id {agent_number} is rejected ! Your pan image is very blurred and difficult to read. If you have any Query? Feel free to contact Us."
                      return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
             else:
                 return Response({"message": "Invalid agent status."})
        except Agent.DoesNotExist:
               return Response({"message": "Agent not found."})
 
+class ReportPlanExpireView(views.APIView):
+    
+    def get(self, request):
+        wholesalers = Wholeseller.objects.all()
+        wholeseller_list = []
+        for wholeseller in wholesalers:
+              wholeseller_list.append(wholeseller.wholeseller_name)
+        return Response(wholeseller_list, status=status.HTTP_200_OK)
+    
+    def post(self, request):
+        wholeseller_name = request.data.get('wholeseller_name')
+        
+        try:
+            wholeseller = Wholeseller.objects.get(wholeseller_name=wholeseller_name)
+        except Wholeseller.DoesNotExist:
+            return Response({'message': 'Wholeseller does not exist.'})
+        
+        days_left = (wholeseller.wholeseller_plan.end_date - datetime.now().date()).days
+        
+        if days_left <= 0:
+            message = f"Your plan has expired. Please renew your plan."
+            return Response({'message': message})
+        elif days_left <= 15:
+            message = f"Your plan will expire in {days_left} days."
+            return Response({'message': message})
+        elif days_left <= 30:
+            message = f"Your plan will expire in {days_left} days. Please renew soon."
+            return Response({'message': message})
+        
+        return Response({'message': 'Success'})
            
+

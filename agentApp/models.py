@@ -47,14 +47,10 @@ class ManageCommision(models.Model):
         return self.agent_manage_commision
 
 
-def generate_random_alphanumeric(length):
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=min(length, 12)))
 
 
 class Agent(models.Model):
 
-    application_id = models.CharField(
-        max_length=12, default=generate_random_alphanumeric(12), editable=False)
     agent_bazaar = models.ManyToManyField(Bazaar, related_name="agent")
     agency = models.ForeignKey(
         Agency, on_delete=models.CASCADE, null=True, related_name="agent_agency")
