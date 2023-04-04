@@ -10,7 +10,6 @@ class Unit(models.Model):
     unit_type = models.CharField(
         max_length=15, choices=UNIT_TYPE, default="QUANTITY")
     unit_name=models.CharField(max_length=30,default=None)
-    unit_value = models.IntegerField(null=True)
 
     def __str__(self):
         return self.unit_name
