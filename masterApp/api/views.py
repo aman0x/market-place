@@ -2,17 +2,19 @@ from rest_framework import viewsets
 from rest_framework import permissions
 from .serializers import *
 from masterApp.models import *
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 
 class UnitViewSet(viewsets.ModelViewSet):
-     """
-     API endpoint that allows groups to be viewed or edited.
-     """
-     queryset = Unit.objects.all().order_by('id')
-     serializer_class = UnitSerializer
-     permission_classes = [permissions.IsAuthenticated]
-    #  lookup_field='state'
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Unit.objects.all().order_by('id')
+    serializer_class = UnitSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['unit_type']
 
 class WholesellerTypeViewSet(viewsets.ModelViewSet):
     """
