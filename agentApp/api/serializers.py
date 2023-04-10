@@ -42,8 +42,6 @@ class AgentCommisionRedeemSerializer(serializers.ModelSerializer):
         fields= "__all__"
 
 
-class ApplicationStatusSerializer(serializers.Serializer):
-    application_id = serializers.CharField()
 
 
 
