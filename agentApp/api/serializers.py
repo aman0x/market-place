@@ -47,4 +47,4 @@ class AgentCommisionRedeemSerializer(serializers.ModelSerializer):
 class WholsellerFilterSerializers(serializers.ModelSerializer):
     class Meta:
         model=Wholeseller
-        fields=['wholeseller_bazaar']
+        fields="__all__"

@@ -11,7 +11,7 @@ router.register(r'wholeseller-filter',views.WholesellerFilterViewset)
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
-    path('wholeseller_count/',views.WholesellerCountView.as_view()),
+    path('wholeseller_count/', views.WholesellerCountView.as_view()),
     path('report_plan/',views.ReportPlanExpireView.as_view()),
     path('application-status/',views.AgentApplicationStatusViews.as_view()),
     path('verify_phone/', views.AgentVerifyNumber.as_view(), name="agent-login"),
