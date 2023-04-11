@@ -29,7 +29,7 @@ class AgentViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
-    queryset = Agent.objects.all()
+    queryset = Agent.objects.all().order_by('id')
     serializer_class = AgentSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
@@ -37,13 +37,13 @@ class AgentViewSet(viewsets.ModelViewSet):
 
 
 class AgentCommisionViewset(viewsets.ModelViewSet):
-    queryset=ManageCommision.objects.all()
+    queryset=ManageCommision.objects.all().order_by('id')
     serializer_class=AgentManageCommisionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 class AgentCommisionRedeemViewset(viewsets.ModelViewSet):
-    queryset=AgentCommisionRedeem.objects.all()
+    queryset=AgentCommisionRedeem.objects.all().order_by('id')
     serializer_class=AgentCommisionRedeemSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
