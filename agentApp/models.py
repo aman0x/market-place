@@ -60,7 +60,7 @@ class Agent(models.Model):
                                   choices=AGENT_TYPE,
                                   default="INDIVIDUAL"
                                   )
-    agent_number = PhoneNumberField(unique=True)
+    agent_number = PhoneNumberField(unique=True,blank=True, null=True)
     agent_altranate_mobile_number = PhoneNumberField(blank=True, null=True)
     agent_email = models.EmailField(null=True)
     agent_gender = models.CharField(
