@@ -2,7 +2,7 @@ from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from agentApp.models import Agent, ManageCommision, AgentCommisionRedeem
 from drf_extra_fields.fields import Base64ImageField
-
+from wholesellerApp.models import Wholeseller
 
 
 class AgentManageCommisionSerializer(serializers.ModelSerializer):
@@ -44,4 +44,7 @@ class AgentCommisionRedeemSerializer(serializers.ModelSerializer):
 
 
 
-
+class WholsellerFilterSerializers(serializers.ModelSerializer):
+    class Meta:
+        model=Wholeseller
+        fields=['wholeseller_bazaar']

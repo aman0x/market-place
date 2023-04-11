@@ -3,17 +3,17 @@ from datetime import timedelta, datetime
 from rest_framework import viewsets, views ,status
 from rest_framework.response import Response
 from rest_framework import permissions
-from .serializers import AgentSerializer,AgentManageCommisionSerializer,AgentCommisionRedeemSerializer
+from .serializers import AgentSerializer,AgentManageCommisionSerializer,AgentCommisionRedeemSerializer,WholsellerFilterSerializers
 from agentApp.models import Agent,ManageCommision,AgentCommisionRedeem
 from rest_framework import filters
 from rest_framework_simplejwt.tokens import Token
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from wholesellerApp.models import Wholeseller
-from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from django.views.decorators.csrf import csrf_exempt
-from django.utils import timezone
-
+from django.db.models.functions import ExtractYear, ExtractMonth, ExtractWeek
+from django.db.models import Count
 
 common_status = {
     "success": {"code": 200, "message": "Request processed successfully"},
@@ -173,34 +173,101 @@ class AgentApplicationStatusViews(views.APIView):
 
 class ReportPlanExpireView(views.APIView):
     permission_classes=[permissions.AllowAny]
-    
     def get(self, request):
         wholesellers = Wholeseller.objects.all()
         wholeseller_list = []
         for wholeseller in wholesellers:
               wholeseller_list.append(wholeseller.wholeseller_name)
         return Response(wholeseller_list, status=status.HTTP_200_OK)
-    
+    @csrf_exempt
     def post(self, request):
         wholeseller_name = request.data.get('wholeseller_name')
-        
         try:
             wholeseller = Wholeseller.objects.get(wholeseller_name=wholeseller_name)
         except Wholeseller.DoesNotExist:
             return Response({'message': 'Wholeseller does not exist.'})
-        
-        days_left = (wholeseller.wholeseller_plan.end_date - datetime.now().date()).days
-        
+        end_date = wholeseller.wholeseller_plan.end_date
+        days_left = (end_date - datetime.now().date()).days
+  
         if days_left <= 0:
-            message = f"Your plan has expired. Please renew your plan."
+            message = f"{wholeseller_name} your plan has expired.{days_left} .Please renew your plan."
             return Response({'message': message})
         elif days_left <= 15:
-            message = f"Your plan will expire in {days_left} days."
             return Response({'message': message})
         elif days_left <= 30:
-            message = f"Your plan will expire in {days_left} days. Please renew soon."
+            message = f"{wholeseller_name} your plan will expire in {days_left} days. Please renew soon."
             return Response({'message': message})
-        
+
         return Response({'message': 'Success'})
            
 
+
+class WholesellerCountView(views.APIView):
+    permission_classes=[permissions.AllowAny]
+    def get(self, request):
+        year = request.query_params.get('year')
+        month = request.query_params.get('month')
+
+        qs = Wholeseller.objects.all()
+        if year:
+            qs = qs.filter(created_at__year=year)
+        if month:
+            qs = qs.filter(created_at__month=month)
+        
+        month_names = {
+            1: 'January',
+            2: 'February',
+            3: 'March',
+            4: 'April',
+            5: 'May',
+            6: 'June',
+            7: 'July',
+            8: 'August',
+            9: 'September',
+            10: 'October',
+            11: 'November',
+            12: 'December'
+        }
+        
+        yearly_counts = qs.annotate(year=ExtractYear('created_at')).values('year').annotate(count=Count('id'))
+        yearly_result = []
+        for item in yearly_counts:
+            year_num = item['year']
+            count = item['count']
+            yearly_result.append({'year': year_num, 'count': count})
+
+        monthly_counts = qs.annotate(year=ExtractYear('created_at'), month=ExtractMonth('created_at')).values('year', 'month').annotate(count=Count('id'))
+        monthly_result = []
+        for item in monthly_counts:
+            year_num = item['year']
+            month_num = item['month']
+            month_name = month_names.get(month_num)
+            count = item['count']
+            monthly_result.append({'year': year_num, 'month': month_name, 'count': count})
+
+        week_counts = qs.annotate(week=ExtractWeek('created_at')).values('week').annotate(count=Count('id'))
+        week_result = []
+        for item in week_counts:
+            week_num = item['week']
+            week_name = 'Week ' + str(week_num)
+            count = item['count']
+            week_result.append({'week': week_name, 'count': count})
+
+
+        data = {
+            'total_wholeseller_count': qs.count(),
+            'no of wholeseller by year': yearly_result,
+            'no of wholeseller by months': monthly_result,
+            'no of wholeseller by week': week_result
+
+        } 
+
+        return Response(data)
+
+
+class WholesellerFilterViewset(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Wholeseller.objects.all()
+    serializer_class = WholsellerFilterSerializers
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['wholeseller_type','wholeseller_bazaar']
