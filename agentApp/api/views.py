@@ -181,13 +181,14 @@ class ReportPlanExpireView(views.APIView):
         return Response(wholeseller_list, status=status.HTTP_200_OK)
     @csrf_exempt
     def post(self, request):
+        today = datetime.now().date()
         wholeseller_name = request.data.get('wholeseller_name')
         try:
             wholeseller = Wholeseller.objects.get(wholeseller_name=wholeseller_name)
         except Wholeseller.DoesNotExist:
             return Response({'message': 'Wholeseller does not exist.'})
         end_date = wholeseller.wholeseller_plan.end_date
-        days_left = (end_date - datetime.now().date()).days
+        days_left = (today - end_date).days
   
         if days_left <= 0:
             message = f"{wholeseller_name} your plan has expired.{days_left} .Please renew your plan."

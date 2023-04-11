@@ -38,7 +38,7 @@ class Wholeseller(models.Model):
                                         default="INDIVIDUAL"
                                         )
     wholeseller_firm_name = models.CharField(max_length=20,null=True,default=None)
-    wholeseller_agent = models.ManyToManyField(Agent, related_name='agent',blank=True)
+    wholeseller_agent = models.ForeignKey(Agent,on_delete=models.CASCADE ,related_name='agent',blank=True,null=True)
     wholeseller_contact_per = models.CharField(max_length=20,null=True,default=None)
     wholeseller_number = PhoneNumberField(blank=True, null=True)
     wholeseller_altranate_number=PhoneNumberField(blank=True,null=True)
