@@ -268,7 +268,14 @@ class WholesellerCountView(views.APIView):
 
 class WholesellerFilterViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Wholeseller.objects.all()
+    queryset = Agent.objects.all().order_by('id')
     serializer_class = WholsellerFilterSerializers
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['wholeseller_type','wholeseller_bazaar']
+    # filter_backends = [DjangoFilterBackend]
+    # filterset_fields = ['wholeseller_type','wholeseller_bazaar']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        pk = self.kwargs.get('pk')
+        if pk:
+            queryset=queryset.filter(pk=pk)
+        return queryset
