@@ -175,34 +175,54 @@ class AgentApplicationStatusViews(views.APIView):
 
 class ReportPlanExpireView(views.APIView):
     permission_classes=[permissions.AllowAny]
-    def get(self, request):
-        wholesellers = Wholeseller.objects.all()
-        wholeseller_list = []
-        for wholeseller in wholesellers:
-              wholeseller_list.append(wholeseller.wholeseller_name)
-        return Response(wholeseller_list, status=status.HTTP_200_OK)
-    @csrf_exempt
-    def post(self, request):
-        today = datetime.now().date()
-        wholeseller_name = request.data.get('wholeseller_name')
-        try:
-            wholeseller = Wholeseller.objects.get(wholeseller_name=wholeseller_name)
-        except Wholeseller.DoesNotExist:
-            return Response({'message': 'Wholeseller does not exist.'})
-        end_date = wholeseller.wholeseller_plan.end_date
-        days_left = (today - end_date).days
-  
-        if days_left <= 0:
-            message = f"{wholeseller_name} your plan has expired.{days_left} .Please renew your plan."
-            return Response({'message': message})
-        elif days_left <= 15:
-            return Response({'message': message})
-        elif days_left <= 30:
-            message = f"{wholeseller_name} your plan will expire in {days_left} days. Please renew soon."
-            return Response({'message': message})
 
-        return Response({'message': 'Success'})
-           
+    def get(self, request, pk):
+        wholesalers = Wholeseller.objects.filter(wholeseller_agent_id=pk)
+        wholeseller_list = []
+        for wholeseller in wholesalers:
+            today = datetime.now().date()
+            end_date = wholeseller.wholeseller_plan.end_date
+            days_left = (end_date - today).days
+
+            status = "active" # default value
+            message = "Your plan is active." # default value
+            days = 0
+
+            wholeseller_data = {
+                'wholeseller_name': wholeseller.wholeseller_name,
+                'message': message,
+                'status': status,
+                'days': days
+            }
+
+            if days_left <= 0:
+                message = "Your plan has expired. Please renew your plan."
+                status = "expired"
+                days = f"expired by {abs(days_left)} days"
+                
+            elif days_left <= 15:
+                message = f"Your plan will expiring soon. Please renew soon."
+                status = "expiring_soon"
+                days = f"expiring in {abs(days_left)} days"
+            elif days_left <= 30:
+                message = f"Your plan will expire . Please renew soon."
+                status = "expiring_soon"
+                days = f"expiring in {abs(days_left)} days"
+
+            wholeseller_data['message'] = message
+            wholeseller_data['status'] = status
+            wholeseller_data['days'] = days
+
+            wholeseller_list.append(wholeseller_data)
+
+        data = {
+            'count': len(wholeseller_list),
+            'wholesellers': wholeseller_list
+        }
+        return Response(data)
+
+
+
 class WholesellerCountView(views.APIView):
     permission_classes=[permissions.AllowAny]
 
