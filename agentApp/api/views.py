@@ -3,7 +3,7 @@ from datetime import timedelta, datetime
 from rest_framework import viewsets, views ,status
 from rest_framework.response import Response
 from rest_framework import permissions
-from .serializers import AgentSerializer,AgentManageCommisionSerializer,AgentCommisionRedeemSerializer,WholsellerFilterSerializers
+from .serializers import AgentSerializer,AgentManageCommisionSerializer,AgentCommisionRedeemSerializer,WholsellerFilterSerializers,AgentCommissionCountSerializer
 from agentApp.models import Agent,ManageCommision,AgentCommisionRedeem
 from rest_framework import filters
 from rest_framework_simplejwt.tokens import Token
@@ -14,7 +14,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import ExtractYear, ExtractMonth, ExtractWeek
 from django.db.models import Count
-
+from django.db.models import Sum, Count
+from datetime import date, timedelta
+from django.conf import settings
 common_status = {
     "success": {"code": 200, "message": "Request processed successfully"},
     "bad_request": {"code": 400, "message": "Bad request, please check your input data"},
@@ -201,35 +203,36 @@ class ReportPlanExpireView(views.APIView):
 
         return Response({'message': 'Success'})
            
-
-
 class WholesellerCountView(views.APIView):
     permission_classes=[permissions.AllowAny]
-    def get(self, request):
+
+    def get(self, request, pk):
         year = request.query_params.get('year')
         month = request.query_params.get('month')
+        week = request.query_params.get('week')
+        wholeseller_agent = pk
 
-        qs = Wholeseller.objects.all()
+        qs = Wholeseller.objects.filter(wholeseller_agent=wholeseller_agent)
+
         if year:
             qs = qs.filter(created_at__year=year)
         if month:
-            qs = qs.filter(created_at__month=month)
-        
-        month_names = {
-            1: 'January',
-            2: 'February',
-            3: 'March',
-            4: 'April',
-            5: 'May',
-            6: 'June',
-            7: 'July',
-            8: 'August',
-            9: 'September',
-            10: 'October',
-            11: 'November',
-            12: 'December'
-        }
-        
+            try:
+                month_num = int(month)
+                qs = qs.filter(created_at__month=month_num)
+            except ValueError:
+                qs = qs.filter(created_at__year=year)
+        if week:
+            try:
+                week_num = int(week)
+                qs = qs.filter(created_at__week=week_num)
+            except ValueError:
+                if year and month:
+                    qs = qs.filter(created_at__year=year, created_at__month=month_num)
+                else:
+                    qs = qs.filter(created_at__year=year)
+
+        month_names = settings.MONTH_NAMES
         yearly_counts = qs.annotate(year=ExtractYear('created_at')).values('year').annotate(count=Count('id'))
         yearly_result = []
         for item in yearly_counts:
@@ -242,7 +245,10 @@ class WholesellerCountView(views.APIView):
         for item in monthly_counts:
             year_num = item['year']
             month_num = item['month']
-            month_name = month_names.get(month_num)
+            try:
+                month_name = month_names[month_num]
+            except (KeyError, TypeError):
+                month_name = None
             count = item['count']
             monthly_result.append({'year': year_num, 'month': month_name, 'count': count})
 
@@ -254,24 +260,21 @@ class WholesellerCountView(views.APIView):
             count = item['count']
             week_result.append({'week': week_name, 'count': count})
 
-
         data = {
             'total_wholeseller_count': qs.count(),
             'no of wholeseller by year': yearly_result,
             'no of wholeseller by months': monthly_result,
             'no of wholeseller by week': week_result
-
-        } 
+        }
 
         return Response(data)
+
 
 
 class WholesellerFilterViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Agent.objects.all().order_by('id')
     serializer_class = WholsellerFilterSerializers
-    # filter_backends = [DjangoFilterBackend]
-    # filterset_fields = ['wholeseller_type','wholeseller_bazaar']
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -279,3 +282,6 @@ class WholesellerFilterViewset(viewsets.ModelViewSet):
         if pk:
             queryset=queryset.filter(pk=pk)
         return queryset
+
+
+

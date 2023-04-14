@@ -61,3 +61,11 @@ class WholsellerFilterSerializers(serializers.ModelSerializer):
         # return obj.agent.all().values(
         #     "wholeseller_bazaar"
         # ).distinct()
+
+
+
+class AgentCommissionCountSerializer(serializers.Serializer):
+    year = serializers.IntegerField()
+    months=serializers.IntegerField()
+    week=serializers.IntegerField()
+    commission_counts = serializers.ListField(child=serializers.DictField())

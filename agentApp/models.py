@@ -104,6 +104,8 @@ class Agent(models.Model):
     is_active = ()
     agent_active = models.BooleanField(default=False)
     get_agent_location_json_data = jsonfield.JSONField(default={}, null=True,)
+    #agent_date_of_creation = models.DateTimeField(auto_now_add=False,null=True,blank=True)
+
 
     def __str__(self):
         return self.agent_name
