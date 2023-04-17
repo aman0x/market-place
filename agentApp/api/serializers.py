@@ -64,8 +64,9 @@ class WholsellerFilterSerializers(serializers.ModelSerializer):
 
 
 
-class AgentCommissionCountSerializer(serializers.Serializer):
-    year = serializers.IntegerField()
-    months=serializers.IntegerField()
-    week=serializers.IntegerField()
-    commission_counts = serializers.ListField(child=serializers.DictField())
+# class AgentCommisionCountSerializer(serializers.Serializer):
+#     wholeseller = serializers.IntegerField(read_only=True)
+#     total_commision = serializers.IntegerField(read_only=True)
+#     year = serializers.CharField(read_only=True)
+#     month = serializers.CharField(read_only=True)
+#     week = serializers.CharField(read_only=True)

@@ -49,7 +49,14 @@ INSTALLED_APPS = [
     'subCategoryApp',
     'productApp',
     'agencyApp',
-    'profileApp'
+    'profileApp',
+    'locationApp',
+    'orderApp',
+    'paymentApp',
+    'adsApp',
+    'masterApp',
+    'planApp',
+    'languageApp',
     # 'leaflet',
 
     # 'corsheaders',
@@ -143,8 +150,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'mwb',
-        'USER': 'mwb',
-        'PASSWORD': 'mwb@123',
+        'USER': 'admin',
+        'PASSWORD': 'admin@1234',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -360,6 +367,27 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # SMS_MASK = 'Sabzzy'
 
 #local_settings
+
+
+
+
+MONTH_NAMES = {
+    1: 'January',
+    2: 'February',
+    3: 'March',
+    4: 'April',
+    5: 'May',
+    6: 'June',
+    7: 'July',
+    8: 'August',
+    9: 'September',
+    10: 'October',
+    11: 'November',
+    12: 'December'
+}
+
+
+
 try:
     from .local_settings import *
 except ImportError as e:

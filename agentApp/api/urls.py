@@ -12,6 +12,7 @@ router.register(r'agent-commision-redeem',views.AgentCommisionRedeemViewset)
 urlpatterns = [
     path('data/<int:pk>/wholeseller_count/', views.WholesellerCountView.as_view()),
     path('data/<int:pk>/plan_expire/',views.ReportPlanExpireView.as_view()),
+    path('data/<int:pk>/commission/', views.AgentCommissionAPIView.as_view()),
     path('application-status/',views.AgentApplicationStatusViews.as_view()),
     path('verify_phone/', views.AgentVerifyNumber.as_view(), name="agent-login"),
     path('verify_otp/', views.AgentVerifyOTP.as_view(), name='verify_otp'),

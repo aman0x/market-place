@@ -3,7 +3,7 @@ from datetime import timedelta, datetime
 from rest_framework import viewsets, views ,status
 from rest_framework.response import Response
 from rest_framework import permissions
-from .serializers import AgentSerializer,AgentManageCommisionSerializer,AgentCommisionRedeemSerializer,WholsellerFilterSerializers,AgentCommissionCountSerializer
+from .serializers import AgentSerializer,AgentManageCommisionSerializer,AgentCommisionRedeemSerializer,WholsellerFilterSerializers
 from agentApp.models import Agent,ManageCommision,AgentCommisionRedeem
 from rest_framework import filters
 from rest_framework_simplejwt.tokens import Token
@@ -14,9 +14,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import ExtractYear, ExtractMonth, ExtractWeek
 from django.db.models import Count
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count,Q
 from datetime import date, timedelta
 from django.conf import settings
+from django.utils import timezone
+from django.db import models
+
 common_status = {
     "success": {"code": 200, "message": "Request processed successfully"},
     "bad_request": {"code": 400, "message": "Bad request, please check your input data"},
@@ -221,8 +224,6 @@ class ReportPlanExpireView(views.APIView):
         }
         return Response(data)
 
-
-
 class WholesellerCountView(views.APIView):
     permission_classes=[permissions.AllowAny]
 
@@ -289,8 +290,6 @@ class WholesellerCountView(views.APIView):
 
         return Response(data)
 
-
-
 class WholesellerFilterViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Agent.objects.all().order_by('id')
@@ -304,4 +303,50 @@ class WholesellerFilterViewset(viewsets.ModelViewSet):
         return queryset
 
 
+class AgentCommissionAPIView(views.APIView):
+    permission_classes = [permissions.AllowAny]
 
+    def get(self, request, pk):
+        year = request.query_params.get('year')
+        month = request.query_params.get('month')
+        week = request.query_params.get('week')
+
+        try:
+            total_wholesellers_added = Wholeseller.objects.filter(wholeseller_agent=pk)
+
+            # Filter by year
+            if year:
+                total_wholesellers_added = total_wholesellers_added.filter(created_at__year=year)
+
+            # Filter by month
+            if month:
+                total_wholesellers_added = total_wholesellers_added.filter(created_at__month=month)
+
+            # Filter by week
+            if week:
+                start_date = timezone.now().date() - timedelta(weeks=52)  # consider only past 52 weeks
+                total_wholesellers_added = total_wholesellers_added.filter(created_at__range=[start_date, timezone.now().date()]).annotate(week_num=Count('id', filter=(models.Q(created_at__week=week))))
+
+            count = total_wholesellers_added.count()
+            if count > 0:
+                total_commission = 0
+                for wholeseller in total_wholesellers_added:
+                    if wholeseller.wholeseller_plan:
+                        total_commission += wholeseller.wholeseller_plan.amount
+
+                response_data = {
+                    "total_wholesellers_added": count,
+                    "total_commission": total_commission
+                }
+
+            else:
+                response_data = {
+                    "message": "No data available for this agent."
+                }
+
+        except Agent.DoesNotExist:
+            response_data = {
+                "message": "No data available for this agent."
+            }
+
+        return Response(response_data)
