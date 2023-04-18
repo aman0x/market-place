@@ -166,14 +166,14 @@ class AgentApplicationStatusViews(views.APIView):
                 message = f"Your application_id {agent_number} is in process./n If you have any Query? Fell free to contact Us ."
                 return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
             elif agent_status == "PENDING":
-             message = f"Your application_id {agent_number} is in process./n we have received your Application, Our team is reviewing it. Thank You for your patience .if you have any Query? Fell free to contact Us."
-             return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
+                message = f"Your application_id {agent_number} is in process./n we have received your Application, Our team is reviewing it. Thank You for your patience .if you have any Query? Fell free to contact Us."
+                return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
             elif agent_status == "KYCREJECTED":
-                     message = f"Your application_id {agent_number} is rejected ! Your pan image is very blurred and difficult to read. If you have any Query? Feel free to contact Us."
-                     return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
+                message = f"Your application_id {agent_number} is rejected ! Your pan image is very blurred and difficult to read. If you have any Query? Feel free to contact Us."
+                return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
             elif agent_status == "KYCAPPROVED":
-                     message = f"Your application_id {agent_number} is approved !  If you have any Query? Feel free to contact Us."
-                     return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
+                message = f"Your application_id {agent_number} is approved !  If you have any Query? Feel free to contact Us."
+                return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
             else:
                 return Response({"message": "Invalid agent status."})
        except Agent.DoesNotExist:
@@ -315,7 +315,7 @@ class WholesellerFilterViewset(viewsets.ModelViewSet):
     
 
 
-class AgentCommissionAPIView(views.APIView):
+class AgentEarningAPIView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request, pk):
