@@ -19,6 +19,9 @@ from datetime import date, timedelta
 from django.conf import settings
 from django.utils import timezone
 from django.db import models
+from django_filters import FilterSet
+from django.db.models import Q
+
 
 common_status = {
     "success": {"code": 200, "message": "Request processed successfully"},
@@ -294,13 +297,22 @@ class WholesellerFilterViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Agent.objects.all().order_by('id')
     serializer_class = WholsellerFilterSerializers
+    # filter_backends = [DjangoFilterBackend]
+    # filterset_fields = ["wholeseller"]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
         pk = self.kwargs.get('pk')
-        if pk:
-            queryset=queryset.filter(pk=pk)
-        return queryset
+        agent=Agent.objects.get(id=pk)
+        wholeseller_queryset= Wholeseller.objects.filter(wholeseller_agent=agent).filter(Q(wholeseller_type='INDIVIDUAL')&(Q(wholeseller_bazaar=2)))
+        # queryset = super().get_queryset()
+        # pk = self.kwargs.get('pk')
+        # if pk:
+        #     queryset=queryset.filter(pk=pk)
+        # return queryset
+        return wholeseller_queryset
+
+
+    
 
 
 class AgentCommissionAPIView(views.APIView):
