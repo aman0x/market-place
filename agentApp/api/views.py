@@ -3,7 +3,7 @@ from datetime import timedelta, datetime
 from rest_framework import viewsets, views, status
 from rest_framework.response import Response
 from rest_framework import permissions
-from .serializers import AgentSerializer, AgentManageCommisionSerializer, AgentCommisionRedeemSerializer, WholsellerFilterSerializers, AgentWalletSerializer
+from .serializers import AgentSerializer, AgentManageCommisionSerializer, AgentCommisionRedeemSerializer, WholsellerListSerializers, AgentWalletSerializer
 from agentApp.models import Agent, ManageCommision, AgentCommisionRedeem
 from rest_framework import filters
 from rest_framework_simplejwt.tokens import Token
@@ -14,13 +14,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import ExtractYear, ExtractMonth, ExtractWeek
 from django.db.models import Count
-from django.db.models import Sum, Count, Q
 from datetime import date, timedelta
 from django.conf import settings
 from django.utils import timezone
 from django.db import models
-from django_filters import FilterSet
-from django.db.models import Q
 
 common_status = {
     "success": {"code": 200, "message": "Request processed successfully"},
@@ -322,25 +319,20 @@ class WholesellerCountView(views.APIView):
         return Response(data)
 
 
-class WholesellerFilterViewset(viewsets.ModelViewSet):
+class WholesellerListViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Agent.objects.all().order_by('id')
-    serializer_class = WholsellerFilterSerializers
-
-    # filter_backends = [DjangoFilterBackend]
-    # filterset_fields = ["wholeseller"]
+    queryset = Wholeseller.objects.all().order_by('id')
+    serializer_class = WholsellerListSerializers
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["wholeseller_bazaar","wholeseller_type"]
 
     def get_queryset(self):
+        queryset = super().get_queryset()
         pk = self.kwargs.get('pk')
-        agent = Agent.objects.get(id=pk)
-        wholeseller_queryset = Wholeseller.objects.filter(wholeseller_agent=agent).filter(
-            Q(wholeseller_type='INDIVIDUAL') & (Q(wholeseller_bazaar=2)))
-        # queryset = super().get_queryset()
-        # pk = self.kwargs.get('pk')
-        # if pk:
-        #     queryset=queryset.filter(pk=pk)
-        # return queryset
-        return wholeseller_queryset
+        if pk:
+            queryset=queryset.filter(wholeseller_agent=pk)
+        return queryset
+
 
 class AgentEarningAPIView(views.APIView):
     permission_classes = [permissions.AllowAny]
