@@ -1,3 +1,8 @@
 from django.contrib import admin
+from.models import *
 
-# Register your models here.
+# admin.site.register(Wholeseller)
+
+
+class wholeselleradmin(admin.ModelAdmin):
+    list_display = ['id', 'wholeseller_name']

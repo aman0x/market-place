@@ -9,7 +9,14 @@ class AgentManageCommisionSerializer(serializers.ModelSerializer):
     class Meta:
         model = ManageCommision
         fields = '__all__'
-    
+
+
+class AgentWalletSerializer(serializers.Serializer):
+
+    total_amount_earned = serializers.IntegerField()
+    total_amount_withdrawn = serializers.IntegerField()
+    agent_balance= serializers.IntegerField()
+    agent_withdrawable_balance = serializers.IntegerField()
 
 
 class AgentSerializer(serializers.ModelSerializer):

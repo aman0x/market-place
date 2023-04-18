@@ -1,10 +1,10 @@
 import random
 from datetime import timedelta, datetime
-from rest_framework import viewsets, views ,status
+from rest_framework import viewsets, views, status
 from rest_framework.response import Response
 from rest_framework import permissions
-from .serializers import AgentSerializer,AgentManageCommisionSerializer,AgentCommisionRedeemSerializer,WholsellerFilterSerializers
-from agentApp.models import Agent,ManageCommision,AgentCommisionRedeem
+from .serializers import AgentSerializer, AgentManageCommisionSerializer, AgentCommisionRedeemSerializer, WholsellerFilterSerializers, AgentWalletSerializer
+from agentApp.models import Agent, ManageCommision, AgentCommisionRedeem
 from rest_framework import filters
 from rest_framework_simplejwt.tokens import Token
 from django.contrib.auth.models import User
@@ -14,14 +14,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models.functions import ExtractYear, ExtractMonth, ExtractWeek
 from django.db.models import Count
-from django.db.models import Sum, Count,Q
+from django.db.models import Sum, Count, Q
 from datetime import date, timedelta
 from django.conf import settings
 from django.utils import timezone
 from django.db import models
 from django_filters import FilterSet
 from django.db.models import Q
-
 
 common_status = {
     "success": {"code": 200, "message": "Request processed successfully"},
@@ -30,7 +29,6 @@ common_status = {
     "not_found": {"code": 404, "message": "The requested resource was not found"},
     "internal_server_error": {"code": 500, "message": "An internal server error occurred"},
 }
-
 
 
 class AgentViewSet(viewsets.ModelViewSet):
@@ -45,18 +43,44 @@ class AgentViewSet(viewsets.ModelViewSet):
 
 
 class AgentCommisionViewset(viewsets.ModelViewSet):
-    queryset=ManageCommision.objects.all().order_by('id')
-    serializer_class=AgentManageCommisionSerializer
+    queryset = ManageCommision.objects.all().order_by('id')
+    serializer_class = AgentManageCommisionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
 class AgentCommisionRedeemViewset(viewsets.ModelViewSet):
-    queryset=AgentCommisionRedeem.objects.all().order_by('id')
-    serializer_class=AgentCommisionRedeemSerializer
+    queryset = AgentCommisionRedeem.objects.all().order_by('id')
+    serializer_class = AgentCommisionRedeemSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
-    search_fields=['id']
+    search_fields = ['id']
 
+
+class AgentWallet(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def get(self, request, pk):
+        data = {
+            'total_amount_earned': 1000,
+            'total_amount_withdrawn': 500,
+            'agent_balance': 700,
+            'agent_withdrawable_balance': 200,
+        }
+        serializer = AgentWalletSerializer(data=data)
+        deserialized_data = ""
+        try:
+            agent = Agent.objects.get(id=pk)
+            if agent:
+                if serializer.is_valid():
+                    deserialized_data = serializer.validated_data
+                    return Response(deserialized_data, status=status.HTTP_200_OK)
+                else:
+                    return Response(deserialized_data, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response("Agent is not valid")
+        except:
+            return Response("Agent is not available")
 
 class AgentVerifyOTP(views.APIView):
     permission_classes = [permissions.AllowAny]
@@ -96,6 +120,7 @@ class AgentVerifyOTP(views.APIView):
             status_code = common_status["unauthorized"]["code"]
             return Response(payload, status=status_code)
 
+
 class AgentVerifyNumber(views.APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
@@ -106,7 +131,7 @@ class AgentVerifyNumber(views.APIView):
         password = data.get('agent_otp')
         payload = {}
         if agent_number != '':
-            agent_otp = random.randrange(1,  1000000)
+            agent_otp = random.randrange(1, 1000000)
             try:
                 data = Agent.objects.get(agent_number=agent_number)
                 data.agent_otp = agent_otp
@@ -144,19 +169,17 @@ class AgentVerifyNumber(views.APIView):
             }
             status_code = common_status["bad_request"]["code"]
             status_message = common_status["bad_request"]["message"]
-            
+
         return Response(payload, status=status_code)
-    
-    
+
 
 class AgentApplicationStatusViews(views.APIView):
-    permission_classes=[permissions.AllowAny]
-
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-       agent_number = request.data.get("agent_number")
-       agent_status = request.data.get("agent_status")
-       try:
+        agent_number = request.data.get("agent_number")
+        agent_status = request.data.get("agent_status")
+        try:
             agent = Agent.objects.get(agent_number=agent_number)
             user = agent.agent_user
             if user is None:
@@ -164,7 +187,8 @@ class AgentApplicationStatusViews(views.APIView):
 
             if agent_status == "CREATED":
                 message = f"Your application_id {agent_number} is in process./n If you have any Query? Fell free to contact Us ."
-                return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
+                return Response(
+                    {"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
             elif agent_status == "PENDING":
                 message = f"Your application_id {agent_number} is in process./n we have received your Application, Our team is reviewing it. Thank You for your patience .if you have any Query? Fell free to contact Us."
                 return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
@@ -176,11 +200,12 @@ class AgentApplicationStatusViews(views.APIView):
                 return Response({"message": message, "contact_information": {"email": user.email, "phone_number": '+91123456789'}})
             else:
                 return Response({"message": "Invalid agent status."})
-       except Agent.DoesNotExist:
-              return Response({"message": "Agent not found."})
+        except Agent.DoesNotExist:
+            return Response({"message": "Agent not found."})
+
 
 class ReportPlanExpireView(views.APIView):
-    permission_classes=[permissions.AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request, pk):
         wholesalers = Wholeseller.objects.filter(wholeseller_agent_id=pk)
@@ -190,8 +215,8 @@ class ReportPlanExpireView(views.APIView):
             end_date = wholeseller.wholeseller_plan.end_date
             days_left = (end_date - today).days
 
-            status = "active" # default value
-            message = "Your plan is active." # default value
+            status = "active"  # default value
+            message = "Your plan is active."  # default value
             days = 0
 
             wholeseller_data = {
@@ -205,7 +230,7 @@ class ReportPlanExpireView(views.APIView):
                 message = "Your plan has expired. Please renew your plan."
                 status = "expired"
                 days = f"expired by {abs(days_left)} days"
-                
+
             elif days_left <= 15:
                 message = f"Your plan will expiring soon. Please renew soon."
                 status = "expiring_soon"
@@ -227,8 +252,9 @@ class ReportPlanExpireView(views.APIView):
         }
         return Response(data)
 
+
 class WholesellerCountView(views.APIView):
-    permission_classes=[permissions.AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request, pk):
         year = request.query_params.get('year')
@@ -264,7 +290,9 @@ class WholesellerCountView(views.APIView):
             count = item['count']
             yearly_result.append({'year': year_num, 'count': count})
 
-        monthly_counts = qs.annotate(year=ExtractYear('created_at'), month=ExtractMonth('created_at')).values('year', 'month').annotate(count=Count('id'))
+        monthly_counts = qs.annotate(year=ExtractYear('created_at'), month=ExtractMonth('created_at')).values('year',
+                                                                                                              'month').annotate(
+            count=Count('id'))
         monthly_result = []
         for item in monthly_counts:
             year_num = item['year']
@@ -293,27 +321,26 @@ class WholesellerCountView(views.APIView):
 
         return Response(data)
 
+
 class WholesellerFilterViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Agent.objects.all().order_by('id')
     serializer_class = WholsellerFilterSerializers
+
     # filter_backends = [DjangoFilterBackend]
     # filterset_fields = ["wholeseller"]
 
     def get_queryset(self):
         pk = self.kwargs.get('pk')
-        agent=Agent.objects.get(id=pk)
-        wholeseller_queryset= Wholeseller.objects.filter(wholeseller_agent=agent).filter(Q(wholeseller_type='INDIVIDUAL')&(Q(wholeseller_bazaar=2)))
+        agent = Agent.objects.get(id=pk)
+        wholeseller_queryset = Wholeseller.objects.filter(wholeseller_agent=agent).filter(
+            Q(wholeseller_type='INDIVIDUAL') & (Q(wholeseller_bazaar=2)))
         # queryset = super().get_queryset()
         # pk = self.kwargs.get('pk')
         # if pk:
         #     queryset=queryset.filter(pk=pk)
         # return queryset
         return wholeseller_queryset
-
-
-    
-
 
 class AgentEarningAPIView(views.APIView):
     permission_classes = [permissions.AllowAny]
@@ -337,7 +364,9 @@ class AgentEarningAPIView(views.APIView):
             # Filter by week
             if week:
                 start_date = timezone.now().date() - timedelta(weeks=52)  # consider only past 52 weeks
-                total_wholesellers_added = total_wholesellers_added.filter(created_at__range=[start_date, timezone.now().date()]).annotate(week_num=Count('id', filter=(models.Q(created_at__week=week))))
+                total_wholesellers_added = total_wholesellers_added.filter(
+                    created_at__range=[start_date, timezone.now().date()]).annotate(
+                    week_num=Count('id', filter=(models.Q(created_at__week=week))))
 
             count = total_wholesellers_added.count()
             if count > 0:

@@ -16,6 +16,7 @@ urlpatterns = [
     path('application-status/',views.AgentApplicationStatusViews.as_view(), name="agent-status-message"),
     path('verify_phone/', views.AgentVerifyNumber.as_view(), name="agent-login"),
     path('verify_otp/', views.AgentVerifyOTP.as_view(), name='verify_otp'),
+    path('data/<int:pk>/wallet/', views.AgentWallet.as_view(), name='wallet'),
     path('data/<int:pk>/wholeseller-filter/',views.WholesellerFilterViewset.as_view({'get': 'list'}), name="wholeseller-filter"),
     path('', include(router.urls)),
 ]
