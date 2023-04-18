@@ -49,31 +49,8 @@ class AgentCommisionRedeemSerializer(serializers.ModelSerializer):
         fields= "__all__"
 
 
-
-
-class WholsellerFilterSerializers(serializers.ModelSerializer):
-    wholeseller = serializers.SerializerMethodField(read_only=True)
+class WholsellerListSerializers(serializers.ModelSerializer):
 
     class Meta:
-        model=Agent
-        fields= ['wholeseller']
-
-    def get_wholeseller(self,obj):
-        return obj.agent.all().values(
-            "id", "wholeseller_active", "wholeseller_address",
-            "wholeseller_agent", "wholeseller_altranate_number",
-            "wholeseller_bazaar", "wholeseller_city", "wholeseller_type",
-            "wholeseller_contact_per", "wholeseller_description", "wholeseller_district",
-        ).distinct()
-        # return obj.agent.all().values(
-        #     "wholeseller_bazaar"
-        # ).distinct()
-
-
-
-# class AgentCommisionCountSerializer(serializers.Serializer):
-#     wholeseller = serializers.IntegerField(read_only=True)
-#     total_commision = serializers.IntegerField(read_only=True)
-#     year = serializers.CharField(read_only=True)
-#     month = serializers.CharField(read_only=True)
-#     week = serializers.CharField(read_only=True)
+        model=Wholeseller
+        fields= "__all__"
