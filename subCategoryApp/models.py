@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 
     
 class SubCategory(models.Model):
-    subcategory_name = models.CharField(max_length=200)
+    subcategory_name = models.CharField(max_length=200, unique=True)
     subcategory_description = models.TextField(blank=True)
     subcategory_ref_image = models.ImageField(
         upload_to="image/subcategory/%Y/%m/%d", null=True)
