@@ -19,13 +19,9 @@ from django.conf import settings
 from django.utils import timezone
 from django.db import models
 
-common_status = {
-    "success": {"code": 200, "message": "Request processed successfully"},
-    "bad_request": {"code": 400, "message": "Bad request, please check your input data"},
-    "unauthorized": {"code": 401, "message": "You are not authorized to perform this action"},
-    "not_found": {"code": 404, "message": "The requested resource was not found"},
-    "internal_server_error": {"code": 500, "message": "An internal server error occurred"},
-}
+
+common_status = settings.COMMON_STATUS
+
 
 
 class AgentViewSet(viewsets.ModelViewSet):
@@ -79,6 +75,7 @@ class AgentWallet(views.APIView):
         except:
             return Response("Agent is not available")
 
+
 class AgentVerifyOTP(views.APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
@@ -121,6 +118,7 @@ class AgentVerifyOTP(views.APIView):
 class AgentVerifyNumber(views.APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
+
 
     def post(self, request):
         data = request.data

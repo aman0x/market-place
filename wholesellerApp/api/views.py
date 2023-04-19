@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, views, status
 from rest_framework import permissions
 from .serializers import *
 from wholesellerApp.models import Wholeseller
@@ -6,7 +6,8 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 import requests
 import json
-
+from django.conf import settings
+from rest_framework.response import Response
 
 class WholesellerViewSet(viewsets.ModelViewSet):
     """
@@ -41,10 +42,34 @@ class WholesellerDashboardBazzarViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['wholeseller_type']
 
-    # def list(self, request, *args, **kwargs):
-    #     response = requests.get('http://127.0.0.1:8000/api/product/filter/')
-    #     data = response.json()
-    #     print(data) # Print the data to the console
-    #     # Call the super class's list method to return the default response
-    #     result = super().list(request, *args, **kwargs)
-    #     return  result
+
+class WholesellerApplicationStatusViews(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        wholeseller_number = request.data.get("wholeseller_number")
+        wholeseller_status = request.data.get("wholeseller_status")
+        contact_number = settings.CONTACT_NUMBER
+        try:
+            wholeseller = Wholeseller.objects.get(wholeseller_number=wholeseller_number)
+            user = wholeseller.wholeseller_user
+            if user is None:
+                return Response({"message": "Wholeseller user not found."})
+
+            if wholeseller_status == "CREATED":
+                message = f"Your application_id {wholeseller_number} is in process./n If you have any Query? Fell free to contact Us ."
+                return Response(
+                    {"message": message, "contact_information": {"email": user.email, "phone_number": contact_number}})
+            elif wholeseller_status == "PENDING":
+                message = f"Your application_id {wholeseller_number} is in process./n we have received your Application, Our team is reviewing it. Thank You for your patience .if you have any Query? Fell free to contact Us."
+                return Response({"message": message, "contact_information": {"email": user.email, "phone_number": contact_number}})
+            elif wholeseller_status == "KYCREJECTED":
+                message = f"Your application_id {wholeseller_number} is rejected ! Your pan image is very blurred and difficult to read. If you have any Query? Feel free to contact Us."
+                return Response({"message": message, "contact_information": {"email": user.email, "phone_number": contact_number}})
+            elif wholeseller_status == "KYCAPPROVED":
+                message = f"Your application_id {wholeseller_number} is approved !  If you have any Query? Feel free to contact Us."
+                return Response({"message": message, "contact_information": {"email": user.email, "phone_number": contact_number}})
+            else:
+                return Response({"message": "Invalid agent status."})
+        except Wholeseller.DoesNotExist:
+            return Response({"message": "Wholeseller not found."})

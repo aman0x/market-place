@@ -20,5 +20,3 @@ urlpatterns = [
     path('data/<int:pk>/wholeseller-list/',views.WholesellerListViewset.as_view({'get': 'list'}), name="wholeseller-filter"),
     path('', include(router.urls)),
 ]
-
-
