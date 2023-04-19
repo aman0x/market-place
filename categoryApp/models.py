@@ -7,7 +7,7 @@ from parentCategoryApp.models import ParentCategory,Bazaar
 
 
 class Category(models.Model):
-    category_name = models.CharField(max_length=200)
+    category_name = models.CharField(max_length=200, unique=True)
     category_description = models.TextField(blank=True)
     category_ref_image = models.ImageField(
         upload_to="image/category/%Y/%m/%d",  null=True)

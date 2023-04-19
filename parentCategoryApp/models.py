@@ -6,7 +6,7 @@ from bazaarApp.models import Bazaar
 
 
 class ParentCategory(models.Model):
-    parent_category_name = models.CharField(max_length=200)
+    parent_category_name = models.CharField(max_length=200, unique=True)
     parent_category_description = models.TextField(blank=True)
     parent_category_ref_image = models.ImageField(
         upload_to="image/parentcategory/%Y/%m/%d",  null=True)
