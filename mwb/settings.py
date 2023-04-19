@@ -177,7 +177,13 @@ MONTH_NAMES = {
     12: 'December'
 }
 
-
+COMMON_STATUS = {
+    "success": {"code": 200, "message": "Request processed successfully"},
+    "bad_request": {"code": 400, "message": "Bad request, please check your input data"},
+    "unauthorized": {"code": 401, "message": "You are not authorized to perform this action"},
+    "not_found": {"code": 404, "message": "The requested resource was not found"},
+    "internal_server_error": {"code": 500, "message": "An internal server error occurred"},
+}
 
 try:
     from .local_settings import *

@@ -13,12 +13,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('application-status/', views.WholesellerApplicationStatusViews.as_view(), name="agent-status-message"),
     path('dashboard/', views.WholesellerDashboardViewSet.as_view({'get': 'list'}),name="Wholeseller-dashboard"),
-<<<<<<< Updated upstream
     path('dashboard/bazaar/', views.WholesellerDashboardBazzarViewSet.as_view({'get': 'list'}),name="Wholeseller-dashboard-bazzar"),
-=======
-    path('dashboard/bazaar/', views.WholesellerDashboardBazzarViewSet.as_view({'get': 'list'}),name="Wholeseller-dashboard"),
-    path('login', views.WholesalerLogin.as_view(), name="wholesaler-login")
->>>>>>> Stashed changes
 ]
 
 urlpatterns += router.urls
