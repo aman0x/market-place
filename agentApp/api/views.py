@@ -325,7 +325,6 @@ class WholesellerListViewset(viewsets.ModelViewSet):
     filterset_fields = ["wholeseller_bazaar","wholeseller_type"]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
         pk = self.kwargs.get('pk')
         if pk:
             queryset=queryset.filter(wholeseller_agent=pk)
