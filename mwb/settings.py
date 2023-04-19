@@ -57,17 +57,7 @@ INSTALLED_APPS = [
     'languageApp',
     'paymentApp',
     'masterApp'
-    # 'leaflet',
-    # 'corsheaders',
-    # 'fcm_django',
-    # 'bucket',
-    # 'invoice',
-    # 'item',
-    # 'itemmaster',
-    # 'locality',
-    # 'order',
-    # 'subcategory',
-    # 'dashboard'
+    'django_extensions',
 ]
 
 #custom entry
@@ -184,6 +174,8 @@ COMMON_STATUS = {
     "not_found": {"code": 404, "message": "The requested resource was not found"},
     "internal_server_error": {"code": 500, "message": "An internal server error occurred"},
 }
+
+CONTACT_NUMBER = "+91123456789"
 
 try:
     from .local_settings import *
