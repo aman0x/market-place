@@ -8,8 +8,8 @@ UNIT_TYPE = (
 
 class Unit(models.Model):
     unit_type = models.CharField(
-        max_length=15, choices=UNIT_TYPE, default="QUANTITY", unique=True)
-    unit_name=models.CharField(max_length=30,default=None)
+        max_length=15, choices=UNIT_TYPE, default="QUANTITY")
+    unit_name=models.CharField(max_length=30,default=None, unique=True)
 
     def __str__(self):
         return self.unit_name
