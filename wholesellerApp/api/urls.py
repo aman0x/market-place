@@ -13,7 +13,8 @@ urlpatterns = [
     path('', include(router.urls)),
     path('application-status/', views.WholesellerApplicationStatusViews.as_view(), name="agent-status-message"),
     path('dashboard/', views.WholesellerDashboardViewSet.as_view({'get': 'list'}),name="Wholeseller-dashboard"),
-    path('dashboard/bazaar/', views.WholesellerDashboardBazzarViewSet.as_view({'get': 'list'}),name="Wholeseller-dashboard-bazzar"),
+    path('dashboard/bazaar/', views.WholesellerDashboardBazzarViewSet.as_view({'get': 'list'}), name="Wholeseller-dashboard-Bazaar"),
+    path('<int:pk>/product/', views.WholesellerProductViewSet.as_view(), name="Wholeseller-Product"),
 ]
 
 urlpatterns += router.urls
