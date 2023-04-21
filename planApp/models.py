@@ -1,5 +1,5 @@
 from django.db import models
-from bazaarApp.models import Bazaar
+from subCategoryApp.models import Bazaar
 from locationApp.models import *
 import datetime
 
@@ -36,3 +36,13 @@ class Plan(models.Model):
     
     def __str__(self):
         return self.firm_name
+    
+class RetailerPlan(models.Model):
+    plan_name = models.CharField(max_length=20, default=None, null=True)
+    plan_added_date = models.DateTimeField(
+        default=datetime.datetime.now, blank=True)
+    plan_updated_date = models.DateTimeField(
+        default=datetime.datetime.now, blank=True)
+        
+    def __str__(self):
+        return self.plan_name
