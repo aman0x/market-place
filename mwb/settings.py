@@ -56,8 +56,7 @@ INSTALLED_APPS = [
     'locationApp',
     'languageApp',
     'paymentApp',
-    'masterApp'
-    'django_extensions',
+    'masterApp',
 ]
 
 #custom entry
