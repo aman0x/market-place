@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'rest_framework',
+    'drf_standardized_errors',
     'django_filters',
     'phonenumber_field',
     'django_otp',
@@ -75,8 +76,10 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler"
 }
+DRF_STANDARDIZED_ERRORS = {"ENABLE_IN_DEBUG_FOR_UNHANDLED_EXCEPTIONS": True}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
