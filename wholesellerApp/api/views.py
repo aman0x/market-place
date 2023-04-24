@@ -35,6 +35,109 @@ class WholesellerDashboardViewSet(viewsets.ModelViewSet):
     filterset_fields = ['wholeseller_type']
 
 
+class WholesellerReportTotalOrderViewSet(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        return Response({"total order": 210})
+
+
+class WholesellerReportTotalIncomeViewSet(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        return Response({"total Income": 5123431})
+
+
+class WholesellerReportCityWiseBusinessViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = WholesellerViewReportCityWiseSerializer
+    queryset = Wholeseller.objects.all().order_by('id')
+
+    def get(self):
+        queryset = super().get_queryset()
+        pk = self.kwargs.get('pk')
+        if pk:
+            queryset = queryset.filter(pk=pk)
+        return queryset
+
+
+class WholesellerReportTopProductViewSet(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        wholeseller_queryset = Wholeseller.objects.filter(id=pk)
+        data = wholeseller_queryset.all().values_list("wholeseller_bazaar")
+        product_ids = []
+        payload = []
+        new_data = []
+        count = 0
+        for bazaar_id in data:
+            Product_queryset = Product.objects.filter(bazaar=bazaar_id)
+            for product in Product_queryset:
+                id = product.id
+                product_ids.append(id)
+        for id in product_ids:
+            product = Product.objects.filter(id=id)
+            Product_data = product.all().values()
+            for Product_data in Product_data:
+                data = {
+                    "product_name": Product_data["product_name"],
+                    "product_total_mrp": Product_data["product_total_mrp"],
+                    "sold": 12131,
+                    "sales": 21213414
+                }
+                new_data.append(data)
+                payload.append(Product_data)
+                count += 1
+            print(new_data)
+        return Response({"count": count, "result": new_data})
+
+
+class WholesellerReportRetailersViewSet(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+
+    def get(self, request, pk):
+        data = [{
+            "Name": "Ajay",
+            "customer_id": 111
+        },
+        {
+            "Name": "B",
+            "customer_id": 112
+        },
+        {
+            "Name": "Ajay",
+            "customer_id": 122
+        }
+        ]
+        return Response(data)
+
+class WholesellerReportTransactionViewSet(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+
+    def get(self, request, pk):
+        data = [{
+            "payment#123" : 124,
+            "payment#125" : 324,
+         }]
+        return Response(data)
+
+
+class WholesellerReportRealtimeSaleViewSet(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+
+    def get(self, request, pk):
+        data = [{
+            "Orders": 1231,
+            "Avg. Sales per Day": 231312
+        }]
+        return Response(data)
+
+
 class WholesellerProductViewSet(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 

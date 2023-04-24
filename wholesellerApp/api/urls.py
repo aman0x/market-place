@@ -12,9 +12,16 @@ router.register(r'data', views.WholesellerViewSet),
 urlpatterns = [
     path('', include(router.urls)),
     path('application-status/', views.WholesellerApplicationStatusViews.as_view(), name="agent-status-message"),
-    path('dashboard/', views.WholesellerDashboardViewSet.as_view({'get': 'list'}),name="Wholeseller-dashboard"),
+    path('dashboard/', views.WholesellerDashboardViewSet.as_view({'get': 'list'}), name="Wholeseller-dashboard"),
     path('dashboard/bazaar/', views.WholesellerDashboardBazzarViewSet.as_view({'get': 'list'}), name="Wholeseller-dashboard-Bazaar"),
-    path('<int:pk>/product/', views.WholesellerProductViewSet.as_view(), name="Wholeseller-Product"),
+    path('data/<int:pk>/product/', views.WholesellerProductViewSet.as_view(), name="Wholeseller-Product"),
+    path('data/<int:pk>/report/total-order/', views.WholesellerReportTotalOrderViewSet.as_view(), name="Wholeseller-Report-total_order"),
+    path('data/<int:pk>/report/total-income/', views.WholesellerReportTotalIncomeViewSet.as_view(), name="Wholeseller-Report-total_income"),
+    path('data/<int:pk>/report/city-wise-business/', views.WholesellerReportCityWiseBusinessViewSet.as_view({'get': 'list'}), name="Wholeseller-Report-city-wise-business"),
+    path('data/<int:pk>/report/top-products/', views.WholesellerReportTopProductViewSet.as_view(), name="Wholeseller-Report-top-product"),
+    path('data/<int:pk>/report/new-retailers/', views.WholesellerReportRetailersViewSet.as_view(), name="Wholeseller-Report-new-retailers"),
+    path('data/<int:pk>/report/transaction-history/', views.WholesellerReportTransactionViewSet.as_view(), name="Wholeseller-Report-transaction-history"),
+    path('data/<int:pk>/report/realtime-sale/', views.WholesellerReportRealtimeSaleViewSet.as_view(), name="Wholeseller-Report-realtime-sale"),
 ]
 
 urlpatterns += router.urls
