@@ -98,7 +98,8 @@ class AgentVerifyOTP(views.APIView):
                 refresh_token.set_exp(from_time=datetime.utcnow(), lifetime=timedelta(seconds=166400))
                 return Response({
                     "access_token": str(access_token),
-                    "refresh_token": str(refresh_token)
+                    "refresh_token": str(refresh_token),
+                    "user_id": user.id
                 })
             else:
                 status_code = common_status["unauthorized"]["code"]
@@ -126,7 +127,7 @@ class AgentVerifyNumber(views.APIView):
         password = data.get('agent_otp')
         payload = {}
         if agent_number != '':
-            agent_otp = random.randrange(1, 1000000)
+            agent_otp = random.randrange(000000, 999999)
             try:
                 data = Agent.objects.get(agent_number=agent_number)
                 data.agent_otp = agent_otp
