@@ -21,7 +21,7 @@ class Bazaar(models.Model):
         default=datetime.now, blank=True)
     bazaar_updated_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='bazaar_updated_by', null=True)
-    bazaar_steps = models.IntegerField(max_length=20, null=True)
+    bazaar_steps = models.IntegerField(null=True, default=None)
     bazaar_active = models.BooleanField(default=True)
 
     class Meta:
