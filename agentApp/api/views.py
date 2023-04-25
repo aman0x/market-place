@@ -99,7 +99,7 @@ class AgentVerifyOTP(views.APIView):
                 return Response({
                     "access_token": str(access_token),
                     "refresh_token": str(refresh_token),
-                    "user_id": user.id
+                    "agent_id": agent.id
                 })
             else:
                 status_code = common_status["unauthorized"]["code"]
