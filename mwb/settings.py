@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'masterApp',
     'offerApp',
     'django_extensions',
+    'retailerApp',
 ]
 
 # custom entry
