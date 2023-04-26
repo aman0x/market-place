@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from agentApp.models import Agent, ManageCommision, AgentCommisionRedeem
+from agentApp.models import Agent, AgentCommisionRedeem
 from drf_extra_fields.fields import Base64ImageField
 from wholesellerApp.models import Wholeseller
 from agencyApp.models import Agency
@@ -9,10 +9,10 @@ from bazaarApp.api.serializers import BazaarSerializer
 from locationApp.api.serializers import *
 from locationApp.models import *
 
-class AgentManageCommisionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ManageCommision
-        fields = '__all__'
+# class AgentManageCommisionSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ManageCommision
+#         fields = '__all__'
 
 
 class AgentWalletSerializer(serializers.Serializer):
