@@ -6,7 +6,7 @@ import requests
 from django.http import JsonResponse
 
 
-class WholesellerSerializerAll(serializers.ModelSerializer):
+class WholesellerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wholeseller
         fields = '__all__'
