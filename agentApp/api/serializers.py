@@ -34,9 +34,9 @@ class AgentSerializer(serializers.ModelSerializer):
     agent_assigned_state_names = serializers.SerializerMethodField()
     agent_assigned_district_names = serializers.SerializerMethodField()
     agent_assigned_city_names = serializers.SerializerMethodField()
-    agent_city = serializers.SerializerMethodField()
-    agent_district = serializers.SerializerMethodField()
-    agent_state = serializers.SerializerMethodField()
+    # agent_city_name = serializers.SerializerMethodField()
+    # agent_district_name = serializers.SerializerMethodField()
+    agent_state_name = serializers.SerializerMethodField()
     
     
     
@@ -51,26 +51,26 @@ class AgentSerializer(serializers.ModelSerializer):
             firm_name = Agency.objects.filter(id=agency_id).get().firm_name
         return firm_name
     
-    def get_agent_state(self, obj):
+    def get_agent_state_name(self, obj):
         state = ""
         state_id = obj.agent_state_id
-        if state is not None:
+        if state_id is not None:
             state = State.objects.filter(id=state_id).get().state
         return state
         
         
-    def get_agent_district(self, obj):
+    def get_agent_district_name(self, obj):
         district = ""
         district_id = obj.agent_district_id
-        if district is not None:
+        if district_id is not None:
             district = District.objects.filter(id=district_id).get().district
         return district
 
     
-    def get_agent_city(self, obj):
+    def get_agent_city_name(self, obj):
         city = ""
         city_id = obj.agent_city_id
-        if city is not None:
+        if city_id is not None:
             city = City.objects.filter(id=city_id).get().city
         return city
         
