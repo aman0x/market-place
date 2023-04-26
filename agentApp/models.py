@@ -26,9 +26,14 @@ AGENT_STATUS = (
     ("APPROVED", "Approved"),
 )
 
-AGENT_COMMISION = (
+AGENT_COMMISSION_TYPE = (
     ("PERCUSTOMER", "Percustomer"),
     ("PERPLAN", "Perplan")
+)
+
+AGENT_COMMISSION_VALUE_TYPE = (
+    ("PERCENTAGE", "Percentage"),
+    ("AMOUNT", "Amount")
 )
 
 AGENT_GENDER = (
@@ -37,14 +42,14 @@ AGENT_GENDER = (
 )
 
 
-class ManageCommision(models.Model):
+# class ManageCommision(models.Model):
 
-    agent_manage_commision = models.CharField(
-        max_length=15, choices=AGENT_COMMISION, default="PERPLAN")
-    agent_commision_value = models.IntegerField(blank=True, null=True)
+#     agent_manage_commision = models.CharField(
+#         max_length=15, choices=AGENT_COMMISION, default="PERPLAN")
+#     agent_commision_value = models.IntegerField(blank=True, null=True)
 
-    def __str__(self):
-        return self.agent_manage_commision
+#     def __str__(self):
+#         return self.agent_manage_commision
 
 
 
@@ -83,8 +88,14 @@ class Agent(models.Model):
     agent_assigned_district = models.ManyToManyField(
         District, related_name="agent_assigned_district")
     agent_pincode = models.IntegerField(null=True)
-    agent_commision = models.ForeignKey(
-        ManageCommision, on_delete=models.CASCADE, null=True)
+    agent_commission_type = models.CharField(
+        max_length=20, choices=AGENT_COMMISSION_TYPE, default="PERCUSTOMER"
+    )
+    agent_commission_value_type =models.CharField(
+        max_length=20, choices=AGENT_COMMISSION_VALUE_TYPE, default="AMOUNT"
+    )
+    agent_commission_value =models.CharField(
+        max_length=10, default=None, blank=True, null=True)
     agent_adharcard_no = models.CharField(
         max_length=12, default=None, blank=True, null=True)
     agent_adhar_front_image = models.ImageField(

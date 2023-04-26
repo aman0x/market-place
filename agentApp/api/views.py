@@ -3,8 +3,8 @@ from datetime import timedelta, datetime
 from rest_framework import viewsets, views, status
 from rest_framework.response import Response
 from rest_framework import permissions
-from .serializers import AgentSerializer, AgentManageCommisionSerializer, AgentCommisionRedeemSerializer, WholsellerListSerializers, AgentWalletSerializer
-from agentApp.models import Agent, ManageCommision, AgentCommisionRedeem
+from .serializers import AgentSerializer, AgentCommisionRedeemSerializer, WholsellerListSerializers, AgentWalletSerializer
+from agentApp.models import Agent,  AgentCommisionRedeem
 from rest_framework import filters
 from rest_framework_simplejwt.tokens import Token
 from django.contrib.auth.models import User
@@ -35,10 +35,10 @@ class AgentViewSet(viewsets.ModelViewSet):
     search_fields = ['agent_name']
 
 
-class AgentCommisionViewset(viewsets.ModelViewSet):
-    queryset = ManageCommision.objects.all().order_by('id')
-    serializer_class = AgentManageCommisionSerializer
-    permission_classes = [permissions.IsAuthenticated]
+# class AgentCommisionViewset(viewsets.ModelViewSet):
+#     queryset = ManageCommision.objects.all().order_by('id')
+#     serializer_class = AgentManageCommisionSerializer
+#     permission_classes = [permissions.IsAuthenticated]
 
 
 class AgentCommisionRedeemViewset(viewsets.ModelViewSet):
