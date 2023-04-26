@@ -34,8 +34,8 @@ class AgentSerializer(serializers.ModelSerializer):
     agent_assigned_state_names = serializers.SerializerMethodField()
     agent_assigned_district_names = serializers.SerializerMethodField()
     agent_assigned_city_names = serializers.SerializerMethodField()
-    # agent_city_name = serializers.SerializerMethodField()
-    # agent_district_name = serializers.SerializerMethodField()
+    agent_city_name = serializers.SerializerMethodField()
+    agent_district_name = serializers.SerializerMethodField()
     agent_state_name = serializers.SerializerMethodField()
     
     
