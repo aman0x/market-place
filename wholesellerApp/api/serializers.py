@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from wholesellerApp.models import Wholeseller
 from bazaarApp.models import Bazaar
-# from retailerApp.models import Retailer
+from retailerApp.models import Retailer
+from parentCategoryApp.models import ParentCategory
 import requests
 from django.http import JsonResponse
 
@@ -30,7 +31,6 @@ class WholesellerViewReportCityWiseSerializer(serializers.ModelSerializer):
     sales = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
-
         model = Wholeseller
         fields = ['id', 'cities', 'orders', 'sales']
         # fields = ['id', 'orders', 'sales']
@@ -50,3 +50,8 @@ class WholesellerViewReportRetailerSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     customer_id = serializers.SerializerMethodField()
 
+
+class WholesellerDashboardTopRetailersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Retailer
+        fields = "__all__"

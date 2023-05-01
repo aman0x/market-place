@@ -22,10 +22,10 @@ class Offers(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='offer_product_name')
 
     offer_base_price = models.DecimalField(decimal_places=2, max_digits=12, null=True)
-    offer_discount_by = models.CharField(max_length=20, null=True, default=None)
-    offer_discount_by_type = models.CharField(max_length=20,
-                                              choices=DISCOUNT_BY_TYPE,
-                                              default="PERCENTAGE")
+    offer_discount_value_type = models.CharField(max_length=20,
+                                                 choices=DISCOUNT_BY_TYPE,
+                                                 default="PERCENTAGE")
+    offer_discount_value = models.CharField(max_length=20, null=True, default=None)
     offer_discounted_price = models.CharField(max_length=20, null=True, default=None)
     offer_coupon_code = models.CharField(max_length=200)
     offer_start_date = models.DateField(default=datetime.now, blank=True)
@@ -44,4 +44,4 @@ class Offers(models.Model):
         verbose_name_plural = "offers"
 
     def __str__(self):
-        return self.offer_name
+        return self.product
