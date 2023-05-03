@@ -15,6 +15,19 @@ class StateViewSet(viewsets.ModelViewSet):
      permission_classes = [permissions.IsAuthenticated]
     #  lookup_field='state'
 
+
+class AllStateViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = State.objects.all().order_by('id')
+    serializer_class = StateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = None
+
+
+#  lookup_field='state'
+
 class CityViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
@@ -22,6 +35,18 @@ class CityViewSet(viewsets.ModelViewSet):
     queryset = City.objects.all().order_by('id')
     serializer_class = CitySerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+class AllCityViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = City.objects.all().order_by('id')
+    serializer_class = CitySerializer
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = None
+
+
 
 class DistrictViewSet(viewsets.ModelViewSet):
     """
@@ -31,6 +56,14 @@ class DistrictViewSet(viewsets.ModelViewSet):
     serializer_class = DistrictSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+class AllDistrictViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = District.objects.all().order_by('id')
+    serializer_class = DistrictSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = None
 
 class DistrictGroupByViewSet(viewsets.ModelViewSet):
     """
