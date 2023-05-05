@@ -21,9 +21,9 @@ urlpatterns = [
     path('data/<int:pk>/dashboard/new-retailers/', views.WholesellerDashboardNewRetailersViewSet.as_view(), name="Wholeseller-dashboard-new-retailers"),
     path('data/<int:pk>/dashboard/top-retailers/', views.WholesellerDashboardTopRetailersViewSet.as_view({'get': 'list'}), name="Wholeseller-dashboard-top-retailers"),
     path('data/<int:pk>/dashboard/top-products/', views.WholesellerDashboardTopProductsViewSet.as_view(), name="Wholeseller-dashboard-top-products"),
-    # path('data/<int:pk>/dashboard/categories/', views.WholesellerDashboardCategoriesViewSet.as_view(), name="Wholeseller-dashboard-categories"),
-# path('dashboard/<int:pk>/sub-categories/', views.WholesellerDashboardSubCategoriesViewSet.as_view(), name="Wholeseller-dashboard-sub-categories"),
-# path('dashboard/<int:pk>/ads-performance/', views.WholesellerDashboardAdsPerformanceViewSet.as_view(), name="Wholeseller-dashboard-ads-performance"),
+    path('data/<int:pk>/dashboard/categories/', views.WholesellerDashboardCategoriesViewSet.as_view(), name="Wholeseller-dashboard-categories"),
+    path('data/<int:pk>/dashboard/sub-categories/', views.WholesellerDashboardSubCategoriesViewSet.as_view(), name="Wholeseller-dashboard-sub-categories"),
+   # path('data/<int:pk>/dashboard/ads-performance/', views.WholesellerDashboardAdsPerformanceViewSet.as_view(), name="Wholeseller-dashboard-ads-performance"),
 
     path('data/<int:pk>/product/', views.WholesellerProductViewSet.as_view(), name="Wholeseller-Product"),
     path('data/<int:pk>/report/total-order/', views.WholesellerReportTotalOrderViewSet.as_view(), name="Wholeseller-Report-total_order"),

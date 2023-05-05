@@ -310,8 +310,34 @@ class WholesellerDashboardCategoriesViewSet(views.APIView):
 
                 new_data.append(data)
 
-        return Response({"category name": category_names})
+        return Response({"category name": new_data})
+class WholesellerDashboardSubCategoriesViewSet(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
 
+    def get(self, request, pk):
+        wholeseller_queryset = Wholeseller.objects.filter(id=pk)
+        data = wholeseller_queryset.all().values_list("wholeseller_bazaar")
+        sub_category_names = []
+        new_data = []
+        for bazaar_id in data:
+            product_queryset = Product.objects.filter(bazaar=bazaar_id)
+            for product in product_queryset:
+                data = {
+                    "subcategory_name": product.subcategory.subcategory_name,
+                    "most_purchased_by": "abc limited",
+                    "sold": 12131,
+                    "sales": 21213414
+                }
+
+                new_data.append(data)
+
+        return Response({"subcategory name": new_data})
+
+class WholesellerDashboardAdsPerformanceViewSet(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+       return Response({"ads name": "ads name "})
 
 class WholesellerApplicationStatusViews(views.APIView):
     permission_classes = [permissions.AllowAny]
