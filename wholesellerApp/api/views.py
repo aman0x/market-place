@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from .serializers import *
 from wholesellerApp.models import Wholeseller
 from productApp.models import Product
+from adsApp.models import Ads
 from django.contrib.auth.models import User
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
@@ -317,7 +318,7 @@ class WholesellerDashboardSubCategoriesViewSet(views.APIView):
     def get(self, request, pk):
         wholeseller_queryset = Wholeseller.objects.filter(id=pk)
         data = wholeseller_queryset.all().values_list("wholeseller_bazaar")
-        sub_category_names = []
+        subcategory_names = []
         new_data = []
         for bazaar_id in data:
             product_queryset = Product.objects.filter(bazaar=bazaar_id)
@@ -337,7 +338,21 @@ class WholesellerDashboardAdsPerformanceViewSet(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk):
-       return Response({"ads name": "ads name "})
+        data = Ads.objects.filter(id=pk)
+        ad_title = []
+        new_data = []
+        for id in data:
+            data = {
+                "Name": id.ad_title,
+                "Product": "Mobile",
+                "City": 12131,
+                "Price": 21213414,
+                "Sold": 200,
+                "Amount Spend": 1000
+            }
+
+            new_data.append(data)
+        return Response({"Ads Performance": new_data})
 
 class WholesellerApplicationStatusViews(views.APIView):
     permission_classes = [permissions.AllowAny]
