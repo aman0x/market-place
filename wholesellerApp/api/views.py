@@ -345,7 +345,7 @@ class WholesellerDashboardAdsPerformanceViewSet(views.APIView):
             data = {
                 "Name": id.ad_title,
                 "Product": "Mobile",
-                "City": 12131,
+                "City": "Jaipur",
                 "Price": 21213414,
                 "Sold": 200,
                 "Amount Spend": 1000
@@ -353,6 +353,21 @@ class WholesellerDashboardAdsPerformanceViewSet(views.APIView):
 
             new_data.append(data)
         return Response({"Ads Performance": new_data})
+
+class WholesellerDashboardTopBranchesViewSet(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        data = []
+        new_data = []
+        data = {
+            "Branch Name": "Branch 1",
+            "Orders": 1200,
+            "Revenue": 100000,
+            "State": "Delhi-NCR"
+        }
+        new_data.append(data)
+        return Response({"Top Branches": new_data})
 
 class WholesellerApplicationStatusViews(views.APIView):
     permission_classes = [permissions.AllowAny]
