@@ -169,7 +169,8 @@ COMMON_STATUS = {
     "internal_server_error": {"code": 500, "message": "An internal server error occurred"},
 }
 
-CONTACT_NUMBER = "+91123456789"
+ADMIN_EMAIL = "admin@email.com"
+ADMIN_CONTACT_NUMBER = "+91123456789"
 
 try:
     from .local_settings import *

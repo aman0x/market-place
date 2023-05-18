@@ -15,27 +15,33 @@ from django.http import JsonResponse, HttpResponse
 from django.db.models import Q
 from retailerApp.models import Retailer
 
+common_status = settings.COMMON_STATUS
+contact_number = settings.ADMIN_CONTACT_NUMBER
+email = settings.ADMIN_EMAIL
+
 
 class WholesellerViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
+
     queryset = Wholeseller.objects.all()
     serializer_class = WholesellerSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
-    search_fields = ['wholeseller_name']
+    search_fields = ["wholeseller_name"]
 
 
 class WholesellerDashboardViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
+
     queryset = Wholeseller.objects.all()
     serializer_class = WholesellerSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['wholeseller_type']
+    filterset_fields = ["wholeseller_type"]
 
 
 class WholesellerReportTotalOrderViewSet(views.APIView):
@@ -55,11 +61,11 @@ class WholesellerReportTotalIncomeViewSet(views.APIView):
 class WholesellerReportCityWiseBusinessViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = WholesellerViewReportCityWiseSerializer
-    queryset = Wholeseller.objects.all().order_by('id')
+    queryset = Wholeseller.objects.all().order_by("id")
 
     def get(self):
         queryset = super().get_queryset()
-        pk = self.kwargs.get('pk')
+        pk = self.kwargs.get("pk")
         if pk:
             queryset = queryset.filter(pk=pk)
         return queryset
@@ -88,7 +94,7 @@ class WholesellerReportTopProductViewSet(views.APIView):
                     "product_name": Product_data["product_name"],
                     "product_total_mrp": Product_data["product_total_mrp"],
                     "sold": 12131,
-                    "sales": 21213414
+                    "sales": 21213414,
                 }
                 new_data.append(data)
                 payload.append(Product_data)
@@ -100,18 +106,10 @@ class WholesellerReportRetailersViewSet(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk):
-        data = [{
-            "Name": "Ajay",
-            "customer_id": 111
-        },
-            {
-                "Name": "B",
-                "customer_id": 112
-            },
-            {
-                "Name": "Ajay",
-                "customer_id": 122
-            }
+        data = [
+            {"Name": "Ajay", "customer_id": 111},
+            {"Name": "B", "customer_id": 112},
+            {"Name": "Ajay", "customer_id": 122},
         ]
         return Response(data)
 
@@ -120,10 +118,12 @@ class WholesellerReportTransactionViewSet(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk):
-        data = [{
-            "payment#123": 124,
-            "payment#125": 324,
-        }]
+        data = [
+            {
+                "payment#123": 124,
+                "payment#125": 324,
+            }
+        ]
         return Response(data)
 
 
@@ -131,10 +131,7 @@ class WholesellerReportRealtimeSaleViewSet(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk):
-        data = [{
-            "Orders": 1231,
-            "Avg. Sales per Day": 231312
-        }]
+        data = [{"Orders": 1231, "Avg. Sales per Day": 231312}]
         return Response(data)
 
 
@@ -145,8 +142,8 @@ class WholesellerProductViewSet(views.APIView):
     # lookup_field = 'id'
 
     def get(self, request, pk):
-        category = request.query_params.get('category')
-        subcategory = request.query_params.get('subcategory')
+        category = request.query_params.get("category")
+        subcategory = request.query_params.get("subcategory")
         wholeseller_queryset = Wholeseller.objects.filter(id=pk)
         data = wholeseller_queryset.all().values_list("wholeseller_bazaar")
         product_ids = []
@@ -159,14 +156,18 @@ class WholesellerProductViewSet(views.APIView):
                 product_ids.append(id)
 
         for id in product_ids:
-            if category != '' and subcategory == '':
+            if category != "" and subcategory == "":
                 product = Product.objects.filter(Q(id=id) & Q(category_id=category))
-            elif subcategory != '' and category == '':
-                product = Product.objects.filter(Q(id=id) & Q(subcategory_id=subcategory))
+            elif subcategory != "" and category == "":
+                product = Product.objects.filter(
+                    Q(id=id) & Q(subcategory_id=subcategory)
+                )
             elif subcategory is None and category is None:
                 product = Product.objects.filter(id=id)
-            elif subcategory != '' and category != '':
-                product = Product.objects.filter(Q(id=id) & Q(subcategory_id=subcategory) & Q(category_id=category))
+            elif subcategory != "" and category != "":
+                product = Product.objects.filter(
+                    Q(id=id) & Q(subcategory_id=subcategory) & Q(category_id=category)
+                )
             elif subcategory == "" and category == "":
                 product = Product.objects.filter(id=id)
 
@@ -182,19 +183,20 @@ class WholesellerDashboardBazzarViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
+
     queryset = Wholeseller.objects.all()
     serializer_class = Wholeseller_bazzarSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['wholeseller_type']
+    filterset_fields = ["wholeseller_type"]
 
 
 class WholesellerDashboardTotalProductViewSet(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk):
-        category = request.query_params.get('category')
-        subcategory = request.query_params.get('subcategory')
+        category = request.query_params.get("category")
+        subcategory = request.query_params.get("subcategory")
         wholeseller_queryset = Wholeseller.objects.filter(id=pk)
         data = wholeseller_queryset.all().values_list("wholeseller_bazaar")
         product_ids = []
@@ -207,14 +209,18 @@ class WholesellerDashboardTotalProductViewSet(views.APIView):
                 product_ids.append(id)
 
         for id in product_ids:
-            if category != '' and subcategory == '':
+            if category != "" and subcategory == "":
                 product = Product.objects.filter(Q(id=id) & Q(category_id=category))
-            elif subcategory != '' and category == '':
-                product = Product.objects.filter(Q(id=id) & Q(subcategory_id=subcategory))
+            elif subcategory != "" and category == "":
+                product = Product.objects.filter(
+                    Q(id=id) & Q(subcategory_id=subcategory)
+                )
             elif subcategory is None and category is None:
                 product = Product.objects.filter(id=id)
-            elif subcategory != '' and category != '':
-                product = Product.objects.filter(Q(id=id) & Q(subcategory_id=subcategory) & Q(category_id=category))
+            elif subcategory != "" and category != "":
+                product = Product.objects.filter(
+                    Q(id=id) & Q(subcategory_id=subcategory) & Q(category_id=category)
+                )
             elif subcategory == "" and category == "":
                 product = Product.objects.filter(id=id)
 
@@ -249,12 +255,12 @@ class WholesellerDashboardNewRetailersViewSet(views.APIView):
 
 class WholesellerDashboardTopRetailersViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Retailer.objects.all().order_by('id')
+    queryset = Retailer.objects.all().order_by("id")
     serializer_class = WholesellerDashboardTopRetailersSerializer
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        pk = self.kwargs.get('pk')
+        pk = self.kwargs.get("pk")
         if pk:
             queryset = queryset.filter(retailer_wholeseller=pk)
         return queryset
@@ -283,7 +289,7 @@ class WholesellerDashboardTopProductsViewSet(views.APIView):
                     "product_name": Product_data["product_name"],
                     "product_total_mrp": Product_data["product_total_mrp"],
                     "sold": 12131,
-                    "sales": 21213414
+                    "sales": 21213414,
                 }
                 new_data.append(data)
                 payload.append(Product_data)
@@ -306,12 +312,14 @@ class WholesellerDashboardCategoriesViewSet(views.APIView):
                     "category_name": product.category.category_name,
                     "most_purchased_by": "abc limited",
                     "sold": 12131,
-                    "sales": 21213414
+                    "sales": 21213414,
                 }
 
                 new_data.append(data)
 
         return Response({"category name": new_data})
+
+
 class WholesellerDashboardSubCategoriesViewSet(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -327,12 +335,13 @@ class WholesellerDashboardSubCategoriesViewSet(views.APIView):
                     "subcategory_name": product.subcategory.subcategory_name,
                     "most_purchased_by": "abc limited",
                     "sold": 12131,
-                    "sales": 21213414
+                    "sales": 21213414,
                 }
 
                 new_data.append(data)
 
         return Response({"subcategory name": new_data})
+
 
 class WholesellerDashboardAdsPerformanceViewSet(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -348,11 +357,12 @@ class WholesellerDashboardAdsPerformanceViewSet(views.APIView):
                 "City": "Jaipur",
                 "Price": 21213414,
                 "Sold": 200,
-                "Amount Spend": 1000
+                "Amount Spend": 1000,
             }
 
             new_data.append(data)
         return Response({"Ads Performance": new_data})
+
 
 class WholesellerDashboardTopBranchesViewSet(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -364,10 +374,11 @@ class WholesellerDashboardTopBranchesViewSet(views.APIView):
             "Branch Name": "Branch 1",
             "Orders": 1200,
             "Revenue": 100000,
-            "State": "Delhi-NCR"
+            "State": "Delhi-NCR",
         }
         new_data.append(data)
         return Response({"Top Branches": new_data})
+
 
 class WholesellerApplicationStatusViews(views.APIView):
     permission_classes = [permissions.AllowAny]
@@ -375,7 +386,7 @@ class WholesellerApplicationStatusViews(views.APIView):
     def post(self, request):
         wholeseller_number = request.data.get("wholeseller_number")
         wholeseller_status = request.data.get("wholeseller_status")
-        contact_number = settings.CONTACT_NUMBER
+        kyc_remarks = request.data.get("kyc_remarks")
         try:
             wholeseller = Wholeseller.objects.get(wholeseller_number=wholeseller_number)
             user = wholeseller.wholeseller_user
@@ -383,21 +394,53 @@ class WholesellerApplicationStatusViews(views.APIView):
                 return Response({"message": "Wholeseller user not found."})
 
             if wholeseller_status == "CREATED":
-                message = f"Your application_id {wholeseller_number} is in process./n If you have any Query? Fell free to contact Us ."
+                message = f"Your application_id {wholeseller_number} is in process. If you have any Query? Fell free to contact Us ."
                 return Response(
-                    {"message": message, "contact_information": {"email": user.email, "phone_number": contact_number}})
+                    {
+                        "message": message,
+                        "remarks": kyc_remarks,
+                        "contact_information": {
+                            "email": email,
+                            "phone_number": contact_number,
+                        },
+                    }
+                )
             elif wholeseller_status == "PENDING":
-                message = f"Your application_id {wholeseller_number} is in process./n we have received your Application, Our team is reviewing it. Thank You for your patience .if you have any Query? Fell free to contact Us."
+                message = f"Your application_id {wholeseller_number} is in process. we have received your Application, Our team is reviewing it. Thank You for your patience .if you have any Query? Fell free to contact Us."
                 return Response(
-                    {"message": message, "contact_information": {"email": user.email, "phone_number": contact_number}})
+                    {
+                        "message": message,
+                        "remarks": kyc_remarks,
+                        "contact_information": {
+                            "email": email,
+                            "phone_number": contact_number,
+                        },
+                    }
+                )
             elif wholeseller_status == "KYCREJECTED":
-                message = f"Your application_id {wholeseller_number} is rejected ! Your pan image is very blurred and difficult to read. If you have any Query? Feel free to contact Us."
+                message = f"Your application_id {wholeseller_number} is rejected ! If you have any Query? Feel free to contact Us."
                 return Response(
-                    {"message": message, "contact_information": {"email": user.email, "phone_number": contact_number}})
+                    {
+                        "message": message,
+                        "remarks": kyc_remarks,
+                        "contact_information": {
+                            "email": email,
+                            "phone_number": contact_number,
+                        },
+                    }
+                )
             elif wholeseller_status == "KYCAPPROVED":
-                message = f"Your application_id {wholeseller_number} is approved !  If you have any Query? Feel free to contact Us."
+                message = f"Your application_id {wholeseller_number} is approved ! If you have any Query? Feel free to contact Us."
                 return Response(
-                    {"message": message, "contact_information": {"email": user.email, "phone_number": contact_number}})
+                    {
+                        "message": message,
+                        "remarks": kyc_remarks,
+                        "contact_information": {
+                            "email": email,
+                            "phone_number": contact_number,
+                        },
+                    }
+                )
             else:
                 return Response({"message": "Invalid agent status."})
         except Wholeseller.DoesNotExist:
