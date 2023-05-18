@@ -65,7 +65,7 @@ class AgentSerializer(serializers.ModelSerializer):
         if district_id is not None:
             district = District.objects.filter(id=district_id).get().district
         return district
-
+    
     
     def get_agent_city_name(self, obj):
         city = ""
@@ -74,7 +74,6 @@ class AgentSerializer(serializers.ModelSerializer):
             city = City.objects.filter(id=city_id).get().city
         return city
         
-
     
     def get_agent_bazaar_data(self, obj):
         bazaar_ids = obj.agent_bazaar.all()

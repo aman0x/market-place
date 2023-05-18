@@ -23,6 +23,7 @@ from datetime import date, timedelta
 from django.conf import settings
 from django.utils import timezone
 from django.db import models
+from django.core.files.storage import default_storage
 
 
 common_status = settings.COMMON_STATUS
@@ -235,7 +236,7 @@ class AgentApplicationStatusViews(views.APIView):
 
 
 class ReportPlanExpireView(views.APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk):
         wholesalers = Wholeseller.objects.filter(wholeseller_agent_id=pk)
@@ -250,12 +251,20 @@ class ReportPlanExpireView(views.APIView):
                 days_left = (end_date - today).days
             except:
                 days_left = None
+            try:
+                wholeseller_image = wholeseller.wholeseller_image.path
+                if not default_storage.exists(wholeseller_image):
+                    raise ValueError("The 'wholeseller_image' attribute has no file associated with it.")
+            except (AttributeError, ValueError):
+                wholeseller_image = "Image not available"
+                
             status = "active"  # default value
             message = "Your plan is active."  # default value
             days = 0
-
+            
             wholeseller_data = {
                 "wholeseller_name": wholeseller.wholeseller_name,
+                "wholeseller_image": wholeseller_image,
                 "message": message,
                 "status": status,
                 "days": days,
