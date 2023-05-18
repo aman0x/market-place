@@ -242,9 +242,14 @@ class ReportPlanExpireView(views.APIView):
         wholeseller_list = []
         for wholeseller in wholesalers:
             today = datetime.now().date()
-            end_date = wholeseller.wholeseller_plan.end_date
-            days_left = (end_date - today).days
-
+            try:
+                end_date = wholeseller.wholeseller_plan.end_date
+            except:
+                end_date = None
+            try:
+                days_left = (end_date - today).days
+            except:
+                days_left = None
             status = "active"  # default value
             message = "Your plan is active."  # default value
             days = 0
@@ -256,7 +261,12 @@ class ReportPlanExpireView(views.APIView):
                 "days": days,
             }
 
-            if days_left <= 0:
+            if end_date == None:
+                message = "No active plan! Please activate plan"
+                status = "No Plan"
+                days = "Not Applicable"
+
+            elif days_left <= 0:
                 message = "Your plan has expired. Please renew your plan."
                 status = "expired"
                 days = f"expired by {abs(days_left)} days"
@@ -265,6 +275,7 @@ class ReportPlanExpireView(views.APIView):
                 message = f"Your plan will expiring soon. Please renew soon."
                 status = "expiring_soon"
                 days = f"expiring in {abs(days_left)} days"
+                
             elif days_left <= 30:
                 message = f"Your plan will expire . Please renew soon."
                 status = "expiring_soon"
