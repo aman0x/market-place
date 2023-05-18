@@ -8,6 +8,7 @@ from planApp.models import Plan
 from agencyApp.models import Agency
 from paymentApp.models import Payment
 from datetime import date
+import jsonfield
 
 
 WHOLESELLER_TYPE = (
@@ -60,6 +61,8 @@ class Wholeseller(models.Model):
     wholeseller_status = models.CharField(
         max_length=20, choices=WHOLESELLER_STATUS, default="CREATED")
     wholeseller_active=models.BooleanField(default=False)
+    get_wholeseller_location_json_data = jsonfield.JSONField(default={}, null=True,)
+
     created_at=models.DateField(auto_now_add=False,default=date.today,blank=True)
 
     def __str__(self):
