@@ -3,7 +3,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from bazaarApp.models import Bazaar
 from phonenumber_field.modelfields import PhoneNumberField
-from django.contrib.auth.models import User
 from agencyApp.models import Agency
 from locationApp.models import *
 from django.db import IntegrityError
