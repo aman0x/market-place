@@ -398,7 +398,6 @@ class WholesellerApplicationStatusViews(views.APIView):
                 return Response(
                     {
                         "message": message,
-                        "remarks": kyc_remarks,
                         "contact_information": {
                             "email": email,
                             "phone_number": contact_number,
@@ -410,19 +409,17 @@ class WholesellerApplicationStatusViews(views.APIView):
                 return Response(
                     {
                         "message": message,
-                        "remarks": kyc_remarks,
                         "contact_information": {
                             "email": email,
                             "phone_number": contact_number,
                         },
                     }
                 )
-            elif wholeseller_status == "KYCREJECTED":
-                message = f"Your application_id {wholeseller_number} is rejected ! If you have any Query? Feel free to contact Us."
+            elif wholeseller_status == "KYCREJECTED" and kyc_remarks is not None:
+                message = f"Your application_id {wholeseller_number} is rejected ! {kyc_remarks}. If you have any Query? Feel free to contact Us."
                 return Response(
                     {
                         "message": message,
-                        "remarks": kyc_remarks,
                         "contact_information": {
                             "email": email,
                             "phone_number": contact_number,
@@ -434,7 +431,6 @@ class WholesellerApplicationStatusViews(views.APIView):
                 return Response(
                     {
                         "message": message,
-                        "remarks": kyc_remarks,
                         "contact_information": {
                             "email": email,
                             "phone_number": contact_number,

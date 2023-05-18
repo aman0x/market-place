@@ -184,24 +184,22 @@ class AgentApplicationStatusViews(views.APIView):
             if user is None:
                 return Response({"message": "Agent user not found."})
 
-            if agent_status == "CREATED" and kyc_remarks is not None:
+            if agent_status == "CREATED":
                 message = f"Your application_id {agent_number} is in process. If you have any Query? Fell free to contact Us ."
                 return Response(
                     {
                         "message": message,
-                        "remarks": kyc_remarks,
                         "contact_information": {
                             "email": email,
                             "phone_number": contact_number,
                         },
                     }
                 )
-            elif agent_status == "PENDING" and kyc_remarks is not None:
+            elif agent_status == "PENDING":
                 message = f"Your application_id {agent_number} is in process. we have received your Application, Our team is reviewing it. Thank You for your patience .if you have any Query? Fell free to contact Us."
                 return Response(
                     {
                         "message": message,
-                        "remarks": kyc_remarks,
                         "contact_information": {
                             "email": email,
                             "phone_number": contact_number,
@@ -209,23 +207,21 @@ class AgentApplicationStatusViews(views.APIView):
                     }
                 )
             elif agent_status == "KYCREJECTED" and kyc_remarks is not None:
-                message = f"Your application_id {agent_number} is rejected ! If you have any Query? Feel free to contact Us."
+                message = f"Your application_id {agent_number} is rejected ! {kyc_remarks}. If you have any Query? Feel free to contact Us."
                 return Response(
                     {
                         "message": message,
-                        "remarks": kyc_remarks,
                         "contact_information": {
                             "email": email,
                             "phone_number": contact_number,
                         },
                     }
                 )
-            elif agent_status == "KYCAPPROVED" and kyc_remarks is not None:
+            elif agent_status == "KYCAPPROVED":
                 message = f"Your application_id {agent_number} is approved !  If you have any Query? Feel free to contact Us."
                 return Response(
                     {
                         "message": message,
-                        "remarks": kyc_remarks,
                         "contact_information": {
                             "email": email,
                             "phone_number": contact_number,
