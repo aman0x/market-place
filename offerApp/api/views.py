@@ -10,4 +10,4 @@ class OfferViewSet(viewsets.ModelViewSet):
     serializer_class = OfferSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
-    search_fields = ["offer_name"]
+    search_fields = ["offer_coupon_code"]
