@@ -24,6 +24,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.db import models
 from django.core.files.storage import default_storage
+from django.core.exceptions import ObjectDoesNotExist
 
 
 common_status = settings.COMMON_STATUS
@@ -239,6 +240,7 @@ class ReportPlanExpireView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, pk):
+        base_url = request.build_absolute_uri('/')
         wholesalers = Wholeseller.objects.filter(wholeseller_agent_id=pk)
         wholeseller_list = []
         for wholeseller in wholesalers:
@@ -252,11 +254,14 @@ class ReportPlanExpireView(views.APIView):
             except:
                 days_left = None
             try:
-                wholeseller_image = wholeseller.wholeseller_image.path
-                if not default_storage.exists(wholeseller_image):
-                    raise ValueError("The 'wholeseller_image' attribute has no file associated with it.")
-            except (AttributeError, ValueError):
-                wholeseller_image = "Image not available"
+                wholeseller_image = str(wholeseller.wholeseller_image)
+                if wholeseller_image:
+                    wholeseller_image = base_url + wholeseller_image
+                elif wholeseller_image == "":
+                    wholeseller_image = "Image not found"
+            except:
+                wholeseller_image = "Image not found"
+                
                 
             status = "active"  # default value
             message = "Your plan is active."  # default value
