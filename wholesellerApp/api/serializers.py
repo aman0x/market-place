@@ -5,12 +5,30 @@ from retailerApp.models import Retailer
 from parentCategoryApp.models import ParentCategory
 import requests
 from django.http import JsonResponse
+from drf_extra_fields.fields import Base64ImageField
 
 
 class WholesellerSerializer(serializers.ModelSerializer):
+    wholeseller_adhar_front_image = Base64ImageField(required=False)
+    wholeseller_adhar_back_image = Base64ImageField(required=False)
+    wholeseller_pan_card_image = Base64ImageField(required=False)
+    wholeseller_image = Base64ImageField(required=False)
+    
     class Meta:
         model = Wholeseller
         fields = '__all__'
+        
+    def update(self, instance, validated_data):
+        instance.wholeseller_adhar_front_image = validated_data.get(
+            'wholeseller_adhar_front_image')
+        instance.wholeseller_adhar_back_image = validated_data.get(
+            'wholeseller_adhar_back_image')
+        instance.wholeseller_pan_card_image = validated_data.get(
+            'wholeseller_pan_card_image')
+        instance.wholeseller_image = validated_data.get(
+            'wholeseller_image')
+        event = super().update(instance, validated_data)
+        return event
 
 
 class WholesellerSerializer(serializers.ModelSerializer):
