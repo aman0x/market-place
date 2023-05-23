@@ -20,7 +20,6 @@ from django.db.models import Count
 from django.conf import settings
 from django.utils import timezone
 from django.db import models
-from dateutil.relativedelta import relativedelta
 from datetime import date
 
 common_status = settings.COMMON_STATUS
