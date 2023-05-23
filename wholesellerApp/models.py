@@ -1,5 +1,6 @@
 # Create your models here.
 from django.db import models
+from django.contrib.auth.models import User
 from phonenumber_field.modelfields import PhoneNumberField
 from bazaarApp.models import Bazaar
 from agentApp.models import Agent
@@ -9,6 +10,7 @@ from agencyApp.models import Agency
 from paymentApp.models import Payment
 from datetime import date
 import jsonfield
+from django.db import IntegrityError
 
 
 WHOLESELLER_TYPE = (
@@ -68,3 +70,17 @@ class Wholeseller(models.Model):
     def __str__(self):
         return self.wholeseller_name
     
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            # If the Agent object is being created for the first time
+            try:
+                user = User.objects.create_user(
+                    username=self.wholeseller_number, password='Test@!Test123')
+                self.wholeseller_number = user
+            except IntegrityError:
+                # If a user with the same username already exists, retrieve the existing user and update its fields
+                user = User.objects.get(username=self.wholeseller_number)
+                user.set_password('Test@!Test123')
+                user.save()
+                self.wholeseller_number = user
+        super().save(*args, **kwargs)

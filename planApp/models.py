@@ -32,6 +32,7 @@ class Plan(models.Model):
     district = models.ManyToManyField(District, related_name="plan_district")
     plan_features = models.ManyToManyField(
         PlanFeatures,  related_name="plan_features")
+    plan_active = models.BooleanField(default=False,null=True)
 
     
     def __str__(self):

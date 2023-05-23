@@ -40,19 +40,6 @@ AGENT_GENDER = (
     ("FEMALE", "Female")
 )
 
-
-# class ManageCommision(models.Model):
-
-#     agent_manage_commision = models.CharField(
-#         max_length=15, choices=AGENT_COMMISION, default="PERPLAN")
-#     agent_commision_value = models.IntegerField(blank=True, null=True)
-
-#     def __str__(self):
-#         return self.agent_manage_commision
-
-
-
-
 class Agent(models.Model):
 
     agent_bazaar = models.ManyToManyField(Bazaar, related_name="agent")
