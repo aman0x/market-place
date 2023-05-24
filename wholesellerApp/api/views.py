@@ -532,3 +532,15 @@ class WholesellerDashboardTopBranchesViewSet(views.APIView):
         }
         new_data.append(data)
         return Response({"Top Branches": new_data})
+
+class WholesellerBazaarListViewSet(viewsets.ModelViewSet):
+    queryset = Wholeseller.objects.all()
+    serializer_class = WholelsellerBazaarListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        pk = self.kwargs.get("pk")
+        if pk:
+            queryset = queryset.filter(id=pk)
+        return queryset

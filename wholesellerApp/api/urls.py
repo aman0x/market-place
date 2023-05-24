@@ -17,6 +17,7 @@ urlpatterns = [
     path('dashboard/', views.WholesellerDashboardViewSet.as_view({'get': 'list'}), name="Wholeseller-dashboard"),
     path('dashboard/bazaar/', views.WholesellerDashboardBazzarViewSet.as_view({'get': 'list'}), name="Wholeseller-dashboard-Bazaar"),
     path('dashboard/', views.WholesellerDashboardViewSet.as_view({'get': 'list'}), name="Wholeseller-dashboard"),
+    path('data/<int:pk>/bazaar-list/', views.WholesellerBazaarListViewSet.as_view({'get': 'list'}), name="Wholeseller-bazaar-list"),
     path('data/<int:pk>/dashboard/total-product/', views.WholesellerDashboardTotalProductViewSet.as_view(), name="Wholeseller-dashboard-Total-Product"),
     path('data/<int:pk>/dashboard/total-order/', views.WholesellerDashboardTotalOrderViewSet.as_view(), name="Wholeseller-dashboard-total_order"),
     path('data/<int:pk>/dashboard/total-income/', views.WholesellerDashboardTotalIncomeViewSet.as_view(), name="Wholeseller-dashboard-total_income"),
