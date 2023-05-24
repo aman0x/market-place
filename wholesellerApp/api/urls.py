@@ -11,6 +11,8 @@ router.register(r'data', views.WholesellerViewSet),
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include(router.urls)),
+    path('verify_phone/', views.WholesellerVerifyNumber.as_view(), name="wholseller-login"),
+    path('verify_otp/', views.WholesellerVerifyOTP.as_view(), name='verify_otp'),
     path('application-status/', views.WholesellerApplicationStatusViews.as_view(), name="agent-status-message"),
     path('dashboard/', views.WholesellerDashboardViewSet.as_view({'get': 'list'}), name="Wholeseller-dashboard"),
     path('dashboard/bazaar/', views.WholesellerDashboardBazzarViewSet.as_view({'get': 'list'}), name="Wholeseller-dashboard-Bazaar"),
