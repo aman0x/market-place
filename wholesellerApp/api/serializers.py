@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from wholesellerApp.models import Wholeseller
+from wholesellerApp.models import Branch
 from bazaarApp.models import Bazaar
 from retailerApp.models import Retailer
 from parentCategoryApp.models import ParentCategory
@@ -73,3 +74,9 @@ class WholesellerDashboardTopRetailersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Retailer
         fields = "__all__"
+
+class WholesellerBranchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch
+        fields = "__all__"
+        #fields = ['branch_name', 'manager_name', 'branch_phone']

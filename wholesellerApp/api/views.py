@@ -5,6 +5,7 @@ from rest_framework import permissions
 from rest_framework.response import Response
 from .serializers import *
 from wholesellerApp.models import Wholeseller
+from wholesellerApp.models import Branch
 from productApp.models import Product
 from adsApp.models import Ads
 from django.contrib.auth.models import User
@@ -17,6 +18,7 @@ from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Q
 from retailerApp.models import Retailer
+from bazaarApp.models import Bazaar
 
 common_status = settings.COMMON_STATUS
 contact_number = settings.ADMIN_CONTACT_NUMBER
@@ -532,3 +534,40 @@ class WholesellerDashboardTopBranchesViewSet(views.APIView):
         }
         new_data.append(data)
         return Response({"Top Branches": new_data})
+
+
+# class WholesellerBazaarListViewSet(views.APIView):
+#     permission_classes = [permissions.IsAuthenticated]
+#
+#     def get(self, request, pk):
+#         wholeseller_queryset = Wholeseller.objects.filter(id=pk)
+#         data = wholeseller_queryset.all().values_list("wholeseller_bazaar")
+#         print(data)
+#         new_data = []
+#         for bazaar_id in data:
+#             Bazaar_queryset = Bazaar.objects.filter(id=bazaar_id[0])
+#             print(Bazaar_queryset)
+#             for id in Bazaar_queryset:
+#                 data = {
+#                     "Bazaar id": id.id,
+#                     "Bazaar Name": id.bazaar_name
+#                 }
+#                 new_data.append(data)
+#         return Response({"Bazaar List": new_data})
+
+class WholesellerBranchViewSet(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        data = Branch.objects.filter(branch_wholeseller_id=pk)
+        city = request.query_params.get('city')
+        new_data = []
+        for id in data:
+            data = {
+                    "Branch name": id.branch_name,
+                    "Manager name": id.manager_name,
+                    "Branch phone": str(id.branch_phone),
+                    "City": "Jaipur"
+            }
+            new_data.append(data)
+        return Response({"Branch name": new_data})
