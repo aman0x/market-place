@@ -43,7 +43,7 @@ class Wholeseller(models.Model):
     wholeseller_firm_name = models.CharField(max_length=20,null=True,default=None)
     wholeseller_agent = models.ForeignKey(Agent,on_delete=models.CASCADE ,related_name='agent',blank=True,null=True)
     wholeseller_contact_per = models.CharField(max_length=20,null=True,default=None)
-    wholeseller_number = PhoneNumberField(blank=True, null=True)
+    wholeseller_number = PhoneNumberField(unique=True, blank=True, null=True)
     wholeseller_altranate_number=PhoneNumberField(blank=True,null=True)
     wholeseller_email_id=models.EmailField(max_length=25,null=True)
     wholeseller_adhar_no=models.CharField(max_length=12,null=True,default=None)
@@ -62,6 +62,9 @@ class Wholeseller(models.Model):
         upload_to='images/wholeseller/', null=True)
     wholeseller_status = models.CharField(
         max_length=20, choices=WHOLESELLER_STATUS, default="CREATED")
+    wholeseller_otp = models.IntegerField(blank=True, null=True)
+    wholeseller_user = models.ForeignKey(
+        User, related_name="wholeseller_user", on_delete=models.CASCADE, null=True, blank=True)
     wholeseller_active=models.BooleanField(default=False)
     get_wholeseller_location_json_data = jsonfield.JSONField(default={}, null=True,)
 
@@ -72,15 +75,15 @@ class Wholeseller(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.pk:
-            # If the Agent object is being created for the first time
+            # If the Wholeseller object is being created for the first time
             try:
                 user = User.objects.create_user(
                     username=self.wholeseller_number, password='Test@!Test123')
-                self.wholeseller_number = user
+                self.wholeseller_user = user
             except IntegrityError:
                 # If a user with the same username already exists, retrieve the existing user and update its fields
                 user = User.objects.get(username=self.wholeseller_number)
                 user.set_password('Test@!Test123')
                 user.save()
-                self.wholeseller_number = user
+                self.wholeseller_user = user
         super().save(*args, **kwargs)

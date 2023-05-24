@@ -1,3 +1,5 @@
+import random
+from datetime import timedelta, datetime
 from rest_framework import viewsets, views, status
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -6,6 +8,7 @@ from wholesellerApp.models import Wholeseller
 from productApp.models import Product
 from adsApp.models import Ads
 from django.contrib.auth.models import User
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 import requests
@@ -30,6 +33,157 @@ class WholesellerViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = ["wholeseller_name"]
+
+
+class WholesellerVerifyOTP(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        wholeseller_number = request.data.get("wholeseller_number")
+        wholeseller_otp = request.data.get("wholeseller_otp")
+
+        try:
+            wholeseller = Wholeseller.objects.get(wholeseller_number=wholeseller_number)
+            if wholeseller.wholeseller_otp == int(wholeseller_otp):
+                # OTP is valid
+                wholeseller.wholeseller_otp = None
+                wholeseller.save(update_fields=["wholeseller_otp"])
+                # Get the User object associated with the Wholeseller
+                user = wholeseller.wholeseller_user
+                access_token = AccessToken.for_user(user)
+                access_token.set_exp(
+                    from_time=datetime.utcnow(), lifetime=timedelta(seconds=6400)
+                )
+                refresh_token = RefreshToken.for_user(user)
+                refresh_token.set_exp(
+                    from_time=datetime.utcnow(), lifetime=timedelta(seconds=166400)
+                )
+                return Response(
+                    {
+                        "access_token": str(access_token),
+                        "refresh_token": str(refresh_token),
+                        "wholeseller_id": wholeseller.id,
+                    }
+                )
+            else:
+                status_code = common_status["unauthorized"]["code"]
+                payload = {"details": "Invalid OTP."}
+                return Response(payload, status=status_code)
+        except Wholeseller.DoesNotExist:
+            # Wholeseller not found
+            payload = {"details": "Wholeseller not found"}
+            status_code = common_status["unauthorized"]["code"]
+            return Response(payload, status=status_code)
+
+
+class WholesellerVerifyNumber(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        data = request.data
+        wholeseller_number = data.get("wholeseller_number")
+        password = data.get("wholeseller_otp")
+        payload = {}
+        if wholeseller_number != "":
+            wholeseller_otp = random.randrange(000000, 999999)
+            try:
+                data = Wholeseller.objects.get(wholeseller_number=wholeseller_number)
+                data.wholeseller_otp = wholeseller_otp
+                data.save(update_fields=["wholeseller_otp"])
+                if data:
+                    user = User.objects.filter(id=data.wholeseller_user_id).distinct().first()
+                    if user:
+                        payload = {
+                            "otp": wholeseller_otp,
+                            "details": "Wholeseller OTP sent of registered mobile Number",
+                        }
+                        status_code = common_status["success"]["code"]
+                    else:
+                        payload = {"details": "No user found for the wholeseller"}
+                        status_code = common_status["not_found"]["code"]
+                else:
+                    payload = {
+                        "details": "No active account found with the given credentials"
+                    }
+                    status_code = common_status["not_found"]["code"]
+
+            except Wholeseller.DoesNotExist:
+                payload = {"details": "Wholeseller not found"}
+                status_code = common_status["unauthorized"]["code"]
+
+        else:
+            payload = {"details": "Something went wrong."}
+            status_code = common_status["bad_request"]["code"]
+            status_message = common_status["bad_request"]["message"]
+
+        return Response(payload, status=status_code)
+
+
+class WholesellerApplicationStatusViews(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        wholeseller_number = request.data.get("wholeseller_number")
+        wholeseller_status = request.data.get("wholeseller_status")
+        kyc_remarks = request.data.get("kyc_remarks")
+        try:
+            wholeseller = Wholeseller.objects.get(wholeseller_number=wholeseller_number)
+            user = wholeseller.wholeseller_user
+            if user is None:
+                return Response({"message": "Wholeseller user not found."})
+
+            if wholeseller_status == "CREATED":
+                message = f"Your application_id {wholeseller_number} is in process. If you have any Query? Fell free to contact Us ."
+                return Response(
+                    {
+                        "message": message,
+                        "contact_information": {
+                            "email": email,
+                            "phone_number": contact_number,
+                        },
+                    }
+                )
+            elif wholeseller_status == "PENDING":
+                message = f"Your application_id {wholeseller_number} is in process. we have received your Application, Our team is reviewing it. Thank You for your patience .if you have any Query? Fell free to contact Us."
+                return Response(
+                    {
+                        "message": message,
+                        "contact_information": {
+                            "email": email,
+                            "phone_number": contact_number,
+                        },
+                    }
+                )
+            elif wholeseller_status == "KYCREJECTED" and kyc_remarks is not None:
+                message = f"Your application_id {wholeseller_number} is rejected ! {kyc_remarks}. If you have any Query? Feel free to contact Us."
+                return Response(
+                    {
+                        "message": message,
+                        "contact_information": {
+                            "email": email,
+                            "phone_number": contact_number,
+                        },
+                    }
+                )
+            elif wholeseller_status == "KYCAPPROVED":
+                message = f"Your application_id {wholeseller_number} is approved !  If you have any Query? Feel free to contact Us."
+                return Response(
+                    {
+                        "message": message,
+                        "contact_information": {
+                            "email": email,
+                            "phone_number": contact_number,
+                        },
+                    }
+                )
+            else:
+                return Response({"message": "Invalid wholeseller status."})
+        except Wholeseller.DoesNotExist:
+            return Response({"message": "Wholeseller not found."})
+
+
 
 
 class WholesellerDashboardViewSet(viewsets.ModelViewSet):
@@ -378,66 +532,3 @@ class WholesellerDashboardTopBranchesViewSet(views.APIView):
         }
         new_data.append(data)
         return Response({"Top Branches": new_data})
-
-
-class WholesellerApplicationStatusViews(views.APIView):
-    permission_classes = [permissions.AllowAny]
-
-    def post(self, request):
-        wholeseller_number = request.data.get("wholeseller_number")
-        wholeseller_status = request.data.get("wholeseller_status")
-        kyc_remarks = request.data.get("kyc_remarks")
-        try:
-            wholeseller = Wholeseller.objects.get(wholeseller_number=wholeseller_number)
-            user = wholeseller.wholeseller_user
-            if user is None:
-                return Response({"message": "Wholeseller user not found."})
-
-            if wholeseller_status == "CREATED":
-                message = f"Your application_id {wholeseller_number} is in process. If you have any Query? Fell free to contact Us ."
-                return Response(
-                    {
-                        "message": message,
-                        "contact_information": {
-                            "email": email,
-                            "phone_number": contact_number,
-                        },
-                    }
-                )
-            elif wholeseller_status == "PENDING":
-                message = f"Your application_id {wholeseller_number} is in process. we have received your Application, Our team is reviewing it. Thank You for your patience .if you have any Query? Fell free to contact Us."
-                return Response(
-                    {
-                        "message": message,
-                        "contact_information": {
-                            "email": email,
-                            "phone_number": contact_number,
-                        },
-                    }
-                )
-            elif wholeseller_status == "KYCREJECTED" and kyc_remarks is not None:
-                message = f"Your application_id {wholeseller_number} is rejected ! {kyc_remarks}. If you have any Query? Feel free to contact Us."
-                return Response(
-                    {
-                        "message": message,
-                        "contact_information": {
-                            "email": email,
-                            "phone_number": contact_number,
-                        },
-                    }
-                )
-            elif wholeseller_status == "KYCAPPROVED":
-                message = f"Your application_id {wholeseller_number} is approved ! If you have any Query? Feel free to contact Us."
-                return Response(
-                    {
-                        "message": message,
-                        "contact_information": {
-                            "email": email,
-                            "phone_number": contact_number,
-                        },
-                    }
-                )
-            else:
-                return Response({"message": "Invalid agent status."})
-        except Wholeseller.DoesNotExist:
-            return Response({"message": "Wholeseller not found."})
