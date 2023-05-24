@@ -6,6 +6,7 @@ from parentCategoryApp.models import ParentCategory
 import requests
 from django.http import JsonResponse
 from drf_extra_fields.fields import Base64ImageField
+from bazaarApp.api.serializers import BazaarSerializer
 
 
 class WholesellerSerializer(serializers.ModelSerializer):
@@ -73,3 +74,17 @@ class WholesellerDashboardTopRetailersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Retailer
         fields = "__all__"
+
+class WholelsellerBazaarListSerializer(serializers.ModelSerializer):
+    wholeseller_bazaar_name = serializers.SerializerMethodField()
+    class Meta:
+        model = Wholeseller
+        fields = ["wholeseller_bazaar_name", "wholeseller_bazaar"]
+        
+    def get_wholeseller_bazaar_name(self, obj):
+        bazaar_ids = obj.wholeseller_bazaar.all()
+        bazaar_names = []
+        for bazaar in bazaar_ids:
+            bazaar_name = Bazaar.objects.filter(id=bazaar.id).get().bazaar_name
+            bazaar_names.append(bazaar_name)
+        return bazaar_names
