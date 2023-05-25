@@ -555,19 +555,12 @@ class WholesellerDashboardTopBranchesViewSet(views.APIView):
 #                 new_data.append(data)
 #         return Response({"Bazaar List": new_data})
 
-class WholesellerBranchViewSet(views.APIView):
-    permission_classes = [permissions.IsAuthenticated]
+class WholesellerAddBranchViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
 
-    def get(self, request, pk):
-        data = Branch.objects.filter(branch_wholeseller_id=pk)
-        city = request.query_params.get('city')
-        new_data = []
-        for id in data:
-            data = {
-                    "Branch name": id.branch_name,
-                    "Manager name": id.manager_name,
-                    "Branch phone": str(id.branch_phone),
-                    "City": "Jaipur"
-            }
-            new_data.append(data)
-        return Response({"Branch name": new_data})
+    queryset = Branch.objects.all()
+    serializer_class = WholesellerBranchSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter]

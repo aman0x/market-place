@@ -5,6 +5,7 @@ from . import views
 router = routers.DefaultRouter()
 router.register(r'data', views.WholesellerViewSet),
 # router.register(r'dash', views.WholesellerDashboardViewSet),
+router.register(r'add-branch', views.WholesellerAddBranchViewSet),
 
 
 # Wire up our API using automatic URL routing.
@@ -27,7 +28,6 @@ urlpatterns = [
     path('data/<int:pk>/dashboard/sub-categories/', views.WholesellerDashboardSubCategoriesViewSet.as_view(), name="Wholeseller-dashboard-sub-categories"),
     path('data/<int:pk>/dashboard/ads-performance/', views.WholesellerDashboardAdsPerformanceViewSet.as_view(), name="Wholeseller-dashboard-ads-performance"),
     path('data/<int:pk>/dashboard/top-branches/', views.WholesellerDashboardTopBranchesViewSet.as_view(), name="Wholeseller-dashboard-top-branches"),
-    path('data/<int:pk>/branch/', views.WholesellerBranchViewSet.as_view(), name="Wholeseller-Branch"),
     path('data/<int:pk>/product/', views.WholesellerProductViewSet.as_view(), name="Wholeseller-Product"),
     path('data/<int:pk>/report/total-order/', views.WholesellerReportTotalOrderViewSet.as_view(), name="Wholeseller-Report-total_order"),
     path('data/<int:pk>/report/total-income/', views.WholesellerReportTotalIncomeViewSet.as_view(), name="Wholeseller-Report-total_income"),
