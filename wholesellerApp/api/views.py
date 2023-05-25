@@ -5,6 +5,7 @@ from rest_framework import permissions
 from rest_framework.response import Response
 from .serializers import *
 from wholesellerApp.models import Wholeseller
+from wholesellerApp.models import Branch
 from productApp.models import Product
 from adsApp.models import Ads
 from django.contrib.auth.models import User
@@ -17,6 +18,7 @@ from django.conf import settings
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Q
 from retailerApp.models import Retailer
+from bazaarApp.models import Bazaar
 
 common_status = settings.COMMON_STATUS
 contact_number = settings.ADMIN_CONTACT_NUMBER
@@ -533,6 +535,26 @@ class WholesellerDashboardTopBranchesViewSet(views.APIView):
         new_data.append(data)
         return Response({"Top Branches": new_data})
 
+
+# class WholesellerBazaarListViewSet(views.APIView):
+#     permission_classes = [permissions.IsAuthenticated]
+#
+#     def get(self, request, pk):
+#         wholeseller_queryset = Wholeseller.objects.filter(id=pk)
+#         data = wholeseller_queryset.all().values_list("wholeseller_bazaar")
+#         print(data)
+#         new_data = []
+#         for bazaar_id in data:
+#             Bazaar_queryset = Bazaar.objects.filter(id=bazaar_id[0])
+#             print(Bazaar_queryset)
+#             for id in Bazaar_queryset:
+#                 data = {
+#                     "Bazaar id": id.id,
+#                     "Bazaar Name": id.bazaar_name
+#                 }
+#                 new_data.append(data)
+#         return Response({"Bazaar List": new_data})
+
 class WholesellerBazaarListViewSet(viewsets.ModelViewSet):
     queryset = Wholeseller.objects.all()
     serializer_class = WholelsellerBazaarListSerializer
@@ -544,3 +566,14 @@ class WholesellerBazaarListViewSet(viewsets.ModelViewSet):
         if pk:
             queryset = queryset.filter(id=pk)
         return queryset
+
+
+class WholesellerAddBranchViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+
+    queryset = Branch.objects.all()
+    serializer_class = WholesellerBranchSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
