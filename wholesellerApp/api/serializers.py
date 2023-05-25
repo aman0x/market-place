@@ -3,6 +3,7 @@ from wholesellerApp.models import Wholeseller
 from wholesellerApp.models import Branch
 from bazaarApp.models import Bazaar
 from retailerApp.models import Retailer
+from productApp.models import Product
 from parentCategoryApp.models import ParentCategory
 import requests
 from django.http import JsonResponse
@@ -95,3 +96,17 @@ class WholesellerBranchSerializer(serializers.ModelSerializer):
         model = Branch
         fields = "__all__"
         #fields = ['branch_name', 'manager_name', 'branch_phone']
+        
+class WholesellerBazaarProductSerializer(serializers.ModelSerializer):
+    stock = serializers.SerializerMethodField()
+    class Meta:
+        model = Product
+        fields = '__all__'
+        
+    def get_stock(self, obj):
+        stock = obj.product_stocks
+        if stock == None or 0:
+            stocks = "Out of Stock"
+        else:
+            stocks = "Available"
+        return stocks

@@ -1,6 +1,6 @@
 import random
 from datetime import timedelta, datetime
-from rest_framework import viewsets, views, status
+from rest_framework import viewsets, views
 from rest_framework import permissions
 from rest_framework.response import Response
 from .serializers import *
@@ -12,13 +12,9 @@ from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
-import requests
-import json
 from django.conf import settings
-from django.http import JsonResponse, HttpResponse
 from django.db.models import Q
 from retailerApp.models import Retailer
-from bazaarApp.models import Bazaar
 
 common_status = settings.COMMON_STATUS
 contact_number = settings.ADMIN_CONTACT_NUMBER
@@ -568,7 +564,7 @@ class WholesellerBazaarListViewSet(viewsets.ModelViewSet):
         return queryset
 
 
-class WholesellerAddBranchViewSet(viewsets.ModelViewSet):
+class WholesellerBranchViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
@@ -577,3 +573,29 @@ class WholesellerAddBranchViewSet(viewsets.ModelViewSet):
     serializer_class = WholesellerBranchSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
+
+class WholesellerBazaarProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all().order_by("id")
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = WholesellerBazaarProductSerializer
+    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    search_fields = [
+        "product_name",
+    ]
+    filterset_fields = [
+        "category_group",
+        "category",
+        "subcategory",
+        "product_brand_name",
+        "product_active",
+        "product_stocks",
+        
+    ]
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        pk = self.kwargs.get("pk")
+        bazaar_id = self.kwargs.get("bazaar_id")
+        if pk and bazaar_id:
+            queryset = queryset.filter(bazaar__wholeseller__id=pk, bazaar_id=bazaar_id)
+        return queryset

@@ -5,7 +5,7 @@ from . import views
 router = routers.DefaultRouter()
 router.register(r'data', views.WholesellerViewSet),
 # router.register(r'dash', views.WholesellerDashboardViewSet),
-router.register(r'add-branch', views.WholesellerAddBranchViewSet),
+router.register(r'branch', views.WholesellerBranchViewSet),
 
 
 # Wire up our API using automatic URL routing.
@@ -19,6 +19,8 @@ urlpatterns = [
     path('dashboard/bazaar/', views.WholesellerDashboardBazzarViewSet.as_view({'get': 'list'}), name="Wholeseller-dashboard-Bazaar"),
     path('dashboard/', views.WholesellerDashboardViewSet.as_view({'get': 'list'}), name="Wholeseller-dashboard"),
     path('data/<int:pk>/bazaar-list/', views.WholesellerBazaarListViewSet.as_view({'get': 'list'}), name="Wholeseller-bazaar-list"),
+    path('data/<int:pk>/bazaar-list/<int:bazaar_id>/product/', views.WholesellerBazaarProductViewSet.as_view({'get': 'list'}), name="Wholeseller-bazaar-product-list"),
+    
     path('data/<int:pk>/dashboard/total-product/', views.WholesellerDashboardTotalProductViewSet.as_view(), name="Wholeseller-dashboard-Total-Product"),
     path('data/<int:pk>/dashboard/total-order/', views.WholesellerDashboardTotalOrderViewSet.as_view(), name="Wholeseller-dashboard-total_order"),
     path('data/<int:pk>/dashboard/total-income/', views.WholesellerDashboardTotalIncomeViewSet.as_view(), name="Wholeseller-dashboard-total_income"),
