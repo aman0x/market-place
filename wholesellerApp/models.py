@@ -8,6 +8,9 @@ from locationApp.models import *
 from planApp.models import Plan
 from agencyApp.models import Agency
 from paymentApp.models import Payment
+from parentCategoryApp.models import ParentCategory
+from categoryApp.models import Category
+from productApp.models import Product
 from datetime import date
 import jsonfield
 from django.db import IntegrityError
@@ -87,3 +90,24 @@ class Wholeseller(models.Model):
                 user.save()
                 self.wholeseller_user = user
         super().save(*args, **kwargs)
+
+class Branch(models.Model):
+    branch_name= models.CharField(max_length=200,null=False)
+    manager_name= models.CharField(max_length=200,null=True)
+    branch_phone= PhoneNumberField(blank=True, null=True)
+    category_name = models.ForeignKey(ParentCategory, on_delete=models.CASCADE, related_name='branch_category')
+    item_name = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='branch_item')
+    subcategory_name= models.ForeignKey(Category, on_delete=models.CASCADE, related_name='branch_subcategory')
+    address_line1 = models.CharField(max_length=300, null=True)
+    address_line2 = models.CharField(max_length=300, null=True)
+    landmark = models.CharField(max_length=300, null=True)
+    city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='branch_city')
+    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='branch_state')
+    district = models.ForeignKey(District, on_delete=models.CASCADE, related_name='branch_district')
+    pincode_no = models.IntegerField(null=True)
+    created_at = models.DateField(auto_now_add=False, default=date.today, blank=True)
+    branch_wholeseller = models.ForeignKey(Wholeseller, on_delete=models.CASCADE,related_name='branch_wholeseller')
+
+    def __str__(self):
+        if self.branch_name != None:
+            return self.branch_name

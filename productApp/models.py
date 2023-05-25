@@ -3,6 +3,8 @@ from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from subCategoryApp.models import SubCategory,Category,ParentCategory,Bazaar
+import hashlib
+from django.utils.crypto import get_random_string
 
 class Product(models.Model):
     product_name = models.CharField(max_length=200)    
@@ -35,10 +37,28 @@ class Product(models.Model):
         default=datetime.now, blank=True)
     product_updated_by = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='product_updated_by')
+    product_barcode_number = models.CharField(max_length=12, blank=True)
+    product_stocks = models.IntegerField(null=True)
+    product_min_quantity = models.IntegerField(null=True)
+    product_max_quantity = models.IntegerField(null=True)
     product_active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name_plural = "products"
+        
+    def save(self, *args, **kwargs):
+        if not self.product_barcode_number:  # Generate barcode only if it's not already set
+            self.product_barcode_number = self.generate_barcode()
+        super(Product, self).save(*args, **kwargs)
+
+    def generate_barcode(self):
+        data = self.product_name + self.product_brand_name
+        sha256 = hashlib.sha256()
+        sha256.update(data.encode('utf-8'))
+        hash_value = sha256.hexdigest()
+        barcode = str(int(hash_value, 16))[:12]
+
+        return barcode.zfill(12)
 
     def __str__(self):
         return self.product_name
