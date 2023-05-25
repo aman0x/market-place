@@ -4,7 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from subCategoryApp.models import SubCategory,Category,ParentCategory,Bazaar
 import hashlib
-from django.utils.crypto import get_random_string
+from masterApp.models import Unit
 
 class Product(models.Model):
     product_name = models.CharField(max_length=200)    
@@ -21,6 +21,7 @@ class Product(models.Model):
     product_total_mrp=models.IntegerField(null=True)
     product_per_unit_weight=models.IntegerField(null=True)
     product_mrp=models.IntegerField(null=True)
+    product_base_price = models.IntegerField(null=True)
     product_gst_no=models.CharField(max_length=15,default=None, blank=True, null=True)
     product_hsn_code=models.IntegerField(null=True)
     bazaar = models.ForeignKey(

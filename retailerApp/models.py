@@ -25,7 +25,7 @@ BUSINESS_STATUS = (
 class Retailer(models.Model):
     
     retailer_type = models.ForeignKey(
-        RetailerType, on_delete=models.CASCADE, related_name='retailer_type', null=True, blank=True)
+        RetailerType, on_delete=models.CASCADE, related_name='retailer_type')
     retailer_business_status = models.CharField(
         max_length=20, choices=BUSINESS_STATUS, default="REGISTERED")
     retailer_name = models.CharField(max_length=20,null=True,default=None)
