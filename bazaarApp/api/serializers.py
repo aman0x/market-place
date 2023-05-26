@@ -4,6 +4,7 @@ from productApp.models import Product,ParentCategory,Category,SubCategory,Bazaar
 from drf_extra_fields.fields import Base64ImageField
 from locationApp.api.serializers import *
 from locationApp.models import *
+from retailerApp.models import RetailerType
 
 
 class BazaarSerializer(serializers.ModelSerializer):
@@ -395,3 +396,19 @@ class ProductBulkUploadSerializer(serializers.ModelSerializer):
             "product_category",
             "product_category_group",
         ]
+
+class BazarRetailerTypeSerializer(serializers.ModelSerializer):
+    bazaar_retailer_type_name = serializers.SerializerMethodField(read_only=True)
+    
+    class Meta:
+        model = Bazaar
+        fields = ["bazaar_retailer_type_name", "bazaar_retailer_type"]
+        
+    def get_bazaar_retailer_type_name(self, obj):
+        retailer_type_name = []
+        retailer_type_ids = obj.bazaar_retailer_type.all().values_list(flat=True)
+        for id in retailer_type_ids:
+            retailer_type = RetailerType.objects.filter(id=id).get().retailer_type_name
+            retailer_type_name.append(retailer_type)
+        return retailer_type_name
+        

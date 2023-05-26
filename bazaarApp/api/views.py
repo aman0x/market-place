@@ -12,6 +12,7 @@ from rest_framework.decorators import action
 from django.core.files.base import ContentFile
 from django.core.files.storage import FileSystemStorage
 import csv
+from retailerApp.models import RetailerType
 
 
 class BazarViewSet(viewsets.ModelViewSet):
@@ -291,3 +292,17 @@ class ProductCsvViewSet(viewsets.ModelViewSet):
             )
         Product.objects.bulk_create(product_list)
         return Response("upload sucessfully")
+    
+class BazarRetailerTypeViewSet(viewsets.ModelViewSet):
+    
+    queryset = Bazaar.objects.all().order_by("id")
+    serializer_class = BazarRetailerTypeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        pk = self.kwargs.get("pk")
+        queryset = super().get_queryset()
+        if pk:
+            queryset = queryset.filter(id=pk)
+        return queryset
+    

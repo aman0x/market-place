@@ -24,6 +24,7 @@ urlpatterns = [
     path('data/<int:pk>/agents-list/', views.BazarAgentsListViewSet.as_view({'get': 'list'}),name="agents-List"),
     path('data/<int:pk>/products-list/', views.BazarProductsListViewSet.as_view({'get': 'list'}),name="products-List"),
     path('data/<int:pk>/dashboard/', views.BazarDashboardViewSet.as_view({'get': 'list'}),name="products-List"),
+    path('data/<int:pk>/retailer-type/', views.BazarRetailerTypeViewSet.as_view({'get': 'list'}),name="retailer-"),
     path('', include(router.urls))
 ]
 
