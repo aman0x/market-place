@@ -110,3 +110,8 @@ class WholesellerBazaarProductSerializer(serializers.ModelSerializer):
         else:
             stocks = "Available"
         return stocks
+
+class WholesellerBazaarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bazaar
+        fields = "__all__"

@@ -8,6 +8,7 @@ from wholesellerApp.models import Wholeseller
 from wholesellerApp.models import Branch
 from productApp.models import Product
 from adsApp.models import Ads
+from bazaarApp.models import Bazaar
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework import filters
@@ -217,7 +218,7 @@ class WholesellerReportCityWiseBusinessViewSet(viewsets.ModelViewSet):
 
     def get(self):
         queryset = super().get_queryset()
-        pk = self.kwargs.get("pk")
+        pk = self.kwargs.get("bazaar_id")
         if pk:
             queryset = queryset.filter(pk=pk)
         return queryset
@@ -599,3 +600,17 @@ class WholesellerBazaarProductViewSet(viewsets.ModelViewSet):
         if pk and bazaar_id:
             queryset = queryset.filter(bazaar__wholeseller__id=pk, bazaar_id=bazaar_id)
         return queryset
+
+
+class WholesellerBazaarViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = WholesellerBazaarSerializer
+    queryset = Bazaar.objects.all()
+    def get_queryset(self):
+        queryset = Bazaar.objects.all()
+        bazaar_id = self.kwargs.get("bazaar_id")
+        if bazaar_id:
+            queryset = queryset.filter(id=bazaar_id)
+        return queryset
+
+
