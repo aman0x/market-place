@@ -218,7 +218,7 @@ class WholesellerReportCityWiseBusinessViewSet(viewsets.ModelViewSet):
 
     def get(self):
         queryset = super().get_queryset()
-        pk = self.kwargs.get("bazaar_id")
+        pk = self.kwargs.get("pk")
         if pk:
             queryset = queryset.filter(pk=pk)
         return queryset
