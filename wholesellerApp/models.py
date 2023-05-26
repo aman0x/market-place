@@ -14,6 +14,7 @@ from productApp.models import Product
 from datetime import date
 import jsonfield
 from django.db import IntegrityError
+from masterApp.models import WholesellerType
 
 
 WHOLESELLER_TYPE = (
@@ -39,10 +40,7 @@ class Wholeseller(models.Model):
         Plan, on_delete=models.CASCADE, related_name="chooseplan", null=True, blank=True)
     wholeseller_payment = models.ForeignKey(
         Payment, on_delete=models.CASCADE, related_name='payment_detail', null=True, blank=True)
-    wholeseller_type = models.CharField(max_length=15,
-                                        choices=WHOLESELLER_TYPE,
-                                        default="INDIVIDUAL"
-                                        )
+    wholeseller_type = models.ForeignKey(WholesellerType, on_delete=models.CASCADE, related_name="wholeseller_type")
     wholeseller_firm_name = models.CharField(max_length=20,null=True,default=None)
     wholeseller_agent = models.ForeignKey(Agent,on_delete=models.CASCADE ,related_name='agent',blank=True,null=True)
     wholeseller_contact_per = models.CharField(max_length=20,null=True,default=None)
