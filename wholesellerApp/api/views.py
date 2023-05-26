@@ -609,8 +609,9 @@ class WholesellerBazaarViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Bazaar.objects.all()
         bazaar_id = self.kwargs.get("bazaar_id")
-        if bazaar_id:
-            queryset = queryset.filter(id=bazaar_id)
+        pk= self.kwargs.get("pk")
+        if pk and bazaar_id:
+            queryset = queryset.filter(wholeseller__id=pk, id=bazaar_id)
         return queryset
 
 
