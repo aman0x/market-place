@@ -32,3 +32,17 @@ class RetailerType(models.Model):
     
     def __str__(self):
         return self.retailer_type_name
+
+class Colour(models.Model):
+    colour=models.CharField(max_length=30,default=None, unique=True)
+    colour_description = models.CharField(max_length=100, default=None, null=True)
+
+    def __str__(self):
+        return self.colour
+    
+class Size(models.Model):
+    size=models.CharField(max_length=30,default=None, unique=True)
+    size_description = models.CharField(max_length=100, default=None, null=True)
+
+    def __str__(self):
+        return self.size
