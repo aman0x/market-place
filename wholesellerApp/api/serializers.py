@@ -67,12 +67,6 @@ class WholesellerSerializer(serializers.ModelSerializer):
         return event
 
 
-class WholesellerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Wholeseller
-        fields = '__all__'
-
-
 class Wholeseller_bazzarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wholeseller
