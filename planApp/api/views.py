@@ -10,7 +10,7 @@ class PlanViewSet(viewsets.ModelViewSet):
     filter_backends=[filters.SearchFilter]
     serializer_class=PlanSerializer
     permission_classes=[permissions.IsAuthenticated]
-    search_fields=['firm_name']
+    search_fields=['plan_name']
 
 
 class FeaturesViewSet(viewsets.ModelViewSet):
