@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django_filters',
     'phonenumber_field',
     'django_otp',
+    'simple_history',
     'bazaarApp',
     'agentApp',
     'wholesellerApp',

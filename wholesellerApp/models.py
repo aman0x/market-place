@@ -17,11 +17,11 @@ from django.db import IntegrityError
 from masterApp.models import WholesellerType
 
 
-WHOLESELLER_TYPE = (
-    ("INDIVIDUAL", "Individual"),
-    ("WHOLESELLER", "Wholeseller"),
-    ("SEMIWHOLESELLER","SemiWholeseller")
-)
+# WHOLESELLER_TYPE = (
+#     ("INDIVIDUAL", "Individual"),
+#     ("WHOLESELLER", "Wholeseller"),
+#     ("SEMIWHOLESELLER","SemiWholeseller")
+# )
 
 WHOLESELLER_STATUS = (
     ("CREATED", "Created"),
