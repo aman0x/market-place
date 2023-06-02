@@ -31,4 +31,20 @@ class RetailerTypeViewSet(viewsets.ModelViewSet):
     queryset = RetailerType.objects.all().order_by('id')
     serializer_class = RetailerTypeSerializer
     permission_classes = [permissions.IsAuthenticated]
+    
+class ColourViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Colour.objects.all().order_by('id')
+    serializer_class = ColourSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+class SizeViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Size.objects.all().order_by('id')
+    serializer_class = SizeSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
