@@ -9,6 +9,7 @@ import requests
 from django.http import JsonResponse
 from drf_extra_fields.fields import Base64ImageField
 from bazaarApp.api.serializers import BazaarSerializer
+from locationApp.models import *
 
 
 class WholesellerSerializer(serializers.ModelSerializer):
@@ -16,10 +17,42 @@ class WholesellerSerializer(serializers.ModelSerializer):
     wholeseller_adhar_back_image = Base64ImageField(required=False)
     wholeseller_pan_card_image = Base64ImageField(required=False)
     wholeseller_image = Base64ImageField(required=False)
+    wholeseller_bazaar_data = serializers.SerializerMethodField()
+    wholeseller_state_name = serializers.SerializerMethodField()
+    wholeseller_district_name = serializers.SerializerMethodField()
+    wholeseller_city_name = serializers.SerializerMethodField()
     
     class Meta:
         model = Wholeseller
         fields = '__all__'
+        
+    def get_wholeseller_state_name(self, obj):
+        state = ""
+        state_id = obj.wholeseller_state_id
+        if state_id is not None:
+            state = State.objects.filter(id=state_id).get().state
+        return state
+    
+    def get_wholeseller_district_name(self, obj):
+        district = ""
+        district_id = obj.wholeseller_district_id
+        if district_id is not None:
+            district = District.objects.filter(id=district_id).get().district
+        return district
+    
+    
+    def get_wholeseller_city_name(self, obj):
+        city = ""
+        city_id = obj.wholeseller_city_id
+        if city_id is not None:
+            city = City.objects.filter(id=city_id).get().city
+        return city
+        
+    def get_wholeseller_bazaar_data(self, obj):
+        bazaar_ids = obj.wholeseller_bazaar.all()
+        bazaar = Bazaar.objects.filter(id__in=bazaar_ids)
+        serializer = BazaarSerializer(bazaar, many=True)
+        return serializer.data
         
     def update(self, instance, validated_data):
         instance.wholeseller_adhar_front_image = validated_data.get(
