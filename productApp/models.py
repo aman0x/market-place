@@ -20,10 +20,10 @@ class Product(models.Model):
     
     # Packing Unit
     product_primary_packing_unit = models.ForeignKey(
-        Unit, on_delete=models.CASCADE, related_name="product_primary_packing_unit", default=None, blank=True)
+        Unit, on_delete=models.CASCADE, related_name="product_primary_packing_unit", default=None, blank=True, null=True)
     product_primary_packing_value = models.IntegerField(null=True)
     product_secondary_packing_unit = models.ForeignKey(
-        Unit, on_delete=models.CASCADE, related_name="product_secondary_packing_unit", default=None, blank=True)
+        Unit, on_delete=models.CASCADE, related_name="product_secondary_packing_unit", default=None, blank=True, null=True)
     product_secondary_packing_value = models.IntegerField(null=True)
     
     # MRP and Selling Price
@@ -33,17 +33,17 @@ class Product(models.Model):
     
     # Weight
     product_per_unit_weight_unit = models.ForeignKey(
-        Unit, on_delete=models.CASCADE, related_name="product_per_unit_weight_unit", default=None, blank=True)
+        Unit, on_delete=models.CASCADE, related_name="product_per_unit_weight_unit", default=None, blank=True, null=True)
     product_per_unit_weight_value=models.IntegerField(null=True)    
     product_total_weight_unit = models.ForeignKey(
-        Unit, on_delete=models.CASCADE, related_name="product_toal_weight_unit", default=None, blank=True)
+        Unit, on_delete=models.CASCADE, related_name="product_toal_weight_unit", default=None, blank=True, null=True)
     product_total_weight_value=models.IntegerField(null=True)
     
     # Colour and Size
     product_colour = models.ForeignKey(
-        Colour, on_delete=models.CASCADE, related_name="product_colour", default=None, blank=True)
+        Colour, on_delete=models.CASCADE, related_name="product_colour", default=None, blank=True, null=True)
     product_size = models.ForeignKey(
-        Size, on_delete=models.CASCADE, related_name="product_size", default=None, blank=True)
+        Size, on_delete=models.CASCADE, related_name="product_size", default=None, blank=True, null=True)
     
     # Barcode, Stocks and Quantity
     product_barcode_number = models.CharField(max_length=12, blank=True)
