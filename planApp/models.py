@@ -18,11 +18,11 @@ class Plan(models.Model):
     plan_choice = models.CharField(
         max_length=20, choices=PLAN_CHOICE, default="Paid")
     plan_name = models.CharField(max_length=100, default=None, null=True)
-    start_date = models.DateField( default=datetime.date.today)
-    start_time = models.TimeField(
-         default=datetime.time(10, 0))
-    end_date = models.DateField( default=datetime.date.today)
-    end_time = models.TimeField( default=datetime.time(10, 0))
+    start_date = models.DateField(null=True)
+    start_time = models.TimeField(null=True)
+    end_date = models.DateField(null=True)
+    end_time = models.TimeField(null=True)
+    plan_periods_in_days = models.IntegerField(null=True)
     amount = models.IntegerField(null=True, default=None)
     branches = models.IntegerField(null=True, default=None)
     user_per_branch = models.IntegerField(null=True)
@@ -31,7 +31,7 @@ class Plan(models.Model):
     city = models.ManyToManyField(City, related_name="plan_city")
     district = models.ManyToManyField(District, related_name="plan_district")
     plan_features = models.ManyToManyField(
-        PlanFeatures,  related_name="plan_features")
+        PlanFeatures,  related_name="plan_features", blank=True)
     plan_active = models.BooleanField(default=False,null=True)
 
     
