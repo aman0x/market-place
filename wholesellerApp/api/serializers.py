@@ -4,9 +4,6 @@ from wholesellerApp.models import Branch
 from bazaarApp.models import Bazaar
 from retailerApp.models import Retailer
 from productApp.models import Product
-from parentCategoryApp.models import ParentCategory
-import requests
-from django.http import JsonResponse
 from drf_extra_fields.fields import Base64ImageField
 from bazaarApp.api.serializers import BazaarSerializer
 from locationApp.models import *
@@ -131,17 +128,18 @@ class WholesellerDashboardTopRetailersSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class WholelsellerBazaarListSerializer(serializers.ModelSerializer):
-    wholeseller_bazaar_name = serializers.SerializerMethodField()
+    wholeseller_bazaar_data = serializers.SerializerMethodField()
     class Meta:
         model = Wholeseller
-        fields = ["wholeseller_bazaar_name", "wholeseller_bazaar"]
+        fields = ["wholeseller_bazaar_data"]
         
-    def get_wholeseller_bazaar_name(self, obj):
+    def get_wholeseller_bazaar_data(self, obj):
         bazaar_ids = obj.wholeseller_bazaar.all()
         bazaar_names = []
         for bazaar in bazaar_ids:
             bazaar_name = Bazaar.objects.filter(id=bazaar.id).get().bazaar_name
-            bazaar_names.append(bazaar_name)
+            bazaar_data = {"bazaar_id":bazaar.id, "bazaar_name" : bazaar_name}
+            bazaar_names.append(bazaar_data)
         return bazaar_names
     
 class WholesellerBranchSerializer(serializers.ModelSerializer):
