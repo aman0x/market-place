@@ -17,7 +17,7 @@ PLAN_CHOICE = (
 class Plan(models.Model):
     plan_choice = models.CharField(
         max_length=20, choices=PLAN_CHOICE, default="Paid")
-    firm_name = models.CharField(max_length=100, default=None, null=True)
+    plan_name = models.CharField(max_length=100, default=None, null=True)
     start_date = models.DateField( default=datetime.date.today)
     start_time = models.TimeField(
          default=datetime.time(10, 0))
@@ -36,7 +36,7 @@ class Plan(models.Model):
 
     
     def __str__(self):
-        return self.firm_name
+        return self.plan_name
     
 class RetailerPlan(models.Model):
     plan_name = models.CharField(max_length=20, default=None, null=True)
