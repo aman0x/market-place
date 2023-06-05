@@ -21,7 +21,7 @@ class WholesellerSerializer(serializers.ModelSerializer):
     wholeseller_state_name = serializers.SerializerMethodField()
     wholeseller_district_name = serializers.SerializerMethodField()
     wholeseller_city_name = serializers.SerializerMethodField()
-    wholeseller_plan_name = serializers.SerializerMethodField()
+    # wholeseller_plan_name = serializers.SerializerMethodField()
     wholeseller_payment_name = serializers.SerializerMethodField()
     wholeseller_type_name = serializers.SerializerMethodField()
     
@@ -56,12 +56,12 @@ class WholesellerSerializer(serializers.ModelSerializer):
         serializer = BazaarSerializer(bazaar, many=True)
         return serializer.data
     
-    def get_wholeseller_plan_name(self, obj):
-        plan = ""
-        plan_id = obj.wholeseller_plan_id
-        if plan_id is not None:
-            plan = Plan.objects.filter(id=plan_id).get().plan_name
-        return plan
+    # def get_wholeseller_plan_name(self, obj):
+    #     plan = ""
+    #     plan_id = obj.wholeseller_plan_id
+    #     if plan_id is not None:
+    #         plan = Plan.objects.filter(id=plan_id).get().plan_name
+    #     return plan
     
     def get_wholeseller_payment_name(self, obj):
         payment = ""
