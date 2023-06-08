@@ -59,4 +59,7 @@ class Offers(models.Model):
         verbose_name_plural = "offers"
 
     def __str__(self):
-        return self.product
+        if self.product is not None:
+            return self.product
+        else:
+            return "None"

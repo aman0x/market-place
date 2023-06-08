@@ -13,5 +13,8 @@ class OfferSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_offer_name(self, obj):
-        name = obj.product.product_name
+        try:
+            name = obj.product.product_name
+        except:
+            name = "None"
         return name
