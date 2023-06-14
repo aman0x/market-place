@@ -7,6 +7,15 @@ router.register(r'data', views.WholesellerViewSet),
 # router.register(r'dash', views.WholesellerDashboardViewSet),
 router.register(r'branch', views.WholesellerBranchViewSet),
 
+# ------------wholeseller agent-----------
+router.register(r'agent', views.WholesellerAgentViewSet)
+# router.register(r'commision',views.WholesellerAgentCommisionViewset)
+router.register(r'agent-commision-redeem',views.WholesellerAgentCommisionRedeemViewset)
+
+# ------------wholeseller retailer-----------
+router.register(r'retailer', views.WholesellerRetailerViewSet)
+
+
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
@@ -40,6 +49,19 @@ urlpatterns = [
     path('data/<int:pk>/report/transaction-history/', views.WholesellerReportTransactionViewSet.as_view(), name="Wholeseller-Report-transaction-history"),
     path('data/<int:pk>/report/realtime-sale/', views.WholesellerReportRealtimeSaleViewSet.as_view(), name="Wholeseller-Report-realtime-sale"),
     #path('data/<int:pk>/bazaar-list/', views.WholesellerBazaarListViewSet.as_view(), name="Wholeseller-Bazaar-List"),
+
+
+    #----------------- Wholeseller agent-----------
+    # path('agent/<int:pk>/wholeseller_count/', views.WholesellerCountView.as_view(), name="agent's-wholeseller-count"),
+    path('agent/<int:pk>/plan_expire/',views.WholesellerReportPlanExpireView.as_view(), name="agent's-wholeseller-plan-expiry"),
+    path('agent/<int:pk>/earning/', views.WholesellerAgentEarningAPIView.as_view(), name="agent-earning"),
+    path('agent/application-status/',views.WholesellerAgentApplicationStatusViews.as_view(), name="agent-status-message"),
+    path('agent/verify_phone/', views.WholesellerAgentVerifyNumber.as_view(), name="agent-login"),
+    path('agent/verify_otp/', views.WholesellerAgentVerifyOTP.as_view(), name='verify_otp'),
+    path('agent/<int:pk>/wallet/', views.WholesellerAgentWallet.as_view(), name='wallet'),
+    path('agent/<int:pk>/wholeseller-list/',views.WholesellerListViewset.as_view({'get': 'list'}), name="wholeseller-filter"),
+
+    path('retailer/', views.WholesellerRetailerViewSet.as_view({'get': 'list'}), name="wholseller-retailer"),
 
 ]
 

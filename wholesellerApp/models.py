@@ -15,6 +15,9 @@ from datetime import date
 import jsonfield
 from django.db import IntegrityError
 from masterApp.models import WholesellerType
+from masterApp.models import RetailerType
+from planApp.models import RetailerPlan
+from datetime import datetime
 
 
 # WHOLESELLER_TYPE = (
@@ -93,9 +96,10 @@ class Branch(models.Model):
     branch_name= models.CharField(max_length=200,null=False)
     manager_name= models.CharField(max_length=200,null=True)
     branch_phone= PhoneNumberField(blank=True, null=True)
-    category_name = models.ForeignKey(ParentCategory, on_delete=models.CASCADE, related_name='branch_category')
-    item_name = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='branch_item')
-    subcategory_name= models.ForeignKey(Category, on_delete=models.CASCADE, related_name='branch_subcategory')
+    # category_name = models.ForeignKey(ParentCategory, on_delete=models.CASCADE, related_name='branch_category')
+    # item_name = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='branch_item')
+    # subcategory_name= models.ForeignKey(Category, on_delete=models.CASCADE, related_name='branch_subcategory')
+    email = models.EmailField(null=True)
     address_line1 = models.CharField(max_length=300, null=True)
     address_line2 = models.CharField(max_length=300, null=True)
     landmark = models.CharField(max_length=300, null=True)
@@ -109,3 +113,187 @@ class Branch(models.Model):
     def __str__(self):
         if self.branch_name != None:
             return self.branch_name
+
+
+#-----------------------------Wholeseller agent ------------------
+WHOLESELLER_AGENT_TYPE = (
+    ("WHOLESELLER_AGENT", "Wholeseller Agent"),
+)
+
+WHOLESELLER_AGENT_STATUS = (
+    ("CREATED", "Created"),
+    ("PENDING", "Pending Approval"),
+    ("KYCAPPROVED", "KYC Approved"),
+    ("KYCREJECTED", "KYC Rejected"),
+    ("APPROVED", "Approved"),
+)
+
+WHOLESELLER_AGENT_COMMISSION_TYPE = (
+    ("PERCUSTOMER", "Percustomer"),
+    ("PERPLAN", "Perplan")
+)
+
+WHOLESELLER_AGENT_COMMISSION_VALUE_TYPE = (
+    ("PERCENTAGE", "Percentage"),
+    ("AMOUNT", "Amount")
+)
+
+WHOLESELLER_AGENT_GENDER = (
+    ("MALE", "Male"),
+    ("FEMALE", "Female")
+)
+
+class WholesellerAgent(models.Model):
+
+    wholeseller_agent_bazaar = models.ManyToManyField(Bazaar, related_name="wholeseller_agent")
+    agency = models.ForeignKey(
+        Agency, on_delete=models.CASCADE, null=True, related_name="wholeseller_agent_agency")
+    wholeseller_agent_description = models.TextField(blank=True, null=True)
+    wholeseller_agent_name = models.CharField(max_length=200)
+    wholeseller_agent_type = models.CharField(max_length=17,
+                                  choices=WHOLESELLER_AGENT_TYPE,
+                                  default="WHOLESELLER_AGENT"
+                                  )
+    wholeseller_agent_number = PhoneNumberField(unique=True,blank=True, null=True)
+    wholeseller_agent_altranate_mobile_number = PhoneNumberField(blank=True, null=True)
+    wholeseller_agent_email = models.EmailField(null=True)
+    wholeseller_agent_gender = models.CharField(
+        max_length=10, choices=WHOLESELLER_AGENT_GENDER, default="MALE")
+    wholeseller_agent_date_of_birth = models.DateField(auto_now_add=False, null=True)
+    wholeseller_agent_address = models.CharField(
+        max_length=100, default=None, blank=True, null=True)
+    wholeseller_agent_landmark = models.CharField(
+        max_length=100, default=None, blank=True, null=True)
+    wholeseller_agent_state = models.ForeignKey(
+        State, on_delete=models.CASCADE, null=True, related_name="wholeseller_agent_state")
+    wholeseller_agent_city = models.ForeignKey(
+        City,  on_delete=models.CASCADE, null=True, related_name="wholeseller_agent_city")
+    wholeseller_agent_district = models.ForeignKey(
+        District,  on_delete=models.CASCADE, null=True, related_name="wholeseller_agent_district")
+    wholeseller_agent_assigned_state = models.ManyToManyField(
+        State, related_name="wholeseller_agent_assigned_state")
+    wholeseller_agent_assigned_city = models.ManyToManyField(
+        City, related_name="wholeseller_agent_assigned_city")
+    wholeseller_agent_assigned_district = models.ManyToManyField(
+        District, related_name="wholeseller_agent_assigned_district")
+    wholeseller_agent_pincode = models.IntegerField(null=True)
+    wholeseller_agent_commission_type = models.CharField(
+        max_length=20, choices=WHOLESELLER_AGENT_COMMISSION_TYPE, default="PERCUSTOMER"
+    )
+    wholeseller_agent_commission_value_type =models.CharField(
+        max_length=20, choices=WHOLESELLER_AGENT_COMMISSION_VALUE_TYPE, default="AMOUNT"
+    )
+    wholeseller_agent_commission_value =models.CharField(
+        max_length=10, default=None, blank=True, null=True)
+    wholeseller_agent_adharcard_no = models.CharField(
+        max_length=12, default=None, blank=True, null=True)
+    wholeseller_agent_adhar_front_image = models.ImageField(
+        upload_to="image/wholeseller_agent/", null=True)
+    wholeseller_agent_adhar_back_image = models.ImageField(
+        upload_to="image/wholeseller_agent/", default=None, null=True)
+    wholeseller_agent_pancard_image = models.ImageField(
+        upload_to="image/wholeseller_agent/", default=None, null=True)
+    wholeseller_agent_pancard_no = models.CharField(
+        max_length=50, default=None, blank=True, null=True)
+    wholeseller_agent_image = models.ImageField(upload_to='images/wholeseller_agent/', null=True)
+    wholeseller_agent_status = models.CharField(
+        max_length=20, choices=WHOLESELLER_AGENT_STATUS, default="CREATED")
+    wholeseller_agent_otp = models.IntegerField(blank=True, null=True)
+    wholeseller_agent_user = models.ForeignKey(
+        User, related_name="wholeseller_agent_user", on_delete=models.CASCADE, null=True, blank=True)
+    is_active = ()
+    wholeseller_agent_active = models.BooleanField(default=False)
+    get_wholeseller_agent_location_json_data = jsonfield.JSONField(default={}, null=True,)
+    #wholeseller_agent_date_of_creation = models.DateTimeField(auto_now_add=False,null=True,blank=True)
+
+
+    def __str__(self):
+        return self.wholeseller_agent_name
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            # If the Agent object is being created for the first time
+            try:
+                user = User.objects.create_user(
+                    username=self.wholeseller_agent_number, password='Test@!Test123')
+                self.wholeseller_agent_user = user
+            except IntegrityError:
+                # If a user with the same username already exists, retrieve the existing user and update its fields
+                user = User.objects.get(username=self.wholeseller_agent_number)
+                user.set_password('Test@!Test123')
+                user.save()
+                self.wholeseller_agent_user = user
+        super().save(*args, **kwargs)
+
+
+PLAN_CHOICE = (
+    ("FREEPLAN", "FreePlan"),
+    ("PLANPAID", "PlanPaid"),
+)
+
+
+class WholesellerAgentCommisionRedeem(models.Model):
+    plan = models.CharField(
+        max_length=15, choices=PLAN_CHOICE, default="PLANPAID")
+    minimum_no_of_invoice_genrated = models.IntegerField(null=True)
+    amount_reimbursed_on_particular_days_percent = models.IntegerField(
+        null=True)
+    no_of_days_between_redemption = models.IntegerField(null=True)
+
+    def __str__(self):
+        return self.plan
+# ------------------------------- wholeseller retailer
+
+RETAILER_STATUS = (
+    ("CREATED", "Created"),
+    ("PENDING", "Pending Approval"),
+    ("KYCAPPROVED", "KYC Approved"),
+    ("KYCREJECTED", "KYC Rejected"),
+    ("APPROVED", "Approved"),
+)
+
+RETAILER_TYPE = (
+    ("WHOLESELLER_RETAILER", 'Wholeseller Retailer'),
+    ("OTHER", 'Other'),
+)
+BUSINESS_STATUS = (
+    ("NOTREGISTERED", "Not Registered"),
+    ("REGISTERED", "Registered")
+)
+
+
+class WholesellerRetailer(models.Model):
+    wholeseller_retailer_type = models.CharField(max_length=20, null=True, default="Wholeseller Retailer")
+    wholeseller_retailer_business_status = models.CharField(
+        max_length=20, choices=BUSINESS_STATUS, default="REGISTERED")
+    wholeseller_retailer_name = models.CharField(max_length=20, null=True, default=None)
+    wholeseller_retailer_description = models.TextField(blank=True, null=True)
+    wholeseller_retailer_contact_per = models.CharField(max_length=20, null=True, default=None)
+    wholeseller_retailer_number = PhoneNumberField(unique=True, blank=True, null=True)
+    wholeseller_retailer_wholeseller = models.ForeignKey(
+        Wholeseller, on_delete=models.CASCADE, related_name='wholeseller_retailer_wholeseller', blank=True, null=True)
+    wholeseller_retailer_agent = models.ForeignKey(
+        Agent, on_delete=models.CASCADE, related_name='wholeseller_retailer_agent', blank=True, null=True)
+    wholeseller_retailer_altranate_number = PhoneNumberField(blank=True, null=True)
+    wholeseller_retailer_plan = models.ForeignKey(
+        RetailerPlan, on_delete=models.CASCADE, related_name="wholeseller_retailer_plan", null=True, blank=True)
+    wholeseller_retailer_credit_limit = models.IntegerField(null=True)
+    wholeseller_retailer_credit_days = models.IntegerField(null=True)
+    wholeseller_retailer_credit_amount = models.IntegerField(null=True)
+    wholeseller_retailer_no_of_bills_allowed = models.IntegerField(null=True)
+    wholeseller_retailer_opening_balance = models.IntegerField(null=True)
+    wholeseller_retailer_state = models.ForeignKey(
+        State, on_delete=models.CASCADE, related_name='wholeseller_retailer_state', null=True, blank=True)
+    wholeseller_retailer_district = models.ForeignKey(
+        District, on_delete=models.CASCADE, related_name='wholeseller_retailer_district', null=True, blank=True)
+    wholeseller_retailer_city = models.ForeignKey(
+        City, on_delete=models.CASCADE, related_name='wholeseller_retailer_city', null=True, blank=True)
+    wholeseller_retailer_status = models.CharField(
+        max_length=20, choices=RETAILER_STATUS, default="CREATED")
+    wholeseller_retailer_active = models.BooleanField(default=False)
+    wholeseller_retailer_created_at = models.DateTimeField(
+        default=datetime.now, blank=True)
+
+    def __str__(self):
+        return self.wholeseller_retailer_name
+
