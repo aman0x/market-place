@@ -10,7 +10,6 @@ router.register(r'branch', views.WholesellerBranchViewSet),
 # ------------wholeseller agent-----------
 router.register(r'agent', views.WholesellerAgentViewSet)
 # router.register(r'commision',views.WholesellerAgentCommisionViewset)
-router.register(r'agent-commision-redeem',views.WholesellerAgentCommisionRedeemViewset)
 
 
 
