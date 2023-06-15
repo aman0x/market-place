@@ -1,5 +1,5 @@
 from django.contrib import admin
 from.models import *
 
-admin.site.register(Wholeseller)
-admin.site.register(Branch)
+admin.site.register([Wholeseller, Branch])
+
