@@ -173,12 +173,6 @@ class WholesellerBazaarSerializer(serializers.ModelSerializer):
 
 
 #=====================   wholeseller agent
-class WholesellerAgentWalletSerializer(serializers.Serializer):
-
-    total_amount_earned = serializers.IntegerField()
-    total_amount_withdrawn = serializers.IntegerField()
-    agent_balance= serializers.IntegerField()
-    agent_withdrawable_balance = serializers.IntegerField()
 
 
 class WholesellerAgentSerializer(serializers.ModelSerializer):
@@ -270,22 +264,3 @@ class WholesellerAgentSerializer(serializers.ModelSerializer):
         event = super().update(instance, validated_data)
         return event
 
-
-class WholesellerAgentCommisionRedeemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model=WholesellerAgentCommisionRedeem
-        fields= "__all__"
-
-
-class WholsellerListSerializers(serializers.ModelSerializer):
-
-    class Meta:
-        model=Wholeseller
-        fields= "__all__"
-
-
-#---------------- wholeseller retailer
-class WholesellerRetailerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = WholesellerRetailer
-        fields = '__all__'

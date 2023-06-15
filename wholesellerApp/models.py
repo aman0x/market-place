@@ -95,13 +95,9 @@ class Wholeseller(models.Model):
 class Branch(models.Model):
     branch_name= models.CharField(max_length=200,null=False)
     manager_name= models.CharField(max_length=200,null=True)
-    branch_phone= PhoneNumberField(blank=True, null=True)
-    # category_name = models.ForeignKey(ParentCategory, on_delete=models.CASCADE, related_name='branch_category')
-    # item_name = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='branch_item')
-    # subcategory_name= models.ForeignKey(Category, on_delete=models.CASCADE, related_name='branch_subcategory')
+    branch_phone= PhoneNumberField(blank=True, unique=True, null=True)
     email = models.EmailField(null=True)
-    address_line1 = models.CharField(max_length=300, null=True)
-    address_line2 = models.CharField(max_length=300, null=True)
+    address = models.CharField(max_length=300, null=True)
     landmark = models.CharField(max_length=300, null=True)
     city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='branch_city')
     state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='branch_state')
@@ -224,76 +220,3 @@ class WholesellerAgent(models.Model):
                 user.save()
                 self.wholeseller_agent_user = user
         super().save(*args, **kwargs)
-
-
-PLAN_CHOICE = (
-    ("FREEPLAN", "FreePlan"),
-    ("PLANPAID", "PlanPaid"),
-)
-
-
-class WholesellerAgentCommisionRedeem(models.Model):
-    plan = models.CharField(
-        max_length=15, choices=PLAN_CHOICE, default="PLANPAID")
-    minimum_no_of_invoice_genrated = models.IntegerField(null=True)
-    amount_reimbursed_on_particular_days_percent = models.IntegerField(
-        null=True)
-    no_of_days_between_redemption = models.IntegerField(null=True)
-
-    def __str__(self):
-        return self.plan
-# ------------------------------- wholeseller retailer
-
-RETAILER_STATUS = (
-    ("CREATED", "Created"),
-    ("PENDING", "Pending Approval"),
-    ("KYCAPPROVED", "KYC Approved"),
-    ("KYCREJECTED", "KYC Rejected"),
-    ("APPROVED", "Approved"),
-)
-
-RETAILER_TYPE = (
-    ("WHOLESELLER_RETAILER", 'Wholeseller Retailer'),
-    ("OTHER", 'Other'),
-)
-BUSINESS_STATUS = (
-    ("NOTREGISTERED", "Not Registered"),
-    ("REGISTERED", "Registered")
-)
-
-
-class WholesellerRetailer(models.Model):
-    wholeseller_retailer_type = models.CharField(max_length=20, null=True, default="Wholeseller Retailer")
-    wholeseller_retailer_business_status = models.CharField(
-        max_length=20, choices=BUSINESS_STATUS, default="REGISTERED")
-    wholeseller_retailer_name = models.CharField(max_length=20, null=True, default=None)
-    wholeseller_retailer_description = models.TextField(blank=True, null=True)
-    wholeseller_retailer_contact_per = models.CharField(max_length=20, null=True, default=None)
-    wholeseller_retailer_number = PhoneNumberField(unique=True, blank=True, null=True)
-    wholeseller_retailer_wholeseller = models.ForeignKey(
-        Wholeseller, on_delete=models.CASCADE, related_name='wholeseller_retailer_wholeseller', blank=True, null=True)
-    wholeseller_retailer_agent = models.ForeignKey(
-        Agent, on_delete=models.CASCADE, related_name='wholeseller_retailer_agent', blank=True, null=True)
-    wholeseller_retailer_altranate_number = PhoneNumberField(blank=True, null=True)
-    wholeseller_retailer_plan = models.ForeignKey(
-        RetailerPlan, on_delete=models.CASCADE, related_name="wholeseller_retailer_plan", null=True, blank=True)
-    wholeseller_retailer_credit_limit = models.IntegerField(null=True)
-    wholeseller_retailer_credit_days = models.IntegerField(null=True)
-    wholeseller_retailer_credit_amount = models.IntegerField(null=True)
-    wholeseller_retailer_no_of_bills_allowed = models.IntegerField(null=True)
-    wholeseller_retailer_opening_balance = models.IntegerField(null=True)
-    wholeseller_retailer_state = models.ForeignKey(
-        State, on_delete=models.CASCADE, related_name='wholeseller_retailer_state', null=True, blank=True)
-    wholeseller_retailer_district = models.ForeignKey(
-        District, on_delete=models.CASCADE, related_name='wholeseller_retailer_district', null=True, blank=True)
-    wholeseller_retailer_city = models.ForeignKey(
-        City, on_delete=models.CASCADE, related_name='wholeseller_retailer_city', null=True, blank=True)
-    wholeseller_retailer_status = models.CharField(
-        max_length=20, choices=RETAILER_STATUS, default="CREATED")
-    wholeseller_retailer_active = models.BooleanField(default=False)
-    wholeseller_retailer_created_at = models.DateTimeField(
-        default=datetime.now, blank=True)
-
-    def __str__(self):
-        return self.wholeseller_retailer_name
-

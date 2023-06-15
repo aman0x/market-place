@@ -12,8 +12,6 @@ router.register(r'agent', views.WholesellerAgentViewSet)
 # router.register(r'commision',views.WholesellerAgentCommisionViewset)
 router.register(r'agent-commision-redeem',views.WholesellerAgentCommisionRedeemViewset)
 
-# ------------wholeseller retailer-----------
-router.register(r'retailer', views.WholesellerRetailerViewSet)
 
 
 
@@ -53,15 +51,10 @@ urlpatterns = [
 
     #----------------- Wholeseller agent-----------
     # path('agent/<int:pk>/wholeseller_count/', views.WholesellerCountView.as_view(), name="agent's-wholeseller-count"),
-    path('agent/<int:pk>/plan_expire/',views.WholesellerReportPlanExpireView.as_view(), name="agent's-wholeseller-plan-expiry"),
-    path('agent/<int:pk>/earning/', views.WholesellerAgentEarningAPIView.as_view(), name="agent-earning"),
-    path('agent/application-status/',views.WholesellerAgentApplicationStatusViews.as_view(), name="agent-status-message"),
-    path('agent/verify_phone/', views.WholesellerAgentVerifyNumber.as_view(), name="agent-login"),
-    path('agent/verify_otp/', views.WholesellerAgentVerifyOTP.as_view(), name='verify_otp'),
-    path('agent/<int:pk>/wallet/', views.WholesellerAgentWallet.as_view(), name='wallet'),
-    path('agent/<int:pk>/wholeseller-list/',views.WholesellerListViewset.as_view({'get': 'list'}), name="wholeseller-filter"),
+    path('data/<int:pk>/agent/application-status/',views.WholesellerAgentApplicationStatusViews.as_view(), name="wholeseller-agent-status-message"),
+    path('data/<int:pk>/agent/verify_phone/', views.WholesellerAgentVerifyNumber.as_view(), name="wholeseller-agent-login"),
+    path('data/<int:pk>/agent/verify_otp/', views.WholesellerAgentVerifyOTP.as_view(), name='wholeseller-verify_otp'),
 
-    path('retailer/', views.WholesellerRetailerViewSet.as_view({'get': 'list'}), name="wholseller-retailer"),
 
 ]
 
