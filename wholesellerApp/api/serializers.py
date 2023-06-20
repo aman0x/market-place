@@ -274,3 +274,9 @@ class WholesellerAgentSerializer(serializers.ModelSerializer):
         event = super().update(instance, validated_data)
         return event
 
+#-----------------------wholeseller retailer-----------------------
+
+class WholesellerRetailerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WholesellerRetailer
+        fields = '__all__'

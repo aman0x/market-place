@@ -532,26 +532,6 @@ class WholesellerDashboardTopBranchesViewSet(views.APIView):
         new_data.append(data)
         return Response({"Top Branches": new_data})
 
-
-# class WholesellerBazaarListViewSet(views.APIView):
-#     permission_classes = [permissions.IsAuthenticated]
-#
-#     def get(self, request, pk):
-#         wholeseller_queryset = Wholeseller.objects.filter(id=pk)
-#         data = wholeseller_queryset.all().values_list("wholeseller_bazaar")
-#         print(data)
-#         new_data = []
-#         for bazaar_id in data:
-#             Bazaar_queryset = Bazaar.objects.filter(id=bazaar_id[0])
-#             print(Bazaar_queryset)
-#             for id in Bazaar_queryset:
-#                 data = {
-#                     "Bazaar id": id.id,
-#                     "Bazaar Name": id.bazaar_name
-#                 }
-#                 new_data.append(data)
-#         return Response({"Bazaar List": new_data})
-
 class WholesellerBazaarListViewSet(viewsets.ModelViewSet):
     queryset = Wholeseller.objects.all()
     serializer_class = WholelsellerBazaarListSerializer
@@ -781,3 +761,16 @@ class WholesellerAgentApplicationStatusViews(views.APIView):
                 return Response({"message": "Invalid agent status."})
         except Agent.DoesNotExist:
             return Response({"message": "Agent not found."})
+
+
+#------------------- wholeseller retailer-------
+
+class RetailerViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = WholesellerRetailer.objects.all()
+    serializer_class = WholesellerRetailerSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['wholeseller_retailer_name']

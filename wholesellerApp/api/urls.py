@@ -4,12 +4,13 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register(r'data', views.WholesellerViewSet),
-# router.register(r'dash', views.WholesellerDashboardViewSet),
 router.register(r'branch', views.WholesellerBranchViewSet),
 
 # ------------wholeseller agent-----------
 router.register(r'agent', views.WholesellerAgentViewSet)
-# router.register(r'commision',views.WholesellerAgentCommisionViewset)
+
+#-------------wholeseller retailer--------
+router.register(r'retailer', views.RetailerViewSet)
 
 
 
