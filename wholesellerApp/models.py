@@ -141,6 +141,7 @@ WHOLESELLER_AGENT_GENDER = (
 
 class WholesellerAgent(models.Model):
 
+    wholeseller = models.ForeignKey(Wholeseller, on_delete=models.CASCADE, null=True, related_name='agent_wholeseller')
     wholeseller_agent_bazaar = models.ManyToManyField(Bazaar, related_name="wholeseller_agent")
     agency = models.ForeignKey(
         Agency, on_delete=models.CASCADE, null=True, related_name="wholeseller_agent_agency")

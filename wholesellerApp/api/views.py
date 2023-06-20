@@ -626,6 +626,13 @@ class WholesellerAgentViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ["wholeseller_agent_name"]
 
+class WholesellerIdAgentViewSet(viewsets.ModelViewSet):
+    serializer_class = WholesellerIdAgentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        wholeseller_id = self.kwargs['wholeseller_id']
+        return WholesellerAgent.objects.filter(wholeseller_id=wholeseller_id)
 
 class WholesellerAgentVerifyOTP(views.APIView):
     permission_classes = [permissions.AllowAny]

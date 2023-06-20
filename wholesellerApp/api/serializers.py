@@ -25,11 +25,17 @@ class WholesellerSerializer(serializers.ModelSerializer):
     wholeseller_plan_name = serializers.SerializerMethodField()
     wholeseller_payment_name = serializers.SerializerMethodField()
     wholeseller_type_name = serializers.SerializerMethodField()
+    Wholeseller_created_agent = serializers.SerializerMethodField()
     
     class Meta:
         model = Wholeseller
         fields = '__all__'
-        
+
+    def get_Wholeseller_created_agent(self, obj):
+        wholeseller_agents = WholesellerAgent.objects.filter(wholeseller=obj)
+        serializer = WholesellerIdAgentSerializer(wholeseller_agents, many=True)
+        return serializer.data
+
     def get_wholeseller_state_name(self, obj):
         state = ""
         state_id = obj.wholeseller_state_id
@@ -174,6 +180,10 @@ class WholesellerBazaarSerializer(serializers.ModelSerializer):
 
 #=====================   wholeseller agent
 
+class WholesellerIdAgentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WholesellerAgent
+        fields = '__all__'
 
 class WholesellerAgentSerializer(serializers.ModelSerializer):
     agent_image = Base64ImageField(required=False)

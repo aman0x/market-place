@@ -47,12 +47,17 @@ urlpatterns = [
     path('data/<int:pk>/report/realtime-sale/', views.WholesellerReportRealtimeSaleViewSet.as_view(), name="Wholeseller-Report-realtime-sale"),
     #path('data/<int:pk>/bazaar-list/', views.WholesellerBazaarListViewSet.as_view(), name="Wholeseller-Bazaar-List"),
 
+    #----------------- Wholeseller branch-----------
+
+
 
     #----------------- Wholeseller agent-----------
     # path('agent/<int:pk>/wholeseller_count/', views.WholesellerCountView.as_view(), name="agent's-wholeseller-count"),
     path('data/<int:pk>/agent/application-status/',views.WholesellerAgentApplicationStatusViews.as_view(), name="wholeseller-agent-status-message"),
     path('data/<int:pk>/agent/verify_phone/', views.WholesellerAgentVerifyNumber.as_view(), name="wholeseller-agent-login"),
     path('data/<int:pk>/agent/verify_otp/', views.WholesellerAgentVerifyOTP.as_view(), name='wholeseller-verify_otp'),
+
+    path('data/<int:wholeseller_id>/agent/', views.WholesellerIdAgentViewSet.as_view({'get': 'list'}), name="Wholeseller-agent-details"),
 
 
 ]
