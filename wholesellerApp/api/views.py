@@ -183,8 +183,6 @@ class WholesellerApplicationStatusViews(views.APIView):
             return Response({"message": "Wholeseller not found."})
 
 
-
-
 class WholesellerDashboardViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
@@ -382,7 +380,7 @@ class WholesellerDashboardTotalProductViewSet(views.APIView):
                 payload.append(Product_data)
                 count += 1
 
-        return Response({"Total Products": count ,"Product Ids": product_ids})
+        return Response({"Total Products": count, "Product Ids": product_ids})
 
 
 class WholesellerDashboardTotalOrderViewSet(views.APIView):
@@ -532,11 +530,12 @@ class WholesellerDashboardTopBranchesViewSet(views.APIView):
         new_data.append(data)
         return Response({"Top Branches": new_data})
 
+
 class WholesellerBazaarListViewSet(viewsets.ModelViewSet):
     queryset = Wholeseller.objects.all()
     serializer_class = WholelsellerBazaarListSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_queryset(self):
         queryset = super().get_queryset()
         pk = self.kwargs.get("pk")
@@ -555,6 +554,7 @@ class WholesellerBranchViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
 
+
 class WholesellerBazaarProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all().order_by("id")
     permission_classes = [permissions.IsAuthenticated]
@@ -570,9 +570,9 @@ class WholesellerBazaarProductViewSet(viewsets.ModelViewSet):
         "product_brand_name",
         "product_active",
         "product_stocks",
-        
+
     ]
-    
+
     def get_queryset(self):
         queryset = super().get_queryset()
         pk = self.kwargs.get("pk")
@@ -586,13 +586,15 @@ class WholesellerBazaarViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = WholesellerBazaarSerializer
     queryset = Bazaar.objects.all()
+
     def get_queryset(self):
         queryset = Bazaar.objects.all()
         bazaar_id = self.kwargs.get("bazaar_id")
-        pk= self.kwargs.get("pk")
+        pk = self.kwargs.get("pk")
         if pk and bazaar_id:
             queryset = queryset.filter(wholeseller__id=pk, id=bazaar_id)
         return queryset
+
 
 # -------------- wholeseller agent
 class WholesellerAgentViewSet(viewsets.ModelViewSet):
@@ -606,6 +608,7 @@ class WholesellerAgentViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ["wholeseller_agent_name"]
 
+
 class WholesellerIdAgentViewSet(viewsets.ModelViewSet):
     serializer_class = WholesellerIdAgentSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -613,6 +616,7 @@ class WholesellerIdAgentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         wholeseller_id = self.kwargs['wholeseller_id']
         return WholesellerAgent.objects.filter(wholeseller_id=wholeseller_id)
+
 
 class WholesellerAgentVerifyOTP(views.APIView):
     permission_classes = [permissions.AllowAny]
@@ -762,8 +766,10 @@ class WholesellerAgentApplicationStatusViews(views.APIView):
         except Agent.DoesNotExist:
             return Response({"message": "Agent not found."})
 
+
 class WholesellerIdAgentViewSetIdViewSet(views.APIView):
     permission_classes = [permissions.AllowAny]
+
     def get(self, request, wholeseller_id, agent_id):
         try:
             wholeseller = Wholeseller.objects.get(id=wholeseller_id)
@@ -777,7 +783,8 @@ class WholesellerIdAgentViewSetIdViewSet(views.APIView):
         except WholesellerAgent.DoesNotExist:
             return Response({'message': 'Agent not found for the given wholeseller'}, status=404)
 
-#------------------- wholeseller retailer-------
+
+# ------------------- wholeseller retailer-------
 
 class RetailerViewSet(viewsets.ModelViewSet):
     """
@@ -789,6 +796,7 @@ class RetailerViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ['wholeseller_retailer_name']
 
+
 class WholesellerIdRetailerAPIView(views.APIView):
     serializer_class = WholesellerRetailerSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -798,8 +806,10 @@ class WholesellerIdRetailerAPIView(views.APIView):
         serializer = self.serializer_class(retailers, many=True)
         return Response(serializer.data)
 
+
 class WholesellerIdRetailerIdViewSet(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request, wholeseller_id, retailer_id):
         try:
             retailer = WholesellerRetailer.objects.get(id=retailer_id, wholeseller_retailer__id=wholeseller_id)
@@ -808,10 +818,12 @@ class WholesellerIdRetailerIdViewSet(views.APIView):
         except WholesellerRetailer.DoesNotExist:
             return Response(status=404)
 
+
 # --------------------wholeseller branch product --------------
 class BranchProductCreateView(views.APIView):
     serializer_class = BranchProductSerializer
     permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request, branch_id):
         branch_products = Branch_Product.objects.filter(branch_id=branch_id)
         serializer = self.serializer_class(branch_products, many=True)

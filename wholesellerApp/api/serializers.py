@@ -10,6 +10,8 @@ from planApp.models import Plan
 from paymentApp.models import Payment
 from masterApp.models import WholesellerType
 from locationApp.api.serializers import *
+
+
 # from locationApp.models import *
 
 
@@ -25,8 +27,9 @@ class WholesellerSerializer(serializers.ModelSerializer):
     wholeseller_plan_name = serializers.SerializerMethodField()
     wholeseller_payment_name = serializers.SerializerMethodField()
     wholeseller_type_name = serializers.SerializerMethodField()
+
     # Wholeseller_created_agent = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Wholeseller
         fields = '__all__'
@@ -42,51 +45,51 @@ class WholesellerSerializer(serializers.ModelSerializer):
         if state_id is not None:
             state = State.objects.filter(id=state_id).get().state
         return state
-    
+
     def get_wholeseller_district_name(self, obj):
         district = ""
         district_id = obj.wholeseller_district_id
         if district_id is not None:
             district = District.objects.filter(id=district_id).get().district
         return district
-    
+
     def get_wholeseller_city_name(self, obj):
         city = ""
         city_id = obj.wholeseller_city_id
         if city_id is not None:
             city = City.objects.filter(id=city_id).get().city
         return city
-        
+
     def get_wholeseller_bazaar_data(self, obj):
         bazaar_ids = obj.wholeseller_bazaar.all()
         bazaar = Bazaar.objects.filter(id__in=bazaar_ids)
         serializer = BazaarSerializer(bazaar, many=True)
         return serializer.data
-    
+
     def get_wholeseller_plan_name(self, obj):
         plan = ""
-        try :
+        try:
             plan_id = obj.wholeseller_plan_id
         except:
             plan_id = None
         if plan_id is not None:
             plan = Plan.objects.filter(id=plan_id).get().plan_name
         return plan
-    
+
     def get_wholeseller_payment_name(self, obj):
         payment = ""
         payment_id = obj.wholeseller_payment_id
         if payment_id is not None:
             payment = Payment.objects.filter(id=payment_id).get().payment_choice
         return payment
-    
+
     def get_wholeseller_type_name(self, obj):
         wholeseller_type = ""
         wholeseller_type_id = obj.wholeseller_type_id
         if wholeseller_type_id is not None:
             wholeseller_type = WholesellerType.objects.filter(id=wholeseller_type_id).get().wholeseller_type_name
         return wholeseller_type
-        
+
     def update(self, instance, validated_data):
         instance.wholeseller_adhar_front_image = validated_data.get(
             'wholeseller_adhar_front_image')
@@ -137,33 +140,38 @@ class WholesellerDashboardTopRetailersSerializer(serializers.ModelSerializer):
         model = Retailer
         fields = "__all__"
 
+
 class WholelsellerBazaarListSerializer(serializers.ModelSerializer):
     wholeseller_bazaar_data = serializers.SerializerMethodField()
+
     class Meta:
         model = Wholeseller
         fields = ["wholeseller_bazaar_data"]
-        
+
     def get_wholeseller_bazaar_data(self, obj):
         bazaar_ids = obj.wholeseller_bazaar.all()
         bazaar_names = []
         for bazaar in bazaar_ids:
             bazaar_name = Bazaar.objects.filter(id=bazaar.id).get().bazaar_name
-            bazaar_data = {"bazaar_id":bazaar.id, "bazaar_name" : bazaar_name}
+            bazaar_data = {"bazaar_id": bazaar.id, "bazaar_name": bazaar_name}
             bazaar_names.append(bazaar_data)
         return bazaar_names
-    
+
+
 class WholesellerBranchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Branch
         fields = "__all__"
-        #fields = ['branch_name', 'manager_name', 'branch_phone']
-        
+        # fields = ['branch_name', 'manager_name', 'branch_phone']
+
+
 class WholesellerBazaarProductSerializer(serializers.ModelSerializer):
     stock = serializers.SerializerMethodField()
+
     class Meta:
         model = Product
         fields = '__all__'
-        
+
     def get_stock(self, obj):
         stock = obj.product_stocks
         if stock == None or 0:
@@ -172,18 +180,20 @@ class WholesellerBazaarProductSerializer(serializers.ModelSerializer):
             stocks = "Available"
         return stocks
 
+
 class WholesellerBazaarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bazaar
         fields = "__all__"
 
 
-#=====================   wholeseller agent
+# =====================   wholeseller agent
 
 class WholesellerIdAgentSerializer(serializers.ModelSerializer):
     class Meta:
         model = WholesellerAgent
         fields = '__all__'
+
 
 class WholesellerAgentSerializer(serializers.ModelSerializer):
     agent_image = Base64ImageField(required=False)
@@ -199,8 +209,6 @@ class WholesellerAgentSerializer(serializers.ModelSerializer):
     wholeseller_agent_city_name = serializers.SerializerMethodField()
     agent_district_name = serializers.SerializerMethodField()
     agent_state_name = serializers.SerializerMethodField()
-
-
 
     class Meta:
         model = WholesellerAgent
@@ -220,7 +228,6 @@ class WholesellerAgentSerializer(serializers.ModelSerializer):
             state = State.objects.filter(id=state_id).get().state
         return state
 
-
     def get_agent_district_name(self, obj):
         district = ""
         district_id = obj.wholeseller_agent_district_id
@@ -228,14 +235,12 @@ class WholesellerAgentSerializer(serializers.ModelSerializer):
             district = District.objects.filter(id=district_id).get().district
         return district
 
-
     def get_wholeseller_agent_city_name(self, obj):
         city = ""
         city_id = obj.wholeseller_agent_city_id
         if city_id is not None:
             city = City.objects.filter(id=city_id).get().city
         return city
-
 
     def get_agent_bazaar_data(self, obj):
         bazaar_ids = obj.wholeseller_agent_bazaar.all()
@@ -261,7 +266,6 @@ class WholesellerAgentSerializer(serializers.ModelSerializer):
         serializer = CitySerializer(city, many=True)
         return serializer.data
 
-
     def update(self, instance, validated_data):
         instance.agent_image = validated_data.get(
             'agent_image')
@@ -274,13 +278,13 @@ class WholesellerAgentSerializer(serializers.ModelSerializer):
         event = super().update(instance, validated_data)
         return event
 
-#-----------------------wholeseller retailer-----------------------
+
+# -----------------------wholeseller retailer-----------------------
 
 class WholesellerRetailerSerializer(serializers.ModelSerializer):
     class Meta:
         model = WholesellerRetailer
         fields = '__all__'
-
 
 
 # ---------------- wholeseller branch product ---------
