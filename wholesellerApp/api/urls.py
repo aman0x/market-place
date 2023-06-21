@@ -76,22 +76,18 @@ urlpatterns = [
 
     # ----------------- Wholeseller agent-----------
     # path('agent/<int:pk>/wholeseller_count/', views.WholesellerCountView.as_view(), name="agent's-wholeseller-count"),
-    path('data/<int:pk>/agent/application-status/', views.WholesellerAgentApplicationStatusViews.as_view(),
-         name="wholeseller-agent-status-message"),
-    path('data/<int:pk>/agent/verify_phone/', views.WholesellerAgentVerifyNumber.as_view(),
-         name="wholeseller-agent-login"),
-    path('data/<int:pk>/agent/verify_otp/', views.WholesellerAgentVerifyOTP.as_view(), name='wholeseller-verify_otp'),
+    path('data/<int:pk>/agent/application-status/', views.WholesellerAgentApplicationStatusViews.as_view(), name="wholeseller-agent-status-message"),
+    path('data/agent/verify_phone/', views.WholesellerAgentVerifyNumber.as_view(), name="wholeseller-agent-login"),
+    path('data/agent/verify_otp/', views.WholesellerAgentVerifyOTP.as_view(), name='wholeseller-verify_otp'),
 
-    path('data/<int:wholeseller_id>/agent/', views.WholesellerIdAgentViewSet.as_view({'get': 'list'}),
-         name="all-agent-details-under-Wholeseller"),
-    path('data/<int:wholeseller_id>/agent/<int:agent_id>/', views.WholesellerIdAgentViewSetIdViewSet.as_view(),
-         name="agent-details-under-Wholeseller"),
+    path('data/<int:wholeseller_id>/agent/', views.WholesellerIdAgentViewSet.as_view({'get': 'list'}), name="all-agent-details-under-Wholeseller"),
+    path('data/<int:wholeseller_id>/agent/<int:agent_id>/', views.WholesellerIdAgentViewSetIdViewSet.as_view(), name="agent-details-under-Wholeseller"),
 
     # ----------------- Wholeseller retailer-----------
-    path('data/<int:wholeseller_id>/retailer/', views.WholesellerIdRetailerAPIView.as_view(),
-         name="all-retailer-details-under-Wholeseller"),
-    path('data/<int:wholeseller_id>/retailer/<int:retailer_id>/', views.WholesellerIdRetailerIdViewSet.as_view(),
-         name="retailer-details-under-Wholeseller"),
+    path('data/<int:wholeseller_id>/retailer/', views.WholesellerIdRetailerAPIView.as_view(), name="all-retailer-details-under-Wholeseller"),
+    path('data/<int:wholeseller_id>/retailer/<int:retailer_id>/', views.WholesellerIdRetailerIdViewSet.as_view(), name="retailer-details-under-Wholeseller"),
+    path('data/retailer/verify_phone/', views.WholesellerRetailerVerifyNumber.as_view(), name="wholeseller-retailer-login"),
+    path('data/retailer/verify_otp/', views.WholesellerRetailerVerifyOTP.as_view(), name='wholeseller-retailer-verify_otp'),
 
 ]
 

@@ -272,9 +272,10 @@ class WholesellerRetailer(models.Model):
         City, on_delete=models.CASCADE, related_name='wholeseller_retailer_city', null=True, blank=True)
     wholeseller_retailer_status = models.CharField(
         max_length=20, choices=RETAILER_STATUS, default="CREATED")
+    wholeseller_retailer_otp = models.IntegerField(blank=True, null=True)
     wholeseller_retailer_active = models.BooleanField(default=False)
-    wholeseller_retailer_created_at = models.DateTimeField(
-        default=datetime.now, blank=True)
+    wholeseller_retailer_created_at = models.DateTimeField(default=datetime.now, blank=True)
+    wholeseller_retailer_user = models.ForeignKey(User, related_name="wholeseller_retailer_user", on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.wholeseller_retailer_name

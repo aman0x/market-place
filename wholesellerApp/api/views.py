@@ -627,13 +627,13 @@ class WholesellerAgentVerifyOTP(views.APIView):
         agent_otp = request.data.get("wholeseller_agent_otp")
 
         try:
-            agent = Agent.objects.get(agent_number=agent_number)
-            if agent.agent_otp == int(agent_otp):
+            agent = WholesellerAgent.objects.get(wholeseller_agent_number=agent_number)
+            if agent.wholeseller_agent_otp == int(agent_otp):
                 # OTP is valid
-                agent.agent_otp = None
-                agent.save(update_fields=["agent_otp"])
+                agent.wholeseller_agent_otp = None
+                agent.save(update_fields=["wholeseller_agent_otp"])
                 # Get the User object associated with the Agent
-                user = agent.agent_user
+                user = agent.wholeseller_agent_user
                 access_token = AccessToken.for_user(user)
                 access_token.set_exp(
                     from_time=datetime.utcnow(), lifetime=timedelta(seconds=6400)
@@ -666,17 +666,17 @@ class WholesellerAgentVerifyNumber(views.APIView):
 
     def post(self, request):
         data = request.data
-        agent_number = data.get("agent_number")
+        agent_number = data.get("wholeseller_agent_number")
         password = data.get("agent_otp")
         payload = {}
         if agent_number != "":
             agent_otp = random.randrange(000000, 999999)
             try:
-                data = Agent.objects.get(agent_number=agent_number)
-                data.agent_otp = agent_otp
-                data.save(update_fields=["agent_otp"])
+                data = WholesellerAgent.objects.get(wholeseller_agent_number=agent_number)
+                data.wholeseller_agent_otp = agent_otp
+                data.save(update_fields=["wholeseller_agent_otp"])
                 if data:
-                    user = User.objects.filter(id=data.agent_user_id).distinct().first()
+                    user = User.objects.filter(id=data.wholeseller_agent_user_id).distinct().first()
                     if user:
                         payload = {
                             "otp": agent_otp,
@@ -818,7 +818,90 @@ class WholesellerIdRetailerIdViewSet(views.APIView):
         except WholesellerRetailer.DoesNotExist:
             return Response(status=404)
 
+class WholesellerRetailerVerifyOTP(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
 
+    def post(self, request):
+        retailer_number = request.data.get("wholeseller_retailer_number")
+        retailer_otp = request.data.get("wholeseller_retailer_otp")
+
+        try:
+            retailer = WholesellerRetailer.objects.get(wholeseller_retailer_number=retailer_number)
+            if retailer.wholeseller_retailer_otp == int(retailer_otp):
+                # OTP is valid
+                retailer.wholeseller_retailer_otp = None
+                retailer.save(update_fields=["wholeseller_retailer_otp"])
+                # Get the User object associated with the Retailer
+                user = retailer.wholeseller_retailer_user
+                access_token = AccessToken.for_user(user)
+                access_token.set_exp(
+                    from_time=datetime.utcnow(), lifetime=timedelta(seconds=6400)
+                )
+                refresh_token = RefreshToken.for_user(user)
+                refresh_token.set_exp(
+                    from_time=datetime.utcnow(), lifetime=timedelta(seconds=166400)
+                )
+                return Response(
+                    {
+                        "access_token": str(access_token),
+                        "refresh_token": str(refresh_token),
+                        "retailer_id": retailer.id,
+                    }
+                )
+            else:
+                status_code = common_status["unauthorized"]["code"]
+                payload = {"details": "Invalid OTP."}
+                return Response(payload, status=status_code)
+        except Retailer.DoesNotExist:
+            # Retailer not found
+            payload = {"details": "Retailer not found"}
+            status_code = common_status["unauthorized"]["code"]
+            return Response(payload, status=status_code)
+
+
+class WholesellerRetailerVerifyNumber(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        data = request.data
+        retailer_number = data.get("wholeseller_retailer_number")
+        password = data.get("wholeseller_retailer_otp")
+        payload = {}
+        if retailer_number != "":
+            retailer_otp = random.randrange(000000, 999999)
+            try:
+                data = WholesellerRetailer.objects.get(wholeseller_retailer_number=retailer_number)
+                data.wholeseller_retailer_otp = retailer_otp
+                data.save(update_fields=["wholeseller_retailer_otp"])
+                if data:
+                    user = User.objects.filter(id=data.wholeseller_retailer_user_id).distinct().first()
+                    if user:
+                        payload = {
+                            "otp": retailer_otp,
+                            "details": "Retailer OTP sent of registered mobile Number",
+                        }
+                        status_code = common_status["success"]["code"]
+                    else:
+                        payload = {"details": "No user found for the retailer"}
+                        status_code = common_status["not_found"]["code"]
+                else:
+                    payload = {
+                        "details": "No active account found with the given credentials"
+                    }
+                    status_code = common_status["not_found"]["code"]
+
+            except Retailer.DoesNotExist:
+                payload = {"details": "Retailer not found"}
+                status_code = common_status["unauthorized"]["code"]
+
+        else:
+            payload = {"details": "Something went wrong."}
+            status_code = common_status["bad_request"]["code"]
+            status_message = common_status["bad_request"]["message"]
+
+        return Response(payload, status=status_code)
 # --------------------wholeseller branch product --------------
 class BranchProductCreateView(views.APIView):
     serializer_class = BranchProductSerializer
