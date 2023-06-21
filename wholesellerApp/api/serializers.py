@@ -25,7 +25,7 @@ class WholesellerSerializer(serializers.ModelSerializer):
     wholeseller_plan_name = serializers.SerializerMethodField()
     wholeseller_payment_name = serializers.SerializerMethodField()
     wholeseller_type_name = serializers.SerializerMethodField()
-    Wholeseller_created_agent = serializers.SerializerMethodField()
+    # Wholeseller_created_agent = serializers.SerializerMethodField()
     
     class Meta:
         model = Wholeseller
@@ -279,4 +279,12 @@ class WholesellerAgentSerializer(serializers.ModelSerializer):
 class WholesellerRetailerSerializer(serializers.ModelSerializer):
     class Meta:
         model = WholesellerRetailer
+        fields = '__all__'
+
+
+
+# ---------------- wholeseller branch product ---------
+class BranchProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch_Product
         fields = '__all__'

@@ -382,7 +382,7 @@ class WholesellerDashboardTotalProductViewSet(views.APIView):
                 payload.append(Product_data)
                 count += 1
 
-        return Response({"Total Products": count})
+        return Response({"Total Products": count ,"Product Ids": product_ids})
 
 
 class WholesellerDashboardTotalOrderViewSet(views.APIView):
@@ -762,6 +762,20 @@ class WholesellerAgentApplicationStatusViews(views.APIView):
         except Agent.DoesNotExist:
             return Response({"message": "Agent not found."})
 
+class WholesellerIdAgentViewSetIdViewSet(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    def get(self, request, wholeseller_id, agent_id):
+        try:
+            wholeseller = Wholeseller.objects.get(id=wholeseller_id)
+            agent = WholesellerAgent.objects.get(id=agent_id, wholeseller=wholeseller)
+
+            agent_serializer = WholesellerAgentSerializer(agent)
+
+            return Response({
+                'agent': agent_serializer.data
+            })
+        except WholesellerAgent.DoesNotExist:
+            return Response({'message': 'Agent not found for the given wholeseller'}, status=404)
 
 #------------------- wholeseller retailer-------
 
@@ -774,3 +788,39 @@ class RetailerViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = ['wholeseller_retailer_name']
+
+class WholesellerIdRetailerAPIView(views.APIView):
+    serializer_class = WholesellerRetailerSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, wholeseller_id):
+        retailers = WholesellerRetailer.objects.filter(wholeseller_retailer=wholeseller_id)
+        serializer = self.serializer_class(retailers, many=True)
+        return Response(serializer.data)
+
+class WholesellerIdRetailerIdViewSet(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, wholeseller_id, retailer_id):
+        try:
+            retailer = WholesellerRetailer.objects.get(id=retailer_id, wholeseller_retailer__id=wholeseller_id)
+            serializer = WholesellerRetailerSerializer(retailer)
+            return Response(serializer.data)
+        except WholesellerRetailer.DoesNotExist:
+            return Response(status=404)
+
+# --------------------wholeseller branch product --------------
+class BranchProductCreateView(views.APIView):
+    serializer_class = BranchProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, branch_id):
+        branch_products = Branch_Product.objects.filter(branch_id=branch_id)
+        serializer = self.serializer_class(branch_products, many=True)
+        return Response(serializer.data, status=200)
+
+    def post(self, request, branch_id):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            branch = Branch.objects.get(id=branch_id)
+            serializer.save(branch=branch)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)

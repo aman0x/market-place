@@ -4,6 +4,8 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register(r'data', views.WholesellerViewSet),
+
+# -------------wholeseller branch-------
 router.register(r'branch', views.WholesellerBranchViewSet),
 
 # ------------wholeseller agent-----------
@@ -50,7 +52,7 @@ urlpatterns = [
 
     #----------------- Wholeseller branch-----------
 
-
+    path('branch/<int:branch_id>/product/', views.BranchProductCreateView.as_view(), name='add_product_to_branch'),
 
     #----------------- Wholeseller agent-----------
     # path('agent/<int:pk>/wholeseller_count/', views.WholesellerCountView.as_view(), name="agent's-wholeseller-count"),
@@ -58,8 +60,12 @@ urlpatterns = [
     path('data/<int:pk>/agent/verify_phone/', views.WholesellerAgentVerifyNumber.as_view(), name="wholeseller-agent-login"),
     path('data/<int:pk>/agent/verify_otp/', views.WholesellerAgentVerifyOTP.as_view(), name='wholeseller-verify_otp'),
 
-    path('data/<int:wholeseller_id>/agent/', views.WholesellerIdAgentViewSet.as_view({'get': 'list'}), name="Wholeseller-agent-details"),
+    path('data/<int:wholeseller_id>/agent/', views.WholesellerIdAgentViewSet.as_view({'get': 'list'}), name="all-agent-details-under-Wholeseller"),
+    path('data/<int:wholeseller_id>/agent/<int:agent_id>/', views.WholesellerIdAgentViewSetIdViewSet.as_view(), name="agent-details-under-Wholeseller"),
 
+    # ----------------- Wholeseller retailer-----------
+    path('data/<int:wholeseller_id>/retailer/', views.WholesellerIdRetailerAPIView.as_view(), name="all-retailer-details-under-Wholeseller"),
+    path('data/<int:wholeseller_id>/retailer/<int:retailer_id>/', views.WholesellerIdRetailerIdViewSet.as_view(), name="retailer-details-under-Wholeseller"),
 
 ]
 

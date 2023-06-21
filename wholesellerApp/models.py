@@ -14,6 +14,7 @@ from django.db import IntegrityError
 from masterApp.models import WholesellerType
 from masterApp.models import RetailerType
 from planApp.models import RetailerPlan
+from productApp.models import Product
 from datetime import datetime
 
 
@@ -107,6 +108,10 @@ class Branch(models.Model):
         if self.branch_name != None:
             return self.branch_name
 
+class Branch_Product(models.Model):
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=True, related_name='branch_products')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, related_name='branch_products')
+    price = models.IntegerField(null=True)
 
 #-----------------------------Wholeseller agent ------------------
 WHOLESELLER_AGENT_TYPE = (
@@ -118,7 +123,6 @@ WHOLESELLER_AGENT_STATUS = (
     ("PENDING", "Pending Approval"),
     ("KYCAPPROVED", "KYC Approved"),
     ("KYCREJECTED", "KYC Rejected"),
-    ("APPROVED", "Approved"),
 )
 
 WHOLESELLER_AGENT_COMMISSION_TYPE = (
@@ -227,7 +231,6 @@ RETAILER_STATUS = (
     ("PENDING", "Pending Approval"),
     ("KYCAPPROVED", "KYC Approved"),
     ("KYCREJECTED", "KYC Rejected"),
-    ("APPROVED", "Approved"),
 )
 
 BUSINESS_STATUS = (
@@ -246,10 +249,10 @@ class WholesellerRetailer(models.Model):
     wholeseller_retailer_description = models.TextField(blank=True, null=True)
     wholeseller_retailer_contact_per = models.CharField(max_length=20, null=True, default=None)
     wholeseller_retailer_number = PhoneNumberField(unique=True, blank=True, null=True)
-    wholeseller_retailer_wholeseller = models.ForeignKey(
-        Wholeseller, on_delete=models.CASCADE, related_name='wholeseller_retailer_wholeseller', blank=True, null=True)
+    # wholeseller_retailer_wholeseller = models.ForeignKey(
+    #     Wholeseller, on_delete=models.CASCADE, related_name='wholeseller_retailer_wholeseller', blank=True, null=True)
     wholeseller_retailer_agent = models.ForeignKey(
-        Agent, on_delete=models.CASCADE, related_name='wholeseller_retailer_agent', blank=True, null=True)
+        WholesellerAgent, on_delete=models.CASCADE, related_name='wholeseller_retailer_agent', blank=True, null=True)
     wholeseller_retailer_altranate_number = PhoneNumberField(blank=True, null=True)
     wholeseller_retailer_plan = models.ForeignKey(
         RetailerPlan, on_delete=models.CASCADE, related_name="wholeseller_retailer_plan", null=True, blank=True)
