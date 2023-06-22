@@ -183,8 +183,6 @@ class WholesellerApplicationStatusViews(views.APIView):
             return Response({"message": "Wholeseller not found."})
 
 
-
-
 class WholesellerDashboardViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
@@ -382,7 +380,7 @@ class WholesellerDashboardTotalProductViewSet(views.APIView):
                 payload.append(Product_data)
                 count += 1
 
-        return Response({"Total Products": count})
+        return Response({"Total Products": count, "Product Ids": product_ids})
 
 
 class WholesellerDashboardTotalOrderViewSet(views.APIView):
@@ -533,30 +531,11 @@ class WholesellerDashboardTopBranchesViewSet(views.APIView):
         return Response({"Top Branches": new_data})
 
 
-# class WholesellerBazaarListViewSet(views.APIView):
-#     permission_classes = [permissions.IsAuthenticated]
-#
-#     def get(self, request, pk):
-#         wholeseller_queryset = Wholeseller.objects.filter(id=pk)
-#         data = wholeseller_queryset.all().values_list("wholeseller_bazaar")
-#         print(data)
-#         new_data = []
-#         for bazaar_id in data:
-#             Bazaar_queryset = Bazaar.objects.filter(id=bazaar_id[0])
-#             print(Bazaar_queryset)
-#             for id in Bazaar_queryset:
-#                 data = {
-#                     "Bazaar id": id.id,
-#                     "Bazaar Name": id.bazaar_name
-#                 }
-#                 new_data.append(data)
-#         return Response({"Bazaar List": new_data})
-
 class WholesellerBazaarListViewSet(viewsets.ModelViewSet):
     queryset = Wholeseller.objects.all()
     serializer_class = WholelsellerBazaarListSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_queryset(self):
         queryset = super().get_queryset()
         pk = self.kwargs.get("pk")
@@ -575,6 +554,7 @@ class WholesellerBranchViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
 
+
 class WholesellerBazaarProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all().order_by("id")
     permission_classes = [permissions.IsAuthenticated]
@@ -590,9 +570,9 @@ class WholesellerBazaarProductViewSet(viewsets.ModelViewSet):
         "product_brand_name",
         "product_active",
         "product_stocks",
-        
+
     ]
-    
+
     def get_queryset(self):
         queryset = super().get_queryset()
         pk = self.kwargs.get("pk")
@@ -606,13 +586,15 @@ class WholesellerBazaarViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = WholesellerBazaarSerializer
     queryset = Bazaar.objects.all()
+
     def get_queryset(self):
         queryset = Bazaar.objects.all()
         bazaar_id = self.kwargs.get("bazaar_id")
-        pk= self.kwargs.get("pk")
+        pk = self.kwargs.get("pk")
         if pk and bazaar_id:
             queryset = queryset.filter(wholeseller__id=pk, id=bazaar_id)
         return queryset
+
 
 # -------------- wholeseller agent
 class WholesellerAgentViewSet(viewsets.ModelViewSet):
@@ -627,6 +609,15 @@ class WholesellerAgentViewSet(viewsets.ModelViewSet):
     search_fields = ["wholeseller_agent_name"]
 
 
+class WholesellerIdAgentViewSet(viewsets.ModelViewSet):
+    serializer_class = WholesellerIdAgentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        wholeseller_id = self.kwargs['wholeseller_id']
+        return WholesellerAgent.objects.filter(wholeseller_id=wholeseller_id)
+
+
 class WholesellerAgentVerifyOTP(views.APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
@@ -636,13 +627,13 @@ class WholesellerAgentVerifyOTP(views.APIView):
         agent_otp = request.data.get("wholeseller_agent_otp")
 
         try:
-            agent = Agent.objects.get(agent_number=agent_number)
-            if agent.agent_otp == int(agent_otp):
+            agent = WholesellerAgent.objects.get(wholeseller_agent_number=agent_number)
+            if agent.wholeseller_agent_otp == int(agent_otp):
                 # OTP is valid
-                agent.agent_otp = None
-                agent.save(update_fields=["agent_otp"])
+                agent.wholeseller_agent_otp = None
+                agent.save(update_fields=["wholeseller_agent_otp"])
                 # Get the User object associated with the Agent
-                user = agent.agent_user
+                user = agent.wholeseller_agent_user
                 access_token = AccessToken.for_user(user)
                 access_token.set_exp(
                     from_time=datetime.utcnow(), lifetime=timedelta(seconds=6400)
@@ -675,17 +666,17 @@ class WholesellerAgentVerifyNumber(views.APIView):
 
     def post(self, request):
         data = request.data
-        agent_number = data.get("agent_number")
+        agent_number = data.get("wholeseller_agent_number")
         password = data.get("agent_otp")
         payload = {}
         if agent_number != "":
             agent_otp = random.randrange(000000, 999999)
             try:
-                data = Agent.objects.get(agent_number=agent_number)
-                data.agent_otp = agent_otp
-                data.save(update_fields=["agent_otp"])
+                data = WholesellerAgent.objects.get(wholeseller_agent_number=agent_number)
+                data.wholeseller_agent_otp = agent_otp
+                data.save(update_fields=["wholeseller_agent_otp"])
                 if data:
-                    user = User.objects.filter(id=data.agent_user_id).distinct().first()
+                    user = User.objects.filter(id=data.wholeseller_agent_user_id).distinct().first()
                     if user:
                         payload = {
                             "otp": agent_otp,
@@ -774,3 +765,243 @@ class WholesellerAgentApplicationStatusViews(views.APIView):
                 return Response({"message": "Invalid agent status."})
         except Agent.DoesNotExist:
             return Response({"message": "Agent not found."})
+
+
+class WholesellerIdAgentViewSetIdViewSet(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, wholeseller_id, agent_id):
+        try:
+            wholeseller = Wholeseller.objects.get(id=wholeseller_id)
+            agent = WholesellerAgent.objects.get(id=agent_id, wholeseller=wholeseller)
+
+            agent_serializer = WholesellerAgentSerializer(agent)
+
+            return Response({
+                'agent': agent_serializer.data
+            })
+        except WholesellerAgent.DoesNotExist:
+            return Response({'message': 'Agent not found for the given wholeseller'}, status=404)
+
+
+# ------------------- wholeseller retailer-------
+
+class RetailerViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = WholesellerRetailer.objects.all()
+    serializer_class = WholesellerRetailerSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['wholeseller_retailer_name']
+
+
+class WholesellerIdRetailerAPIView(views.APIView):
+    serializer_class = WholesellerRetailerSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, wholeseller_id):
+        retailers = WholesellerRetailer.objects.filter(wholeseller_retailer=wholeseller_id)
+        serializer = self.serializer_class(retailers, many=True)
+        return Response(serializer.data)
+
+
+class WholesellerIdRetailerIdViewSet(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, wholeseller_id, retailer_id):
+        try:
+            retailer = WholesellerRetailer.objects.get(id=retailer_id, wholeseller_retailer__id=wholeseller_id)
+            serializer = WholesellerRetailerSerializer(retailer)
+            return Response(serializer.data)
+        except WholesellerRetailer.DoesNotExist:
+            return Response(status=404)
+
+class WholesellerRetailerVerifyOTP(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        retailer_number = request.data.get("wholeseller_retailer_number")
+        retailer_otp = request.data.get("wholeseller_retailer_otp")
+
+        try:
+            retailer = WholesellerRetailer.objects.get(wholeseller_retailer_number=retailer_number)
+            if retailer.wholeseller_retailer_otp == int(retailer_otp):
+                # OTP is valid
+                retailer.wholeseller_retailer_otp = None
+                retailer.save(update_fields=["wholeseller_retailer_otp"])
+                # Get the User object associated with the Retailer
+                user = retailer.wholeseller_retailer_user
+                access_token = AccessToken.for_user(user)
+                access_token.set_exp(
+                    from_time=datetime.utcnow(), lifetime=timedelta(seconds=6400)
+                )
+                refresh_token = RefreshToken.for_user(user)
+                refresh_token.set_exp(
+                    from_time=datetime.utcnow(), lifetime=timedelta(seconds=166400)
+                )
+                return Response(
+                    {
+                        "access_token": str(access_token),
+                        "refresh_token": str(refresh_token),
+                        "retailer_id": retailer.id,
+                    }
+                )
+            else:
+                status_code = common_status["unauthorized"]["code"]
+                payload = {"details": "Invalid OTP."}
+                return Response(payload, status=status_code)
+        except Retailer.DoesNotExist:
+            # Retailer not found
+            payload = {"details": "Retailer not found"}
+            status_code = common_status["unauthorized"]["code"]
+            return Response(payload, status=status_code)
+
+
+class WholesellerRetailerVerifyNumber(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        data = request.data
+        retailer_number = data.get("wholeseller_retailer_number")
+        password = data.get("wholeseller_retailer_otp")
+        payload = {}
+        if retailer_number != "":
+            retailer_otp = random.randrange(000000, 999999)
+            try:
+                data = WholesellerRetailer.objects.get(wholeseller_retailer_number=retailer_number)
+                data.wholeseller_retailer_otp = retailer_otp
+                data.save(update_fields=["wholeseller_retailer_otp"])
+                if data:
+                    user = User.objects.filter(id=data.wholeseller_retailer_user_id).distinct().first()
+                    if user:
+                        payload = {
+                            "otp": retailer_otp,
+                            "details": "Retailer OTP sent of registered mobile Number",
+                        }
+                        status_code = common_status["success"]["code"]
+                    else:
+                        payload = {"details": "No user found for the retailer"}
+                        status_code = common_status["not_found"]["code"]
+                else:
+                    payload = {
+                        "details": "No active account found with the given credentials"
+                    }
+                    status_code = common_status["not_found"]["code"]
+
+            except Retailer.DoesNotExist:
+                payload = {"details": "Retailer not found"}
+                status_code = common_status["unauthorized"]["code"]
+
+        else:
+            payload = {"details": "Something went wrong."}
+            status_code = common_status["bad_request"]["code"]
+            status_message = common_status["bad_request"]["message"]
+
+        return Response(payload, status=status_code)
+# --------------------wholeseller branch --------------
+class BranchProductCreateView(views.APIView):
+    serializer_class = BranchProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, branch_id):
+        branch_products = Branch_Product.objects.filter(branch_id=branch_id)
+        serializer = self.serializer_class(branch_products, many=True)
+        return Response(serializer.data, status=200)
+
+    def post(self, request, branch_id):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            branch = Branch.objects.get(id=branch_id)
+            serializer.save(branch=branch)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+
+class WholesellerBranchManagerVerifyNumber(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        data = request.data
+        branch_manager_number = data.get("branch_phone")
+        password = data.get("branch_otp")
+        payload = {}
+        if branch_manager_number != "":
+            branch_otp = random.randrange(000000, 999999)
+            try:
+                data = Branch.objects.get(branch_phone=branch_manager_number)
+                data.branch_otp = branch_otp
+                data.save(update_fields=["branch_otp"])
+                if data:
+                    user = User.objects.filter(id=data.wholeseller_branch_user_id).distinct().first()
+                    if user:
+                        payload = {
+                            "otp": branch_otp,
+                            "details": "Manager's OTP sent of registered mobile Number",
+                        }
+                        status_code = common_status["success"]["code"]
+                    else:
+                        payload = {"details": "No user found for the manager"}
+                        status_code = common_status["not_found"]["code"]
+                else:
+                    payload = {
+                        "details": "No active account found with the given credentials"
+                    }
+                    status_code = common_status["not_found"]["code"]
+
+            except Retailer.DoesNotExist:
+                payload = {"details": "Manager not found"}
+                status_code = common_status["unauthorized"]["code"]
+
+        else:
+            payload = {"details": "Something went wrong."}
+            status_code = common_status["bad_request"]["code"]
+            status_message = common_status["bad_request"]["message"]
+
+        return Response(payload, status=status_code)
+
+
+class WholesellerBranchManagerVerifyOTP(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        branch_manager_number = request.data.get("branch_phone")
+        branch_manager_otp = request.data.get("branch_otp")
+
+        try:
+            manager = Branch.objects.get(branch_phone=branch_manager_number)
+            if manager.branch_otp == int(branch_manager_otp):
+                # OTP is valid
+                manager.branch_otp = None
+                manager.save(update_fields=["branch_otp"])
+                # Get the User object associated with the Retailer
+                user = manager.wholeseller_branch_user
+                access_token = AccessToken.for_user(user)
+                access_token.set_exp(
+                    from_time=datetime.utcnow(), lifetime=timedelta(seconds=6400)
+                )
+                refresh_token = RefreshToken.for_user(user)
+                refresh_token.set_exp(
+                    from_time=datetime.utcnow(), lifetime=timedelta(seconds=166400)
+                )
+                return Response(
+                    {
+                        "access_token": str(access_token),
+                        "refresh_token": str(refresh_token),
+                        "branch_id": manager.id,
+                    }
+                )
+            else:
+                status_code = common_status["unauthorized"]["code"]
+                payload = {"details": "Invalid OTP."}
+                return Response(payload, status=status_code)
+        except Retailer.DoesNotExist:
+            # Retailer not found
+            payload = {"details": "Manager not found"}
+            status_code = common_status["unauthorized"]["code"]
+            return Response(payload, status=status_code)
