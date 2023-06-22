@@ -73,6 +73,8 @@ urlpatterns = [
     # ----------------- Wholeseller branch-----------
 
     path('branch/<int:branch_id>/product/', views.BranchProductCreateView.as_view(), name='add_product_to_branch'),
+    path('data/branch/verify_phone/', views.WholesellerBranchManagerVerifyNumber.as_view(), name="wholeseller-retailer-login"),
+    path('data/branch/verify_otp/', views.WholesellerBranchManagerVerifyOTP.as_view(), name='wholeseller-retailer-verify_otp'),
 
     # ----------------- Wholeseller agent-----------
     # path('agent/<int:pk>/wholeseller_count/', views.WholesellerCountView.as_view(), name="agent's-wholeseller-count"),

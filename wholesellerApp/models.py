@@ -94,6 +94,7 @@ class Branch(models.Model):
     branch_name = models.CharField(max_length=200, null=False)
     manager_name = models.CharField(max_length=200, null=True)
     branch_phone = PhoneNumberField(blank=True, unique=True, null=True)
+    branch_otp = models.IntegerField(blank=True, null=True)
     email = models.EmailField(null=True)
     address = models.CharField(max_length=300, null=True)
     landmark = models.CharField(max_length=300, null=True)
@@ -103,10 +104,24 @@ class Branch(models.Model):
     pincode_no = models.IntegerField(null=True)
     created_at = models.DateField(auto_now_add=False, default=date.today, blank=True)
     branch_wholeseller = models.ForeignKey(Wholeseller, on_delete=models.CASCADE, related_name='branch_wholeseller')
-
+    wholeseller_branch_user = models.ForeignKey(User, related_name="wholeseller_branch_user", on_delete=models.CASCADE, null=True, blank=True)
     def __str__(self):
         if self.branch_name != None:
             return self.branch_name
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            # If the Agent object is being created for the first time
+            try:
+                user = User.objects.create_user(username=self.branch_phone, password='Test@!Test123')
+                self.wholeseller_branch_user = user
+            except IntegrityError:
+                # If a user with the same username already exists, retrieve the existing user and update its fields
+                user = User.objects.get(username=self.branch_phone)
+                user.set_password('Test@!Test123')
+                user.save()
+                self.wholeseller_branch_user = user
+        super().save(*args, **kwargs)
 
 
 class Branch_Product(models.Model):

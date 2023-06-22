@@ -902,7 +902,7 @@ class WholesellerRetailerVerifyNumber(views.APIView):
             status_message = common_status["bad_request"]["message"]
 
         return Response(payload, status=status_code)
-# --------------------wholeseller branch product --------------
+# --------------------wholeseller branch --------------
 class BranchProductCreateView(views.APIView):
     serializer_class = BranchProductSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -919,3 +919,89 @@ class BranchProductCreateView(views.APIView):
             serializer.save(branch=branch)
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+
+
+class WholesellerBranchManagerVerifyNumber(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        data = request.data
+        branch_manager_number = data.get("branch_phone")
+        password = data.get("branch_otp")
+        payload = {}
+        if branch_manager_number != "":
+            branch_otp = random.randrange(000000, 999999)
+            try:
+                data = Branch.objects.get(branch_phone=branch_manager_number)
+                data.branch_otp = branch_otp
+                data.save(update_fields=["branch_otp"])
+                if data:
+                    user = User.objects.filter(id=data.wholeseller_branch_user_id).distinct().first()
+                    if user:
+                        payload = {
+                            "otp": branch_otp,
+                            "details": "Manager's OTP sent of registered mobile Number",
+                        }
+                        status_code = common_status["success"]["code"]
+                    else:
+                        payload = {"details": "No user found for the manager"}
+                        status_code = common_status["not_found"]["code"]
+                else:
+                    payload = {
+                        "details": "No active account found with the given credentials"
+                    }
+                    status_code = common_status["not_found"]["code"]
+
+            except Retailer.DoesNotExist:
+                payload = {"details": "Manager not found"}
+                status_code = common_status["unauthorized"]["code"]
+
+        else:
+            payload = {"details": "Something went wrong."}
+            status_code = common_status["bad_request"]["code"]
+            status_message = common_status["bad_request"]["message"]
+
+        return Response(payload, status=status_code)
+
+
+class WholesellerBranchManagerVerifyOTP(views.APIView):
+    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        branch_manager_number = request.data.get("branch_phone")
+        branch_manager_otp = request.data.get("branch_otp")
+
+        try:
+            manager = Branch.objects.get(branch_phone=branch_manager_number)
+            if manager.branch_otp == int(branch_manager_otp):
+                # OTP is valid
+                manager.branch_otp = None
+                manager.save(update_fields=["branch_otp"])
+                # Get the User object associated with the Retailer
+                user = manager.wholeseller_branch_user
+                access_token = AccessToken.for_user(user)
+                access_token.set_exp(
+                    from_time=datetime.utcnow(), lifetime=timedelta(seconds=6400)
+                )
+                refresh_token = RefreshToken.for_user(user)
+                refresh_token.set_exp(
+                    from_time=datetime.utcnow(), lifetime=timedelta(seconds=166400)
+                )
+                return Response(
+                    {
+                        "access_token": str(access_token),
+                        "refresh_token": str(refresh_token),
+                        "branch_id": manager.id,
+                    }
+                )
+            else:
+                status_code = common_status["unauthorized"]["code"]
+                payload = {"details": "Invalid OTP."}
+                return Response(payload, status=status_code)
+        except Retailer.DoesNotExist:
+            # Retailer not found
+            payload = {"details": "Manager not found"}
+            status_code = common_status["unauthorized"]["code"]
+            return Response(payload, status=status_code)
