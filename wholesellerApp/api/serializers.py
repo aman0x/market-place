@@ -10,7 +10,8 @@ from planApp.models import Plan
 from paymentApp.models import Payment
 from masterApp.models import WholesellerType
 from locationApp.api.serializers import *
-
+from productApp.models import Product
+from productApp.api.serializers import ProductSerializer
 
 # from locationApp.models import *
 
@@ -289,6 +290,26 @@ class WholesellerRetailerSerializer(serializers.ModelSerializer):
 
 # ---------------- wholeseller branch product ---------
 class BranchProductSerializer(serializers.ModelSerializer):
+    # product_details = serializers.SerializerMethodField()
     class Meta:
         model = Branch_Product
+        fields = '__all__'
+        # exclude = ['branch']
+
+    def validate(self, attrs):
+        branch = attrs.get('branch')
+        if branch and branch.main_branch:
+            return attrs
+        raise serializers.ValidationError("Branch must be a main branch.")
+
+    def get_product_details(self,obj):
+        product = Product.objects.filter(id=obj.product_id)
+        serializer = ProductSerializer(product, many=True)
+        return serializer.data
+
+
+class BranchCategoryWisePlanSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Branch_Category_Wise_Plan
         fields = '__all__'

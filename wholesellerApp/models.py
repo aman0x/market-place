@@ -16,6 +16,7 @@ from masterApp.models import RetailerType
 from planApp.models import RetailerPlan
 from productApp.models import Product
 from datetime import datetime
+from categoryApp.models import Category
 
 # WHOLESELLER_TYPE = (
 #     ("INDIVIDUAL", "Individual"),
@@ -36,10 +37,8 @@ class Wholeseller(models.Model):
     wholeseller_description = models.TextField(blank=True, null=True)
     wholeseller_name = models.CharField(max_length=200, blank=True)
     wholeseller_bazaar = models.ManyToManyField(Bazaar, 'wholeseller')
-    wholeseller_plan = models.ForeignKey(
-        Plan, on_delete=models.CASCADE, related_name="chooseplan", null=True, blank=True)
-    wholeseller_payment = models.ForeignKey(
-        Payment, on_delete=models.CASCADE, related_name='payment_detail', null=True, blank=True)
+    wholeseller_plan = models.ForeignKey(Plan, on_delete=models.CASCADE, related_name="chooseplan", null=True, blank=True)
+    wholeseller_payment = models.ForeignKey(Payment, on_delete=models.CASCADE, related_name='payment_detail', null=True, blank=True)
     wholeseller_type = models.ForeignKey(WholesellerType, on_delete=models.CASCADE, related_name="wholeseller_type")
     wholeseller_firm_name = models.CharField(max_length=20, null=True, default=None)
     wholeseller_agent = models.ForeignKey(Agent, on_delete=models.CASCADE, related_name='agent', blank=True, null=True)
@@ -59,16 +58,12 @@ class Wholeseller(models.Model):
     wholeseller_adhar_front_image = models.ImageField(upload_to="adhar-image/wholeseller/%y/%m/%d", null=True)
     wholeseller_adhar_back_image = models.ImageField(upload_to="adhar-image/wholeseller/%y/%m/%d", null=True)
     wholeseller_pan_card_image = models.ImageField(upload_to="pan-image/wholeseller/%y/%m/%d", null=True)
-    wholeseller_image = models.ImageField(
-        upload_to='images/wholeseller/', null=True)
-    wholeseller_status = models.CharField(
-        max_length=20, choices=WHOLESELLER_STATUS, default="CREATED")
+    wholeseller_image = models.ImageField(upload_to='images/wholeseller/', null=True)
+    wholeseller_status = models.CharField(max_length=20, choices=WHOLESELLER_STATUS, default="CREATED")
     wholeseller_otp = models.IntegerField(blank=True, null=True)
-    wholeseller_user = models.ForeignKey(
-        User, related_name="wholeseller_user", on_delete=models.CASCADE, null=True, blank=True)
+    wholeseller_user = models.ForeignKey(User, related_name="wholeseller_user", on_delete=models.CASCADE, null=True, blank=True)
     wholeseller_active = models.BooleanField(default=False)
     get_wholeseller_location_json_data = jsonfield.JSONField(default={}, null=True, )
-
     created_at = models.DateField(auto_now_add=False, default=date.today, blank=True)
 
     def __str__(self):
@@ -105,13 +100,16 @@ class Branch(models.Model):
     created_at = models.DateField(auto_now_add=False, default=date.today, blank=True)
     branch_wholeseller = models.ForeignKey(Wholeseller, on_delete=models.CASCADE, related_name='branch_wholeseller')
     wholeseller_branch_user = models.ForeignKey(User, related_name="wholeseller_branch_user", on_delete=models.CASCADE, null=True, blank=True)
+    main_branch = models.BooleanField(default=False,)
     def __str__(self):
         if self.branch_name != None:
             return self.branch_name
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            # If the Agent object is being created for the first time
+            # If the Branch object is being created for the first time
+            if not Branch.objects.filter(branch_wholeseller=self.branch_wholeseller).exists():
+                self.main_branch = True  # Set main_branch to True for the first branch
             try:
                 user = User.objects.create_user(username=self.branch_phone, password='Test@!Test123')
                 self.wholeseller_branch_user = user
@@ -123,11 +121,41 @@ class Branch(models.Model):
                 self.wholeseller_branch_user = user
         super().save(*args, **kwargs)
 
+BRANCH_PLAN = {
+    ("PERCENTAGE", "percentage"),
+    ("RUPEE", "rupee")
+}
 
 class Branch_Product(models.Model):
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=True, related_name='branch_products')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, related_name='branch_products')
-    price = models.IntegerField(null=True)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=False, related_name='branch_products')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False, related_name='branch_products')
+    price = models.IntegerField(null=False)
+    # cash_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    # cash_value = models.IntegerField(null=True)
+    # platinum_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    # platinum_value = models.IntegerField(null=True)
+    # diamond_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    # diamond_value = models.IntegerField(null=True)
+    # gold_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    # gold_value = models.IntegerField(null=True)
+    # bronze_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    # bronze_value = models.IntegerField(null=True)
+    # last_update_date = models.DateTimeField(default=datetime.now, blank=True)
+
+class Branch_Category_Wise_Plan(models.Model):
+    branch = models.OneToOneField(Branch, on_delete=models.CASCADE, null=False, related_name='branch_category_wise_plan')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=False, related_name='branch_category')
+    cash_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    cash_value = models.IntegerField(null=True)
+    platinum_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    platinum_value = models.IntegerField(null=True)
+    diamond_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    diamond_value = models.IntegerField(null=True)
+    gold_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    gold_value = models.IntegerField(null=True)
+    bronze_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    bronze_value = models.IntegerField(null=True)
+    last_update_date = models.DateTimeField(default=datetime.now, blank=True)
 
 
 # -----------------------------Wholeseller agent ------------------

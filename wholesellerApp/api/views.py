@@ -11,11 +11,17 @@ from adsApp.models import Ads
 from bazaarApp.models import Bazaar
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-from rest_framework import filters
+from rest_framework import filters, status
 from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
 from django.db.models import Q
 from retailerApp.models import Retailer
+from categoryApp.models import Category
+from categoryApp.api.serializers import CategorySerializer
+from subCategoryApp.models import SubCategory
+from subCategoryApp.api.serializers import SubCategorySerializer
+from django.shortcuts import get_object_or_404
+
 
 common_status = settings.COMMON_STATUS
 contact_number = settings.ADMIN_CONTACT_NUMBER
@@ -903,24 +909,92 @@ class WholesellerRetailerVerifyNumber(views.APIView):
 
         return Response(payload, status=status_code)
 # --------------------wholeseller branch --------------
-class BranchProductCreateView(views.APIView):
-    serializer_class = BranchProductSerializer
+
+class WholesellerBranchAddProduct(viewsets.ModelViewSet):
+
     permission_classes = [permissions.IsAuthenticated]
+    queryset = Branch_Product.objects.all()
+    serializer_class = BranchProductSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["branch"]
 
-    def get(self, request, branch_id):
-        branch_products = Branch_Product.objects.filter(branch_id=branch_id)
-        serializer = self.serializer_class(branch_products, many=True)
-        return Response(serializer.data, status=200)
-
-    def post(self, request, branch_id):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            branch = Branch.objects.get(id=branch_id)
-            serializer.save(branch=branch)
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+from rest_framework import generics
+class WholesellerBranchCategoryWisePlanList(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Branch_Category_Wise_Plan.objects.all()
+    serializer_class = BranchCategoryWisePlanSerializer
 
 
+class WholesellerBranchCategoryWisePlan(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = BranchCategoryWisePlanSerializer
+
+    def get_queryset(self):
+        branch_id = self.kwargs['branch_id']
+        queryset = Branch_Category_Wise_Plan.objects.filter(branch_id=branch_id)
+        return queryset
+    #
+    def create(self, request, *args, **kwargs):
+        branch_id = self.kwargs['branch_id']
+        request.data['branch'] = branch_id  # Set branch_id in request data
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+class WholesellerBranchCategoryWisePlanRetrieveUpdateDestroyAPIView(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = BranchCategoryWisePlanSerializer
+
+    def get_queryset(self):
+        branch_id = self.kwargs['branch_id']
+        pk = self.kwargs['pk']
+        queryset = Branch_Category_Wise_Plan.objects.filter(branch_id=branch_id,pk=pk)
+        return queryset
+
+# class WholesellerBranchCategoryWisePlan(views.APIView):
+#     permission_classes = [permissions.IsAuthenticated]
+#     def get(self, request, branch_id):
+#         branch = Branch_Category_Wise_Plan.objects.all()
+#         serializer = BranchCategoryWisePlanSerializer(branch, many=True)
+#         return Response(serializer.data)
+#
+#     def post(self, request):
+#         serializer = BranchCategoryWisePlanSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#
+#
+# class WholesellerBranchCategoryWisePlanDetailAPIView(views.APIView):
+#     def get_object(self, pk):
+#         try:
+#             return Branch_Category_Wise_Plan.objects.get(pk=pk)
+#         except Branch_Category_Wise_Plan.DoesNotExist:
+#             raise Http404
+#
+#     def get(self, request, pk):
+#         plan = self.get_object(pk)
+#         serializer = BranchCategoryWisePlanSerializer(plan)
+#         return Response(serializer.data)
+#
+#     def put(self, request, pk):
+#         plan = self.get_object(pk)
+#         serializer = BranchCategoryWisePlanSerializer(plan, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#
+#     def delete(self, request, pk):
+#         plan = self.get_object(pk)
+#         plan.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)
 class WholesellerBranchManagerVerifyNumber(views.APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
@@ -1005,3 +1079,15 @@ class WholesellerBranchManagerVerifyOTP(views.APIView):
             payload = {"details": "Manager not found"}
             status_code = common_status["unauthorized"]["code"]
             return Response(payload, status=status_code)
+
+
+# class BranchProductList(views.APIView):
+#     serializer_class = BranchProductSerializer
+#     permission_classes = [permissions.AllowAny]
+#     authentication_classes = []
+#
+#     def get(self, request, branch_id):
+#         branch = get_object_or_404(Branch, id=branch_id)
+#         branch_products = Branch_Product.objects.filter(branch=branch)
+#         serializer = self.serializer_class(branch_products, many=True)
+#         return Response(serializer.data)
