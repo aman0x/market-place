@@ -313,3 +313,9 @@ class BranchCategoryWisePlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Branch_Category_Wise_Plan
         fields = '__all__'
+
+class BranchSubCategoryWisePlanSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Branch_Sub_Category_Wise_Plan
+        fields = '__all__'

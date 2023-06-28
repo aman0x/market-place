@@ -54,11 +54,11 @@ urlpatterns = [
     path('data/branch/verify_phone/', views.WholesellerBranchManagerVerifyNumber.as_view(), name="wholeseller-retailer-login"),
     path('data/branch/verify_otp/', views.WholesellerBranchManagerVerifyOTP.as_view(), name='wholeseller-retailer-verify_otp'),
 
-    path('data/branch/category_wise_plan/', views.WholesellerBranchCategoryWisePlanList.as_view({'get': 'list'}), name='wholeseller-branch-category-wise-plan'),
-    path('data/branch/<int:branch_id>/category_wise_plan/', views.WholesellerBranchCategoryWisePlan.as_view({'get': 'list','post': 'list',}), name='wholeseller-branch-category-wise-plan'),
-    path('data/branch/<int:branch_id>/category_wise/data/<int:pk>', views.WholesellerBranchCategoryWisePlanRetrieveUpdateDestroyAPIView.as_view({'get': 'list', 'put': 'list', 'delete': 'list'}), name='wholeseller-branch-category-wise'),
-    # path('branch/<int:branch_id>/product/', views.BranchProductList.as_view(), name='branch_product_list'),
-    # path('branch/<int:branch_id>/create_product/', views.BranchProductCreateView.as_view(), name='add_product_to_branch'),
+    path('data/branch/category-wise-plan/', views.WholesellerBranchCategoryWisePlanList.as_view({'get': 'list', 'post': 'create'}), name='wholeseller-branch-category-wise-plan'),
+    path('data/branch/category-wise-plan/<int:pk>/', views.WholesellerBranchCategoryWisePlanList.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='wholeseller-branch-category-wise-plan-detail'),
+
+    path('data/branch/sub-category-wise-plan/', views.WholesellerBranchSubCategoryWisePlanList.as_view({'get': 'list', 'post': 'create'}), name='wholeseller-branch-sub-category-wise-plan'),
+    path('data/branch/sub-category-wise-plan/<int:pk>/', views.WholesellerBranchSubCategoryWisePlanList.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='wholeseller-branch-sub-category-wise-plan-detail'),
 
     # ----------------- Wholeseller agent-----------
     # path('agent/<int:pk>/wholeseller_count/', views.WholesellerCountView.as_view(), name="agent's-wholeseller-count"),

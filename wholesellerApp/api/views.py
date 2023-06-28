@@ -924,77 +924,10 @@ class WholesellerBranchCategoryWisePlanList(viewsets.ModelViewSet):
     queryset = Branch_Category_Wise_Plan.objects.all()
     serializer_class = BranchCategoryWisePlanSerializer
 
-
-class WholesellerBranchCategoryWisePlan(viewsets.ModelViewSet):
+class WholesellerBranchSubCategoryWisePlanList(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = BranchCategoryWisePlanSerializer
-
-    def get_queryset(self):
-        branch_id = self.kwargs['branch_id']
-        queryset = Branch_Category_Wise_Plan.objects.filter(branch_id=branch_id)
-        return queryset
-    #
-    def create(self, request, *args, **kwargs):
-        branch_id = self.kwargs['branch_id']
-        request.data['branch'] = branch_id  # Set branch_id in request data
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    def perform_create(self, serializer):
-        serializer.save()
-
-class WholesellerBranchCategoryWisePlanRetrieveUpdateDestroyAPIView(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
-    serializer_class = BranchCategoryWisePlanSerializer
-
-    def get_queryset(self):
-        branch_id = self.kwargs['branch_id']
-        pk = self.kwargs['pk']
-        queryset = Branch_Category_Wise_Plan.objects.filter(branch_id=branch_id,pk=pk)
-        return queryset
-
-# class WholesellerBranchCategoryWisePlan(views.APIView):
-#     permission_classes = [permissions.IsAuthenticated]
-#     def get(self, request, branch_id):
-#         branch = Branch_Category_Wise_Plan.objects.all()
-#         serializer = BranchCategoryWisePlanSerializer(branch, many=True)
-#         return Response(serializer.data)
-#
-#     def post(self, request):
-#         serializer = BranchCategoryWisePlanSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#
-#
-# class WholesellerBranchCategoryWisePlanDetailAPIView(views.APIView):
-#     def get_object(self, pk):
-#         try:
-#             return Branch_Category_Wise_Plan.objects.get(pk=pk)
-#         except Branch_Category_Wise_Plan.DoesNotExist:
-#             raise Http404
-#
-#     def get(self, request, pk):
-#         plan = self.get_object(pk)
-#         serializer = BranchCategoryWisePlanSerializer(plan)
-#         return Response(serializer.data)
-#
-#     def put(self, request, pk):
-#         plan = self.get_object(pk)
-#         serializer = BranchCategoryWisePlanSerializer(plan, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#
-#     def delete(self, request, pk):
-#         plan = self.get_object(pk)
-#         plan.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
+    queryset = Branch_Sub_Category_Wise_Plan.objects.all()
+    serializer_class = BranchSubCategoryWisePlanSerializer
 class WholesellerBranchManagerVerifyNumber(views.APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []

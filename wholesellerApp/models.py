@@ -17,6 +17,7 @@ from planApp.models import RetailerPlan
 from productApp.models import Product
 from datetime import datetime
 from categoryApp.models import Category
+from subCategoryApp.models import SubCategory
 
 # WHOLESELLER_TYPE = (
 #     ("INDIVIDUAL", "Individual"),
@@ -126,24 +127,18 @@ BRANCH_PLAN = {
     ("RUPEE", "rupee")
 }
 
+CUSTOMER_TYPE = {
+    ("RETAILER", "retailer"),
+    ("SEMI-WHOLESELLER", "semi-wholeseller"),
+    ("HOTELLIER","hotellier")
+}
 class Branch_Product(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=False, related_name='branch_products')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False, related_name='branch_products')
     price = models.IntegerField(null=False)
-    # cash_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
-    # cash_value = models.IntegerField(null=True)
-    # platinum_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
-    # platinum_value = models.IntegerField(null=True)
-    # diamond_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
-    # diamond_value = models.IntegerField(null=True)
-    # gold_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
-    # gold_value = models.IntegerField(null=True)
-    # bronze_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
-    # bronze_value = models.IntegerField(null=True)
-    # last_update_date = models.DateTimeField(default=datetime.now, blank=True)
 
 class Branch_Category_Wise_Plan(models.Model):
-    branch = models.OneToOneField(Branch, on_delete=models.CASCADE, null=False, related_name='branch_category_wise_plan')
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=False, related_name='branch_category_wise_plan')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=False, related_name='branch_category')
     cash_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
     cash_value = models.IntegerField(null=True)
@@ -156,6 +151,23 @@ class Branch_Category_Wise_Plan(models.Model):
     bronze_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
     bronze_value = models.IntegerField(null=True)
     last_update_date = models.DateTimeField(default=datetime.now, blank=True)
+    customer_type = models.CharField(max_length=20, choices=CUSTOMER_TYPE, default="RETAILER")
+
+class Branch_Sub_Category_Wise_Plan(models.Model):
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=False, related_name='branch_sub_category_wise_plan')
+    sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE, null=False, related_name='branch_sub_category')
+    cash_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    cash_value = models.IntegerField(null=True)
+    platinum_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    platinum_value = models.IntegerField(null=True)
+    diamond_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    diamond_value = models.IntegerField(null=True)
+    gold_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    gold_value = models.IntegerField(null=True)
+    bronze_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    bronze_value = models.IntegerField(null=True)
+    last_update_date = models.DateTimeField(default=datetime.now, blank=True)
+    customer_type = models.CharField(max_length=20, choices=CUSTOMER_TYPE, default="RETAILER")
 
 
 # -----------------------------Wholeseller agent ------------------
