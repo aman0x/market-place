@@ -365,11 +365,9 @@ class BranchSubCategoryWisePlanSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_retailer_details(self, obj):
-        retailer_type = RetailerType.objects.all()
+        retailer_type_ids = obj.retailer_type.all()
+        retailer_type = RetailerType.objects.filter(id__in=retailer_type_ids)
         serializer = RetailerTypeSerializer(retailer_type, many=True)
-        serialized_data = serializer.data
-        retailer_type_name = [data['retailer_type_name'] for data in serialized_data]
-        # return retailer_type_name
         return serializer.data
 
     def get_product_details(self, obj):
@@ -379,7 +377,21 @@ class BranchSubCategoryWisePlanSerializer(serializers.ModelSerializer):
 
 
 class BranchItemWisePlanSerializer(serializers.ModelSerializer):
+    product_details = serializers.SerializerMethodField()
+    retailer_details = serializers.SerializerMethodField()
     class Meta:
         model = Branch_Item_Wise_Plan
         fields = '__all__'
         # exclude = ['customer_type']
+
+    def get_retailer_details(self, obj):
+        retailer_type_ids = obj.retailer_type.all()
+        retailer_type = RetailerType.objects.filter(id__in=retailer_type_ids)
+        serializer = RetailerTypeSerializer(retailer_type, many=True)
+        return serializer.data
+
+    def get_product_details(self, obj):
+        product_ids = obj.product.all()
+        product = Product.objects.filter(id__in=product_ids)
+        serializer = ProductSerializer(product, many=True)
+        return serializer.data
