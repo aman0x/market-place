@@ -349,11 +349,9 @@ class BranchCategoryWisePlanSerializer(serializers.ModelSerializer):
         return category_name
 
     def get_retailer_details(self, obj):
-        retailer_type = RetailerType.objects.all()
+        retailer_type_ids = obj.retailer_type.all()
+        retailer_type = RetailerType.objects.filter(id__in=retailer_type_ids)
         serializer = RetailerTypeSerializer(retailer_type, many=True)
-        serialized_data = serializer.data
-        retailer_type_name = [data['retailer_type_name'] for data in serialized_data]
-        # return retailer_type_name
         return serializer.data
 
 class BranchSubCategoryWisePlanSerializer(serializers.ModelSerializer):
