@@ -195,16 +195,12 @@ class WholesellerBazaarSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-<<<<<<< HEAD
-#=====================   wholeseller agent
-=======
 # =====================   wholeseller agent
 
 class WholesellerIdAgentSerializer(serializers.ModelSerializer):
     class Meta:
         model = WholesellerAgent
         fields = '__all__'
->>>>>>> 20d834c324aa905461011ab676850730afe67f87
 
 
 class WholesellerAgentSerializer(serializers.ModelSerializer):
@@ -290,8 +286,6 @@ class WholesellerAgentSerializer(serializers.ModelSerializer):
         event = super().update(instance, validated_data)
         return event
 
-<<<<<<< HEAD
-=======
 
 # -----------------------wholeseller retailer-----------------------
 
@@ -389,4 +383,4 @@ class BranchItemWisePlanSerializer(serializers.ModelSerializer):
         model = Branch_Item_Wise_Plan
         fields = '__all__'
         # exclude = ['customer_type']
->>>>>>> 20d834c324aa905461011ab676850730afe67f87
+

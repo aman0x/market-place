@@ -613,8 +613,6 @@ class WholesellerAgentViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = ["wholeseller_agent_name"]
-<<<<<<< HEAD
-=======
 
 
 class WholesellerIdAgentViewSet(viewsets.ModelViewSet):
@@ -624,7 +622,6 @@ class WholesellerIdAgentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         wholeseller_id = self.kwargs['wholeseller_id']
         return WholesellerAgent.objects.filter(wholeseller_id=wholeseller_id)
->>>>>>> 20d834c324aa905461011ab676850730afe67f87
 
 
 class WholesellerAgentVerifyOTP(views.APIView):
@@ -774,8 +771,6 @@ class WholesellerAgentApplicationStatusViews(views.APIView):
                 return Response({"message": "Invalid agent status."})
         except Agent.DoesNotExist:
             return Response({"message": "Agent not found."})
-<<<<<<< HEAD
-=======
 
 
 class WholesellerIdAgentViewSetIdViewSet(views.APIView):
@@ -1038,4 +1033,4 @@ class WholesellerBranchManagerVerifyOTP(views.APIView):
 #         branch_products = Branch_Product.objects.filter(branch=branch)
 #         serializer = self.serializer_class(branch_products, many=True)
 #         return Response(serializer.data)
->>>>>>> 20d834c324aa905461011ab676850730afe67f87
+

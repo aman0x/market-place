@@ -89,16 +89,10 @@ class Wholeseller(models.Model):
 
 
 class Branch(models.Model):
-<<<<<<< HEAD
-    branch_name= models.CharField(max_length=200,null=False)
-    manager_name= models.CharField(max_length=200,null=True)
-    branch_phone= PhoneNumberField(blank=True, unique=True, null=True)
-=======
     branch_name = models.CharField(max_length=200, null=False)
     manager_name = models.CharField(max_length=200, null=True)
     branch_phone = PhoneNumberField(blank=True, unique=True, null=True)
     branch_otp = models.IntegerField(blank=True, null=True)
->>>>>>> 20d834c324aa905461011ab676850730afe67f87
     email = models.EmailField(null=True)
     address = models.CharField(max_length=300, null=True)
     landmark = models.CharField(max_length=300, null=True)
@@ -299,9 +293,6 @@ class WholesellerAgent(models.Model):
                 user.set_password('Test@!Test123')
                 user.save()
                 self.wholeseller_agent_user = user
-<<<<<<< HEAD
-        super().save(*args, **kwargs)
-=======
         super().save(*args, **kwargs)
 
 
@@ -358,4 +349,4 @@ class WholesellerRetailer(models.Model):
 
     def __str__(self):
         return self.wholeseller_retailer_name
->>>>>>> 20d834c324aa905461011ab676850730afe67f87
+
