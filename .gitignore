@@ -13,3 +13,4 @@ venv
 /image
 /images
 migrations/
+.idea

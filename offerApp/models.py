@@ -37,7 +37,7 @@ class Offers(models.Model):
                                                  default="PERCENTAGE")
     offer_discount_value = models.CharField(max_length=20, null=True, default=None)
     offer_discounted_price = models.CharField(max_length=20, null=True, default=None)
-    #offer_coupon_code = models.CharField(max_length=200)
+    offer_coupon_code = models.CharField(max_length=200, null=True, blank=True, default='')
     offer_start_date = models.DateField(default=datetime.now, blank=True)
     offer_end_date = models.DateField(default=datetime.now, blank=True)
     offer_min_qty = models.IntegerField()
