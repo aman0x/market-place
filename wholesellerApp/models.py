@@ -89,7 +89,7 @@ class Wholeseller(models.Model):
 
 
 class Branch(models.Model):
-    branch_name = models.CharField(max_length=200, null=False)
+    branch_name = models.CharField(max_length=200, null=True)
     manager_name = models.CharField(max_length=200, null=True)
     branch_phone = PhoneNumberField(blank=True, unique=True, null=True)
     branch_otp = models.IntegerField(blank=True, null=True)
@@ -130,13 +130,13 @@ BRANCH_PLAN = {
 }
 
 class Branch_Product(models.Model):
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=False, related_name='branch_products')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False, related_name='branch_products')
-    price = models.IntegerField(null=False)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=True, related_name='branch_products')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, related_name='branch_products')
+    price = models.IntegerField(null=True)
 
 class Branch_Category_Wise_Plan(models.Model):
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=False, related_name='branch_category_wise_plan')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=False, related_name='branch_category')
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=True, related_name='branch_category_wise_plan')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, related_name='branch_category')
     cash_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
     cash_value = models.IntegerField(null=True)
     platinum_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
@@ -153,8 +153,8 @@ class Branch_Category_Wise_Plan(models.Model):
 
 
 class Branch_Sub_Category_Wise_Plan(models.Model):
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=False, related_name='branch_sub_category_wise_plan')
-    sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE, null=False, related_name='branch_sub_category')
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=True, related_name='branch_sub_category_wise_plan')
+    sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE, null=True, related_name='branch_sub_category')
     cash_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
     cash_value = models.IntegerField(null=True)
     platinum_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
@@ -169,8 +169,8 @@ class Branch_Sub_Category_Wise_Plan(models.Model):
     retailer_type = models.ManyToManyField(RetailerType, related_name="wholeseller_branch_sub_category_wise_plan_retailer_type" )
 
 class Branch_Item_Wise_Plan(models.Model):
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=False, related_name='branch_item_wise_plan')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False, related_name='branch_item')
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=True, related_name='branch_item_wise_plan')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, related_name='branch_item')
     cash_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
     cash_value = models.IntegerField(null=True)
     platinum_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
