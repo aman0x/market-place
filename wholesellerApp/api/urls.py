@@ -60,6 +60,11 @@ urlpatterns = [
     path('data/branch/sub-category-wise-plan/', views.WholesellerBranchSubCategoryWisePlanList.as_view({'get': 'list', 'post': 'create'}), name='wholeseller-branch-sub-category-wise-plan'),
     path('data/branch/sub-category-wise-plan/<int:pk>/', views.WholesellerBranchSubCategoryWisePlanList.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='wholeseller-branch-sub-category-wise-plan-detail'),
 
+    path('data/branch/item-wise-plan/', views.WholesellerBranchItemWisePlanList.as_view({'get': 'list', 'post': 'create'}), name='wholeseller-branch-item-wise-plan'),
+    path('data/branch/item-wise-plan/<int:pk>/', views.WholesellerBranchItemWisePlanList.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='wholeseller-branch-item-wise-plan-detail'),
+
+
+
     # ----------------- Wholeseller agent-----------
     # path('agent/<int:pk>/wholeseller_count/', views.WholesellerCountView.as_view(), name="agent's-wholeseller-count"),
     path('data/<int:pk>/agent/application_status/', views.WholesellerAgentApplicationStatusViews.as_view(), name="wholeseller-agent-status-message"),

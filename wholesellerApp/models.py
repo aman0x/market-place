@@ -18,6 +18,8 @@ from productApp.models import Product
 from datetime import datetime
 from categoryApp.models import Category
 from subCategoryApp.models import SubCategory
+from masterApp.models import RetailerType
+from masterApp.api.serializers import RetailerTypeSerializer
 
 # WHOLESELLER_TYPE = (
 #     ("INDIVIDUAL", "Individual"),
@@ -127,11 +129,6 @@ BRANCH_PLAN = {
     ("RUPEE", "rupee")
 }
 
-CUSTOMER_TYPE = {
-    ("RETAILER", "retailer"),
-    ("SEMI-WHOLESELLER", "semi-wholeseller"),
-    ("HOTELLIER","hotellier")
-}
 class Branch_Product(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=False, related_name='branch_products')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False, related_name='branch_products')
@@ -151,7 +148,9 @@ class Branch_Category_Wise_Plan(models.Model):
     bronze_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
     bronze_value = models.IntegerField(null=True)
     last_update_date = models.DateTimeField(default=datetime.now, blank=True)
-    customer_type = models.CharField(max_length=20, choices=CUSTOMER_TYPE, default="RETAILER")
+    retailer_type = models.ManyToManyField(RetailerType, related_name="wholeseller_branch_category_wise_plan_retailer_type" )
+        # (max_length=20, choices=CUSTOMER_TYPE, default="RETAILER")
+
 
 class Branch_Sub_Category_Wise_Plan(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=False, related_name='branch_sub_category_wise_plan')
@@ -167,7 +166,23 @@ class Branch_Sub_Category_Wise_Plan(models.Model):
     bronze_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
     bronze_value = models.IntegerField(null=True)
     last_update_date = models.DateTimeField(default=datetime.now, blank=True)
-    customer_type = models.CharField(max_length=20, choices=CUSTOMER_TYPE, default="RETAILER")
+    retailer_type = models.ManyToManyField(RetailerType, related_name="wholeseller_branch_sub_category_wise_plan_retailer_type" )
+
+class Branch_Item_Wise_Plan(models.Model):
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=False, related_name='branch_item_wise_plan')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False, related_name='branch_item')
+    cash_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    cash_value = models.IntegerField(null=True)
+    platinum_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    platinum_value = models.IntegerField(null=True)
+    diamond_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    diamond_value = models.IntegerField(null=True)
+    gold_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    gold_value = models.IntegerField(null=True)
+    bronze_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
+    bronze_value = models.IntegerField(null=True)
+    last_update_date = models.DateTimeField(default=datetime.now, blank=True)
+    retailer_type = models.ManyToManyField(RetailerType, related_name="wholeseller_branch_item_wise_plan_retailer_type" )
 
 
 # -----------------------------Wholeseller agent ------------------

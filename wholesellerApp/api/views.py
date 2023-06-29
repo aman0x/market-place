@@ -918,16 +918,25 @@ class WholesellerBranchAddProduct(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ["branch"]
 
-from rest_framework import generics
 class WholesellerBranchCategoryWisePlanList(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Branch_Category_Wise_Plan.objects.all()
     serializer_class = BranchCategoryWisePlanSerializer
+    # filter_backends = [filters.SearchFilter]
+    # search_fields = ["category"]
 
 class WholesellerBranchSubCategoryWisePlanList(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Branch_Sub_Category_Wise_Plan.objects.all()
     serializer_class = BranchSubCategoryWisePlanSerializer
+    # filter_backends = [filters.SearchFilter]
+    # search_fields = ["sub_category"]
+
+class WholesellerBranchItemWisePlanList(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Branch_Item_Wise_Plan.objects.all()
+    serializer_class = BranchItemWisePlanSerializer
+
 class WholesellerBranchManagerVerifyNumber(views.APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
