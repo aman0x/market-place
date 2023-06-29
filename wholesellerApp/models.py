@@ -170,7 +170,7 @@ class Branch_Sub_Category_Wise_Plan(models.Model):
 
 class Branch_Item_Wise_Plan(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=True, related_name='branch_item_wise_plan')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, related_name='branch_item')
+    product = models.ManyToManyField(Product, related_name='branch_item')
     cash_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
     cash_value = models.IntegerField(null=True)
     platinum_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
@@ -216,61 +216,36 @@ WHOLESELLER_AGENT_GENDER = (
 class WholesellerAgent(models.Model):
     wholeseller = models.ForeignKey(Wholeseller, on_delete=models.CASCADE, null=True, related_name='agent_wholeseller')
     wholeseller_agent_bazaar = models.ManyToManyField(Bazaar, related_name="wholeseller_agent")
-    agency = models.ForeignKey(
-        Agency, on_delete=models.CASCADE, null=True, related_name="wholeseller_agent_agency")
+    agency = models.ForeignKey(Agency, on_delete=models.CASCADE, null=True, related_name="wholeseller_agent_agency")
     wholeseller_agent_description = models.TextField(blank=True, null=True)
     wholeseller_agent_name = models.CharField(max_length=200)
-    wholeseller_agent_type = models.CharField(max_length=17,
-                                              choices=WHOLESELLER_AGENT_TYPE,
-                                              default="WHOLESELLER_AGENT"
-                                              )
+    wholeseller_agent_type = models.CharField(max_length=17, choices=WHOLESELLER_AGENT_TYPE,default="WHOLESELLER_AGENT")
     wholeseller_agent_number = PhoneNumberField(unique=True, blank=True, null=True)
     wholeseller_agent_altranate_mobile_number = PhoneNumberField(blank=True, null=True)
     wholeseller_agent_email = models.EmailField(null=True)
-    wholeseller_agent_gender = models.CharField(
-        max_length=10, choices=WHOLESELLER_AGENT_GENDER, default="MALE")
+    wholeseller_agent_gender = models.CharField(max_length=10, choices=WHOLESELLER_AGENT_GENDER, default="MALE")
     wholeseller_agent_date_of_birth = models.DateField(auto_now_add=False, null=True)
-    wholeseller_agent_address = models.CharField(
-        max_length=100, default=None, blank=True, null=True)
-    wholeseller_agent_landmark = models.CharField(
-        max_length=100, default=None, blank=True, null=True)
-    wholeseller_agent_state = models.ForeignKey(
-        State, on_delete=models.CASCADE, null=True, related_name="wholeseller_agent_state")
-    wholeseller_agent_city = models.ForeignKey(
-        City, on_delete=models.CASCADE, null=True, related_name="wholeseller_agent_city")
-    wholeseller_agent_district = models.ForeignKey(
-        District, on_delete=models.CASCADE, null=True, related_name="wholeseller_agent_district")
-    wholeseller_agent_assigned_state = models.ManyToManyField(
-        State, related_name="wholeseller_agent_assigned_state")
-    wholeseller_agent_assigned_city = models.ManyToManyField(
-        City, related_name="wholeseller_agent_assigned_city")
-    wholeseller_agent_assigned_district = models.ManyToManyField(
-        District, related_name="wholeseller_agent_assigned_district")
+    wholeseller_agent_address = models.CharField(max_length=100, default=None, blank=True, null=True)
+    wholeseller_agent_landmark = models.CharField(max_length=100, default=None, blank=True, null=True)
+    wholeseller_agent_state = models.ForeignKey(State, on_delete=models.CASCADE, null=True, related_name="wholeseller_agent_state")
+    wholeseller_agent_city = models.ForeignKey(City, on_delete=models.CASCADE, null=True, related_name="wholeseller_agent_city")
+    wholeseller_agent_district = models.ForeignKey(District, on_delete=models.CASCADE, null=True, related_name="wholeseller_agent_district")
+    wholeseller_agent_assigned_state = models.ManyToManyField(State, related_name="wholeseller_agent_assigned_state")
+    wholeseller_agent_assigned_city = models.ManyToManyField(City, related_name="wholeseller_agent_assigned_city")
+    wholeseller_agent_assigned_district = models.ManyToManyField(District, related_name="wholeseller_agent_assigned_district")
     wholeseller_agent_pincode = models.IntegerField(null=True)
-    wholeseller_agent_commission_type = models.CharField(
-        max_length=20, choices=WHOLESELLER_AGENT_COMMISSION_TYPE, default="PERCUSTOMER"
-    )
-    wholeseller_agent_commission_value_type = models.CharField(
-        max_length=20, choices=WHOLESELLER_AGENT_COMMISSION_VALUE_TYPE, default="AMOUNT"
-    )
-    wholeseller_agent_commission_value = models.CharField(
-        max_length=10, default=None, blank=True, null=True)
-    wholeseller_agent_adharcard_no = models.CharField(
-        max_length=12, default=None, blank=True, null=True)
-    wholeseller_agent_adhar_front_image = models.ImageField(
-        upload_to="image/wholeseller_agent/", null=True)
-    wholeseller_agent_adhar_back_image = models.ImageField(
-        upload_to="image/wholeseller_agent/", default=None, null=True)
-    wholeseller_agent_pancard_image = models.ImageField(
-        upload_to="image/wholeseller_agent/", default=None, null=True)
-    wholeseller_agent_pancard_no = models.CharField(
-        max_length=50, default=None, blank=True, null=True)
+    wholeseller_agent_commission_type = models.CharField(max_length=20, choices=WHOLESELLER_AGENT_COMMISSION_TYPE, default="PERCUSTOMER")
+    wholeseller_agent_commission_value_type = models.CharField(max_length=20, choices=WHOLESELLER_AGENT_COMMISSION_VALUE_TYPE, default="AMOUNT")
+    wholeseller_agent_commission_value = models.CharField(max_length=10, default=None, blank=True, null=True)
+    wholeseller_agent_adharcard_no = models.CharField(max_length=12, default=None, blank=True, null=True)
+    wholeseller_agent_adhar_front_image = models.ImageField(upload_to="image/wholeseller_agent/", null=True)
+    wholeseller_agent_adhar_back_image = models.ImageField(upload_to="image/wholeseller_agent/", default=None, null=True)
+    wholeseller_agent_pancard_image = models.ImageField(upload_to="image/wholeseller_agent/", default=None, null=True)
+    wholeseller_agent_pancard_no = models.CharField(max_length=50, default=None, blank=True, null=True)
     wholeseller_agent_image = models.ImageField(upload_to='images/wholeseller_agent/', null=True)
-    wholeseller_agent_status = models.CharField(
-        max_length=20, choices=WHOLESELLER_AGENT_STATUS, default="CREATED")
+    wholeseller_agent_status = models.CharField(max_length=20, choices=WHOLESELLER_AGENT_STATUS, default="CREATED")
     wholeseller_agent_otp = models.IntegerField(blank=True, null=True)
-    wholeseller_agent_user = models.ForeignKey(
-        User, related_name="wholeseller_agent_user", on_delete=models.CASCADE, null=True, blank=True)
+    wholeseller_agent_user = models.ForeignKey(User, related_name="wholeseller_agent_user", on_delete=models.CASCADE, null=True, blank=True)
     is_active = ()
     wholeseller_agent_active = models.BooleanField(default=False)
     get_wholeseller_agent_location_json_data = jsonfield.JSONField(default={}, null=True, )

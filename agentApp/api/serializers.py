@@ -120,7 +120,13 @@ class AgentCommisionRedeemSerializer(serializers.ModelSerializer):
 
 
 class WholsellerListSerializers(serializers.ModelSerializer):
-
+    bazaar_details = serializers.SerializerMethodField()
     class Meta:
         model=Wholeseller
         fields= "__all__"
+
+    def get_bazaar_details(self,obj):
+        bazaar_ids = obj.wholeseller_bazaar.all()
+        bazaar = Bazaar.objects.filter(id__in=bazaar_ids)
+        serializer = BazaarSerializer(bazaar, many=True)
+        return serializer.data
