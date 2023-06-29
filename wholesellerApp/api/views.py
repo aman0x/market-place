@@ -11,11 +11,17 @@ from adsApp.models import Ads
 from bazaarApp.models import Bazaar
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-from rest_framework import filters
+from rest_framework import filters, status
 from django_filters.rest_framework import DjangoFilterBackend
 from django.conf import settings
 from django.db.models import Q
 from retailerApp.models import Retailer
+from categoryApp.models import Category
+from categoryApp.api.serializers import CategorySerializer
+from subCategoryApp.models import SubCategory
+from subCategoryApp.api.serializers import SubCategorySerializer
+from django.shortcuts import get_object_or_404
+
 
 common_status = settings.COMMON_STATUS
 contact_number = settings.ADMIN_CONTACT_NUMBER
@@ -903,23 +909,33 @@ class WholesellerRetailerVerifyNumber(views.APIView):
 
         return Response(payload, status=status_code)
 # --------------------wholeseller branch --------------
-class BranchProductCreateView(views.APIView):
-    serializer_class = BranchProductSerializer
+
+class WholesellerBranchAddProduct(viewsets.ModelViewSet):
+
     permission_classes = [permissions.IsAuthenticated]
+    queryset = Branch_Product.objects.all()
+    serializer_class = BranchProductSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["branch"]
 
-    def get(self, request, branch_id):
-        branch_products = Branch_Product.objects.filter(branch_id=branch_id)
-        serializer = self.serializer_class(branch_products, many=True)
-        return Response(serializer.data, status=200)
+class WholesellerBranchCategoryWisePlanList(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Branch_Category_Wise_Plan.objects.all()
+    serializer_class = BranchCategoryWisePlanSerializer
+    # filter_backends = [filters.SearchFilter]
+    # search_fields = ["category"]
 
-    def post(self, request, branch_id):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            branch = Branch.objects.get(id=branch_id)
-            serializer.save(branch=branch)
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+class WholesellerBranchSubCategoryWisePlanList(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Branch_Sub_Category_Wise_Plan.objects.all()
+    serializer_class = BranchSubCategoryWisePlanSerializer
+    # filter_backends = [filters.SearchFilter]
+    # search_fields = ["sub_category"]
 
+class WholesellerBranchItemWisePlanList(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Branch_Item_Wise_Plan.objects.all()
+    serializer_class = BranchItemWisePlanSerializer
 
 class WholesellerBranchManagerVerifyNumber(views.APIView):
     permission_classes = [permissions.AllowAny]
@@ -1005,3 +1021,15 @@ class WholesellerBranchManagerVerifyOTP(views.APIView):
             payload = {"details": "Manager not found"}
             status_code = common_status["unauthorized"]["code"]
             return Response(payload, status=status_code)
+
+
+# class BranchProductList(views.APIView):
+#     serializer_class = BranchProductSerializer
+#     permission_classes = [permissions.AllowAny]
+#     authentication_classes = []
+#
+#     def get(self, request, branch_id):
+#         branch = get_object_or_404(Branch, id=branch_id)
+#         branch_products = Branch_Product.objects.filter(branch=branch)
+#         serializer = self.serializer_class(branch_products, many=True)
+#         return Response(serializer.data)

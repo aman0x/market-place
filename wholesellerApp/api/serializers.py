@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+import categoryApp.models
 from wholesellerApp.models import *
 from bazaarApp.models import Bazaar
 from retailerApp.models import Retailer
@@ -10,6 +12,12 @@ from planApp.models import Plan
 from paymentApp.models import Payment
 from masterApp.models import WholesellerType
 from locationApp.api.serializers import *
+from productApp.models import Product
+from productApp.api.serializers import ProductSerializer
+from categoryApp.models import Category
+from categoryApp.api.serializers import CategorySerializer
+from subCategoryApp.models import SubCategory
+from subCategoryApp.api.serializers import SubCategorySerializer
 
 
 # from locationApp.models import *
@@ -289,6 +297,89 @@ class WholesellerRetailerSerializer(serializers.ModelSerializer):
 
 # ---------------- wholeseller branch product ---------
 class BranchProductSerializer(serializers.ModelSerializer):
+    # product_details = serializers.SerializerMethodField()
     class Meta:
         model = Branch_Product
         fields = '__all__'
+        # exclude = ['branch']
+
+    def validate(self, attrs):
+        branch = attrs.get('branch')
+        if branch and branch.main_branch:
+            return attrs
+        raise serializers.ValidationError("Branch must be a main branch.")
+
+    def get_product_details(self, obj):
+        product = Product.objects.filter(id=obj.product_id)
+        serializer = ProductSerializer(product, many=True)
+        return serializer.data
+
+
+class BranchCategoryWisePlanSerializer(serializers.ModelSerializer):
+    category_name = serializers.SerializerMethodField()
+    subCategory_name = serializers.SerializerMethodField()
+    branch_name = serializers.SerializerMethodField()
+    retailer_details = serializers.SerializerMethodField()
+
+
+    class Meta:
+        model = Branch_Category_Wise_Plan
+        fields = '__all__'
+
+    def get_subCategory_name(self, obj):
+        subCategory = SubCategory.objects.filter(id=obj.category_id)
+        serializer = SubCategorySerializer(subCategory, many=True)
+        serialized_data = serializer.data
+        subcategory_names = [data['subcategory_name'] for data in serialized_data]
+        return subcategory_names
+
+    def get_branch_name(self, obj):
+        branch = Branch.objects.filter(id=obj.branch_id)
+        serializer = WholesellerBranchSerializer(branch, many=True)
+        serialized_data = serializer.data
+        branch_name = [data['branch_name'] for data in serialized_data]
+        return branch_name
+
+
+    def get_category_name(self, obj):
+        category = Category.objects.filter(id=obj.category_id)
+        serializer = CategorySerializer(category, many=True)
+        serialized_data = serializer.data
+        category_name = [data['category_name'] for data in serialized_data]
+        return category_name
+
+    def get_retailer_details(self, obj):
+        retailer_type = RetailerType.objects.all()
+        serializer = RetailerTypeSerializer(retailer_type, many=True)
+        serialized_data = serializer.data
+        retailer_type_name = [data['retailer_type_name'] for data in serialized_data]
+        # return retailer_type_name
+        return serializer.data
+
+class BranchSubCategoryWisePlanSerializer(serializers.ModelSerializer):
+    product_details = serializers.SerializerMethodField()
+    retailer_details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Branch_Sub_Category_Wise_Plan
+        fields = '__all__'
+
+    def get_retailer_details(self, obj):
+        retailer_type = RetailerType.objects.all()
+        serializer = RetailerTypeSerializer(retailer_type, many=True)
+        serialized_data = serializer.data
+        retailer_type_name = [data['retailer_type_name'] for data in serialized_data]
+        # return retailer_type_name
+        return serializer.data
+
+    def get_product_details(self, obj):
+        product = Product.objects.filter(id=obj.sub_category_id)
+        serializer = ProductSerializer(product, many=True)
+        return serializer.data
+
+
+class BranchItemWisePlanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch_Item_Wise_Plan
+        fields = '__all__'
+        # exclude = ['customer_type']
