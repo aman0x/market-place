@@ -11,19 +11,14 @@ class Product(models.Model):
     product_name = models.CharField(max_length=200)    
     product_description = models.TextField(blank=True)
     product_brand_name=models.CharField(max_length=200)
-    product_upload_front_image = models.ImageField(
-        upload_to="image/product/%Y/%m/%d", null=True)
-    product_upload_back_image=models.ImageField(
-        upload_to="image/product/%Y/%m/%d",null=True)
-    product_upload_mrp_label_image=models.ImageField(
-        upload_to="image/product/%Y/%m/%d",null=True)
+    product_upload_front_image = models.ImageField(upload_to="image/product/%Y/%m/%d", null=True)
+    product_upload_back_image=models.ImageField(upload_to="image/product/%Y/%m/%d",null=True)
+    product_upload_mrp_label_image=models.ImageField(upload_to="image/product/%Y/%m/%d",null=True)
     
     # Packing Unit
-    product_primary_packing_unit = models.ForeignKey(
-        Unit, on_delete=models.CASCADE, related_name="product_primary_packing_unit", default=None, blank=True, null=True)
+    product_primary_packing_unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="product_primary_packing_unit", default=None, blank=True, null=True)
     product_primary_packing_value = models.IntegerField(null=True)
-    product_secondary_packing_unit = models.ForeignKey(
-        Unit, on_delete=models.CASCADE, related_name="product_secondary_packing_unit", default=None, blank=True, null=True)
+    product_secondary_packing_unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="product_secondary_packing_unit", default=None, blank=True, null=True)
     product_secondary_packing_value = models.IntegerField(null=True)
     
     # MRP and Selling Price
@@ -32,11 +27,9 @@ class Product(models.Model):
     product_per_unit_price = models.IntegerField(null=True)
     
     # Weight
-    product_per_unit_weight_unit = models.ForeignKey(
-        Unit, on_delete=models.CASCADE, related_name="product_per_unit_weight_unit", default=None, blank=True, null=True)
+    product_per_unit_weight_unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="product_per_unit_weight_unit", default=None, blank=True, null=True)
     product_per_unit_weight_value=models.IntegerField(null=True)    
-    product_total_weight_unit = models.ForeignKey(
-        Unit, on_delete=models.CASCADE, related_name="product_toal_weight_unit", default=None, blank=True, null=True)
+    product_total_weight_unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name="product_toal_weight_unit", default=None, blank=True, null=True)
     product_total_weight_value=models.IntegerField(null=True)
     
     # Colour and Size
