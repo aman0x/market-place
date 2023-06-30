@@ -46,6 +46,7 @@ class Offers(models.Model):
     # Wholeseller = models.ForeignKey(SubCategory, on_delete=models.CASCADE, related_name='offer_wholeseller_name')
     # wholeseller_agent = models.ForeignKey(SubCategory, on_delete=models.CASCADE, related_name='offer_agent')
 
+    offer_image = models.ImageField(upload_to="image/offer/", null=True)
     offer_active = models.BooleanField(default=True)
     offer_image = models.ImageField(upload_to="image/offer/", null=True)
     offer_for = models.CharField(max_length=200)
