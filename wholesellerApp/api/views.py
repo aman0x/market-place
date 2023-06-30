@@ -918,16 +918,65 @@ class WholesellerBranchAddProduct(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter]
     search_fields = ["branch"]
 
+
+class WholesellerBranchCategoryList(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, branch_id):
+        queryset = Branch.objects.filter(id=branch_id)
+        wholeseller_id = queryset.values()[0]["branch_wholeseller_id"]
+        queryset = Wholeseller.objects.filter(id=wholeseller_id)
+        wholeseller_bazaar = queryset.values('wholeseller_bazaar')
+        # print(wholeseller_bazaar)
+        query =[]
+        for i in wholeseller_bazaar:
+            print(i["wholeseller_bazaar"])
+            queryset = Category.objects.filter(bazaar_id=i["wholeseller_bazaar"])
+            query.append(queryset.values())
+        return Response(query)
+
+
 class WholesellerBranchCategoryWisePlanList(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Branch_Category_Wise_Plan.objects.all()
     serializer_class = BranchCategoryWisePlanSerializer
 
 
+class WholesellerBranchSubCategoryList(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, branch_id):
+        queryset = Branch.objects.filter(id=branch_id)
+        wholeseller_id = queryset.values()[0]["branch_wholeseller_id"]
+        queryset = Wholeseller.objects.filter(id=wholeseller_id)
+        wholeseller_bazaar = queryset.values('wholeseller_bazaar')
+        # print(wholeseller_bazaar)
+        query =[]
+        for i in wholeseller_bazaar:
+            print(i["wholeseller_bazaar"])
+            queryset = SubCategory.objects.filter(bazaar_id=i["wholeseller_bazaar"])
+            query.append(queryset.values())
+        return Response(query)
+
+
 class WholesellerBranchSubCategoryWisePlanList(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Branch_Sub_Category_Wise_Plan.objects.all()
     serializer_class = BranchSubCategoryWisePlanSerializer
+
+
+class WholesellerBranchitemList(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, branch_id):
+        queryset = Branch.objects.filter(id=branch_id)
+        wholeseller_id = queryset.values()[0]["branch_wholeseller_id"]
+        queryset = Wholeseller.objects.filter(id=wholeseller_id)
+        wholeseller_bazaar = queryset.values('wholeseller_bazaar')
+        # print(wholeseller_bazaar)
+        query =[]
+        for i in wholeseller_bazaar:
+            print(i["wholeseller_bazaar"])
+            queryset = Product.objects.filter(bazaar_id=i["wholeseller_bazaar"])
+            query.append(queryset.values())
+        return Response(query)
 
 
 class WholesellerBranchItemWisePlanList(viewsets.ModelViewSet):
