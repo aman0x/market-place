@@ -314,6 +314,11 @@ class BranchProductSerializer(serializers.ModelSerializer):
         serializer = ProductSerializer(product, many=True)
         return serializer.data
 
+class BranchCategoryListPlanSerialize(serializers.ModelSerializer):
+    class Meta:
+        model = Branch
+        fields = '__all__'
+
 
 class BranchCategoryWisePlanSerializer(serializers.ModelSerializer):
     category_name = serializers.SerializerMethodField()

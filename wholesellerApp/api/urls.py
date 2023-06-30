@@ -54,6 +54,9 @@ urlpatterns = [
     path('data/branch/verify_phone/', views.WholesellerBranchManagerVerifyNumber.as_view(), name="wholeseller-retailer-login"),
     path('data/branch/verify_otp/', views.WholesellerBranchManagerVerifyOTP.as_view(), name='wholeseller-retailer-verify_otp'),
 
+    # path('data/branch/<int:branch_id>/categorylist/', views.WholesellerBranchCategoryList.as_view({'get': 'list'}), name='wholeseller-branch-category-list'),
+    path('data/branch/<int:branch_id>/categorylist/', views.WholesellerBranchCategoryList.as_view(), name='wholeseller-branch-category-list'),
+
     path('data/branch/category-wise-plan/', views.WholesellerBranchCategoryWisePlanList.as_view({'get': 'list', 'post': 'create'}), name='wholeseller-branch-category-wise-plan'),
     path('data/branch/category-wise-plan/<int:pk>/', views.WholesellerBranchCategoryWisePlanList.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='wholeseller-branch-category-wise-plan-detail'),
 

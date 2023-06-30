@@ -22,3 +22,5 @@ class OfferSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.offer_image = validated_data.get('offer_image')
+        event = super().update(instance, validated_data)
+        return event
