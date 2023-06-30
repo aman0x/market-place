@@ -324,4 +324,3 @@ class WholesellerRetailer(models.Model):
 
     def __str__(self):
         return self.wholeseller_retailer_name
-
