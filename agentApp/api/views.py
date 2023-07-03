@@ -437,10 +437,15 @@ class AgentEarningAPIView(views.APIView):
             count = total_wholesellers_added.count()
             if count > 0:
                 commission_by_month = self.get_commission_by_month(total_wholesellers_added)
+                total_commission_yearly = self.calculate_total_commission(total_wholesellers_added)
+                commission_by_year = self.get_commission_by_year(total_wholesellers_added)
 
                 response_data = {
+                    "year": year,
                     "total_wholesellers_added": count,
                     "commission_by_month": commission_by_month,
+                    "total_commission_yearly": total_commission_yearly,
+                    "commission_by_year": commission_by_year
                 }
 
             else:
@@ -469,3 +474,45 @@ class AgentEarningAPIView(views.APIView):
             commission_by_month[month_name] = total_commission
 
         return commission_by_month
+
+    def calculate_total_commission(self, wholesellers):
+        total_commission = 0
+
+        for wholeseller in wholesellers:
+            if wholeseller.wholeseller_plan:
+                total_commission += wholeseller.wholeseller_plan.amount
+
+        return total_commission
+
+    def get_commission_by_year(self, wholesellers):
+        commission_by_year = {}
+        years = wholesellers.values_list("created_at__year", flat=True).distinct()
+
+        for year in years:
+            total_commission_year = 0
+            commission_by_month = {}
+
+            # Filter by year
+            total_wholesellers_added = wholesellers.filter(
+                created_at__year=year
+            )
+
+            for month in range(1, 13):
+                month_name = calendar.month_name[month]
+                total_commission_month = 0
+
+                # Filter by month
+                total_wholesellers_added_month = total_wholesellers_added.filter(
+                    created_at__month=month
+                )
+
+                for wholeseller in total_wholesellers_added_month:
+                    if wholeseller.wholeseller_plan:
+                        total_commission_month += wholeseller.wholeseller_plan.amount
+
+                commission_by_month[month_name] = total_commission_month
+                total_commission_year += total_commission_month
+
+            commission_by_year[str(year)] = commission_by_month
+
+        return commission_by_year
