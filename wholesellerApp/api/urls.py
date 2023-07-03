@@ -63,11 +63,12 @@ urlpatterns = [
     path('data/branch/sub-category-wise-plan/', views.WholesellerBranchSubCategoryWisePlanList.as_view({'get': 'list', 'post': 'create'}), name='wholeseller-branch-sub-category-wise-plan'),
     path('data/branch/sub-category-wise-plan/<int:pk>/', views.WholesellerBranchSubCategoryWisePlanList.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='wholeseller-branch-sub-category-wise-plan-detail'),
 
-    path('data/branch/<int:branch_id>/itemlist/', views.WholesellerBranchitemList.as_view(), name='wholeseller-branch-item-list'),
+    path('data/branch/<int:branch_id>/itemlist/', views.WholesellerBranchItemList.as_view(), name='wholeseller-branch-item-list'),
     path('data/branch/item-wise-plan/', views.WholesellerBranchItemWisePlanList.as_view({'get': 'list', 'post': 'create'}), name='wholeseller-branch-item-wise-plan'),
     path('data/branch/item-wise-plan/<int:pk>/', views.WholesellerBranchItemWisePlanList.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='wholeseller-branch-item-wise-plan-detail'),
 
-
+    path('data/branch/<int:branch_id>/productPricing/', views.WholesellerBranchProductPricingViews.as_view({'get': 'list', 'post': 'create'}), name='wholeseller-branch-item-list'),
+    path('data/branch/<int:branch_id>/productPricing/<int:pk>/', views.WholesellerBranchProductPricingViews.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='wholeseller-branch-item-list'),
 
     # ----------------- Wholeseller agent-----------
     # path('agent/<int:pk>/wholeseller_count/', views.WholesellerCountView.as_view(), name="agent's-wholeseller-count"),

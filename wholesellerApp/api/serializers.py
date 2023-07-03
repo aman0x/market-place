@@ -393,3 +393,20 @@ class BranchItemWisePlanSerializer(serializers.ModelSerializer):
         product = Product.objects.filter(id__in=product_ids)
         serializer = ProductSerializer(product, many=True)
         return serializer.data
+
+
+class BranchProductPricingSerializer(serializers.ModelSerializer):
+    product_total_mrp = serializers.ReadOnlyField(source='product.product_total_mrp')
+
+    class Meta:
+        model = Branch_Product_Pricing
+        fields = ['id', 'product', 'new_base_price', 'last_update_date', 'product_total_mrp']
+class BranchProductPricingCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch_Product_Pricing
+        fields = ['product', 'new_base_price']
+
+class BranchProductPricingUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Branch_Product_Pricing
+        fields = ['new_base_price']
