@@ -252,6 +252,7 @@ class WholesellerReportTopProductViewSet(views.APIView):
                     "product_total_mrp": Product_data["product_total_mrp"],
                     "sold": 12131,
                     "sales": 21213414,
+                    'Most Purchased By' : "Laxmi Traders"
                 }
                 new_data.append(data)
                 payload.append(Product_data)
