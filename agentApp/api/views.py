@@ -21,6 +21,8 @@ from django.conf import settings
 from django.utils import timezone
 from django.db import models
 from datetime import date
+from django.db.models.functions import ExtractYear, ExtractMonth, ExtractDay
+
 
 common_status = settings.COMMON_STATUS
 contact_number = settings.ADMIN_CONTACT_NUMBER
@@ -302,12 +304,12 @@ class ReportPlanExpireView(views.APIView):
 
 class WholesellerCountView(views.APIView):
     permission_classes = [permissions.AllowAny]
-    
+
     def get_week_number(self, year, month, day):
         date_obj = date(int(year), int(month), int(day))
         week_number = (date_obj.day - 1) // 7 + 1
         return week_number
-    
+
     def get_week_of_year(self, year, month, week_of_month):
         first_day_of_month = date(year, month, 1)
         first_week_of_month = first_day_of_month.isocalendar()[1]
@@ -319,7 +321,7 @@ class WholesellerCountView(views.APIView):
         month = request.query_params.get("month")
         week = request.query_params.get("week")
         wholeseller_agent = pk
-        
+
         qs = Wholeseller.objects.filter(wholeseller_agent=wholeseller_agent)
 
         if year:
@@ -335,7 +337,7 @@ class WholesellerCountView(views.APIView):
                 year = int(year)
                 month_num = int(month)
                 week_of_month = int(week)
-                week_of_year = self.get_week_of_year(year,month_num,week_of_month)
+                week_of_year = self.get_week_of_year(year, month_num, week_of_month)
                 qs = qs.filter(created_at__week=week_of_year)
             except ValueError:
                 if year and month:
@@ -344,49 +346,46 @@ class WholesellerCountView(views.APIView):
                     qs = qs.filter(created_at__year=year)
 
         month_names = settings.MONTH_NAMES
-        # yearly_counts = (
-        #     qs.annotate(year=ExtractYear("created_at"))
-        #     .values("year")
-        #     .annotate(count=Count("id"))
-        # )
-        # yearly_result = []
-        # for item in yearly_counts:
-        #     year_num = item["year"]
-        #     count = item["count"]
-        #     yearly_result.append({"year": year_num, "count": count})
 
-        # monthly_counts = (
-        #     qs.annotate(
-        #         year=ExtractYear("created_at"), month=ExtractMonth("created_at")
-        #     )
-        #     .values("year", "month")
-        #     .annotate(count=Count("id"))
-        # )
-        # monthly_result = []
-        # for item in monthly_counts:
-        #     year_num = item["year"]
-        #     month_num = item["month"]
-        #     try:
-        #         month_name = month_names[month_num]
-        #     except (KeyError, TypeError):
-        #         month_name = None
-        #     count = item["count"]
-        #     monthly_result.append(
-        #         {"year": year_num, "month": month_name, "count": count}
-        #     )
+        yearly_counts = (
+            qs.annotate(year=ExtractYear("created_at"))
+            .values("year")
+            .annotate(count=Count("id"))
+        )
+
+        monthly_counts = (
+            qs.annotate(
+                year=ExtractYear("created_at"), month=ExtractMonth("created_at")
+            )
+            .values("year", "month")
+            .annotate(count=Count("id"))
+        )
 
         week_counts = (
             qs.annotate(day=ExtractDay("created_at"), year=ExtractYear("created_at"), month=ExtractMonth("created_at"))
             .values("day", "year", "month")
             .annotate(count=Count("id"))
         )
-                
+
+        monthly_result = []
+        for item in monthly_counts:
+            year_num = item["year"]
+            month_num = item["month"]
+            try:
+                month_name = month_names[month_num]
+            except (KeyError, TypeError):
+                month_name = None
+            count = item["count"]
+            monthly_result.append(
+                {"year": year_num, "month": month_name, "count": count}
+            )
+
         week_result = []
         for item in week_counts:
             year_num = item["year"]
             month_num = item["month"]
             day_num = item["day"]
-            week_num = self.get_week_number(year_num,month_num,day_num)
+            week_num = self.get_week_number(year_num, month_num, day_num)
             try:
                 month_name = month_names[month_num]
             except (KeyError, TypeError):
@@ -397,12 +396,115 @@ class WholesellerCountView(views.APIView):
 
         data = {
             "total_wholeseller_count": qs.count(),
-            # "no of wholeseller by year": yearly_result,
-            # "no of wholeseller by months": monthly_result,
-            "Wholesellers": week_result,
+            "no_of_wholeseller_by_year": yearly_counts,
+            "no_of_wholeseller_by_month": monthly_result,
+            "wholesellers": week_result,
         }
 
         return Response(data)
+# class WholesellerCountView(views.APIView):
+#     permission_classes = [permissions.AllowAny]
+#
+#     def get_week_number(self, year, month, day):
+#         date_obj = date(int(year), int(month), int(day))
+#         week_number = (date_obj.day - 1) // 7 + 1
+#         return week_number
+#
+#     def get_week_of_year(self, year, month, week_of_month):
+#         first_day_of_month = date(year, month, 1)
+#         first_week_of_month = first_day_of_month.isocalendar()[1]
+#         week_of_year = first_week_of_month + week_of_month - 1
+#         return week_of_year
+#
+#     def get(self, request, pk):
+#         year = request.query_params.get("year")
+#         month = request.query_params.get("month")
+#         week = request.query_params.get("week")
+#         wholeseller_agent = pk
+#
+#         qs = Wholeseller.objects.filter(wholeseller_agent=wholeseller_agent)
+#
+#         if year:
+#             qs = qs.filter(created_at__year=year)
+#         if month:
+#             try:
+#                 month_num = int(month)
+#                 qs = qs.filter(created_at__month=month_num)
+#             except ValueError:
+#                 qs = qs.filter(created_at__year=year)
+#         if week:
+#             try:
+#                 year = int(year)
+#                 month_num = int(month)
+#                 week_of_month = int(week)
+#                 week_of_year = self.get_week_of_year(year,month_num,week_of_month)
+#                 qs = qs.filter(created_at__week=week_of_year)
+#             except ValueError:
+#                 if year and month:
+#                     qs = qs.filter(created_at__year=year, created_at__month=month_num)
+#                 else:
+#                     qs = qs.filter(created_at__year=year)
+#
+#         month_names = settings.MONTH_NAMES
+#         # yearly_counts = (
+#         #     qs.annotate(year=ExtractYear("created_at"))
+#         #     .values("year")
+#         #     .annotate(count=Count("id"))
+#         # )
+#         # yearly_result = []
+#         # for item in yearly_counts:
+#         #     year_num = item["year"]
+#         #     count = item["count"]
+#         #     yearly_result.append({"year": year_num, "count": count})
+#
+#         # monthly_counts = (
+#         #     qs.annotate(
+#         #         year=ExtractYear("created_at"), month=ExtractMonth("created_at")
+#         #     )
+#         #     .values("year", "month")
+#         #     .annotate(count=Count("id"))
+#         # )
+#         # monthly_result = []
+#         # for item in monthly_counts:
+#         #     year_num = item["year"]
+#         #     month_num = item["month"]
+#         #     try:
+#         #         month_name = month_names[month_num]
+#         #     except (KeyError, TypeError):
+#         #         month_name = None
+#         #     count = item["count"]
+#         #     monthly_result.append(
+#         #         {"year": year_num, "month": month_name, "count": count}
+#         #     )
+#
+#         week_counts = (
+#             qs.annotate(day=ExtractDay("created_at"), year=ExtractYear("created_at"), month=ExtractMonth("created_at"))
+#             .values("day", "year", "month")
+#             .annotate(count=Count("id"))
+#         )
+#
+#         week_result = []
+#         for item in week_counts:
+#             year_num = item["year"]
+#             month_num = item["month"]
+#             day_num = item["day"]
+#             week_num = self.get_week_number(year_num,month_num,day_num)
+#             try:
+#                 month_name = month_names[month_num]
+#             except (KeyError, TypeError):
+#                 month_name = None
+#             week_name = "Week " + str(week_num)
+#             count = item["count"]
+#             week_result.append({"year": year_num, "month": month_name, "week": week_name, "count": count})
+#
+#         data = {
+#             "total_wholeseller_count": qs.count(),
+#             # "no of wholeseller by year": yearly_result,
+#             # "no of wholeseller by months": monthly_result,
+#             "Wholesellers": week_result,
+#         }
+#
+#         return Response(data)
 
 
 class WholesellerListViewset(viewsets.ModelViewSet):

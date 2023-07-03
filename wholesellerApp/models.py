@@ -185,6 +185,13 @@ class Branch_Item_Wise_Plan(models.Model):
     retailer_type = models.ManyToManyField(RetailerType, related_name="wholeseller_branch_item_wise_plan_retailer_type" )
 
 
+class Branch_Product_Pricing(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, related_name='branch_product')
+    new_base_price = models.IntegerField(null=True)
+    last_update_date = models.DateTimeField(default=datetime.now, blank=True)
+
+
+
 # -----------------------------Wholeseller agent ------------------
 WHOLESELLER_AGENT_TYPE = (
     ("WHOLESELLER_AGENT", "Wholeseller Agent"),
