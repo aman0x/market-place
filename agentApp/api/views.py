@@ -22,6 +22,7 @@ from django.utils import timezone
 from django.db import models
 from datetime import date
 from django.db.models.functions import ExtractYear, ExtractMonth, ExtractDay
+import calendar
 
 
 common_status = settings.COMMON_STATUS
@@ -402,110 +403,6 @@ class WholesellerCountView(views.APIView):
         }
 
         return Response(data)
-# class WholesellerCountView(views.APIView):
-#     permission_classes = [permissions.AllowAny]
-#
-#     def get_week_number(self, year, month, day):
-#         date_obj = date(int(year), int(month), int(day))
-#         week_number = (date_obj.day - 1) // 7 + 1
-#         return week_number
-#
-#     def get_week_of_year(self, year, month, week_of_month):
-#         first_day_of_month = date(year, month, 1)
-#         first_week_of_month = first_day_of_month.isocalendar()[1]
-#         week_of_year = first_week_of_month + week_of_month - 1
-#         return week_of_year
-#
-#     def get(self, request, pk):
-#         year = request.query_params.get("year")
-#         month = request.query_params.get("month")
-#         week = request.query_params.get("week")
-#         wholeseller_agent = pk
-#
-#         qs = Wholeseller.objects.filter(wholeseller_agent=wholeseller_agent)
-#
-#         if year:
-#             qs = qs.filter(created_at__year=year)
-#         if month:
-#             try:
-#                 month_num = int(month)
-#                 qs = qs.filter(created_at__month=month_num)
-#             except ValueError:
-#                 qs = qs.filter(created_at__year=year)
-#         if week:
-#             try:
-#                 year = int(year)
-#                 month_num = int(month)
-#                 week_of_month = int(week)
-#                 week_of_year = self.get_week_of_year(year,month_num,week_of_month)
-#                 qs = qs.filter(created_at__week=week_of_year)
-#             except ValueError:
-#                 if year and month:
-#                     qs = qs.filter(created_at__year=year, created_at__month=month_num)
-#                 else:
-#                     qs = qs.filter(created_at__year=year)
-#
-#         month_names = settings.MONTH_NAMES
-#         # yearly_counts = (
-#         #     qs.annotate(year=ExtractYear("created_at"))
-#         #     .values("year")
-#         #     .annotate(count=Count("id"))
-#         # )
-#         # yearly_result = []
-#         # for item in yearly_counts:
-#         #     year_num = item["year"]
-#         #     count = item["count"]
-#         #     yearly_result.append({"year": year_num, "count": count})
-#
-#         # monthly_counts = (
-#         #     qs.annotate(
-#         #         year=ExtractYear("created_at"), month=ExtractMonth("created_at")
-#         #     )
-#         #     .values("year", "month")
-#         #     .annotate(count=Count("id"))
-#         # )
-#         # monthly_result = []
-#         # for item in monthly_counts:
-#         #     year_num = item["year"]
-#         #     month_num = item["month"]
-#         #     try:
-#         #         month_name = month_names[month_num]
-#         #     except (KeyError, TypeError):
-#         #         month_name = None
-#         #     count = item["count"]
-#         #     monthly_result.append(
-#         #         {"year": year_num, "month": month_name, "count": count}
-#         #     )
-#
-#         week_counts = (
-#             qs.annotate(day=ExtractDay("created_at"), year=ExtractYear("created_at"), month=ExtractMonth("created_at"))
-#             .values("day", "year", "month")
-#             .annotate(count=Count("id"))
-#         )
-#
-#         week_result = []
-#         for item in week_counts:
-#             year_num = item["year"]
-#             month_num = item["month"]
-#             day_num = item["day"]
-#             week_num = self.get_week_number(year_num,month_num,day_num)
-#             try:
-#                 month_name = month_names[month_num]
-#             except (KeyError, TypeError):
-#                 month_name = None
-#             week_name = "Week " + str(week_num)
-#             count = item["count"]
-#             week_result.append({"year": year_num, "month": month_name, "week": week_name, "count": count})
-#
-#         data = {
-#             "total_wholeseller_count": qs.count(),
-#             # "no of wholeseller by year": yearly_result,
-#             # "no of wholeseller by months": monthly_result,
-#             "Wholesellers": week_result,
-#         }
-#
-#         return Response(data)
-
 
 class WholesellerListViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -527,8 +424,6 @@ class AgentEarningAPIView(views.APIView):
 
     def get(self, request, pk):
         year = request.query_params.get("year")
-        month = request.query_params.get("month")
-        week = request.query_params.get("week")
 
         try:
             total_wholesellers_added = Wholeseller.objects.filter(wholeseller_agent=pk)
@@ -539,33 +434,13 @@ class AgentEarningAPIView(views.APIView):
                     created_at__year=year
                 )
 
-            # Filter by month
-            if month:
-                total_wholesellers_added = total_wholesellers_added.filter(
-                    created_at__month=month
-                )
-
-            # Filter by week
-            if week:
-                start_date = timezone.now().date() - timedelta(
-                    weeks=52
-                )  # consider only past 52 weeks
-                total_wholesellers_added = total_wholesellers_added.filter(
-                    created_at__range=[start_date, timezone.now().date()]
-                ).annotate(
-                    week_num=Count("id", filter=(models.Q(created_at__week=week)))
-                )
-
             count = total_wholesellers_added.count()
             if count > 0:
-                total_commission = 0
-                for wholeseller in total_wholesellers_added:
-                    if wholeseller.wholeseller_plan:
-                        total_commission += wholeseller.wholeseller_plan.amount
+                commission_by_month = self.get_commission_by_month(total_wholesellers_added)
 
                 response_data = {
                     "total_wholesellers_added": count,
-                    "total_commission": total_commission,
+                    "commission_by_month": commission_by_month,
                 }
 
             else:
@@ -575,3 +450,22 @@ class AgentEarningAPIView(views.APIView):
             response_data = {"message": "No data available for this agent."}
 
         return Response(response_data)
+
+    def get_commission_by_month(self, wholesellers):
+        commission_by_month = {}
+        for month in range(1, 13):
+            total_commission = 0
+            month_name = calendar.month_name[month]
+
+            # Filter by month
+            total_wholesellers_added = wholesellers.filter(
+                created_at__month=month
+            )
+
+            for wholeseller in total_wholesellers_added:
+                if wholeseller.wholeseller_plan:
+                    total_commission += wholeseller.wholeseller_plan.amount
+
+            commission_by_month[month_name] = total_commission
+
+        return commission_by_month
