@@ -422,8 +422,17 @@ class AgentEarningAPIView(views.APIView):
 
     def get_week_number(self, year, month, day):
         date_obj = date(int(year), int(month), int(day))
-        week_number = (date_obj.day - 1) // 7 + 1
+        first_day = date_obj.replace(day=1)
+        first_day_weekday = first_day.weekday()
+        shift = (first_day_weekday + 1) % 7
+        week_number = (date_obj.day + shift - 1) // 7 + 1
         return week_number
+
+    def get_week_of_year(self, year, month, week_of_month):
+        first_day_of_month = date(year, month, 1)
+        first_week_of_month = first_day_of_month.isocalendar()[1]
+        week_of_year = first_week_of_month + week_of_month - 1
+        return week_of_year
 
     def get(self, request, pk):
         year = request.query_params.get("year")
@@ -456,29 +465,32 @@ class AgentEarningAPIView(views.APIView):
 
         month_names = settings.MONTH_NAMES
 
-        monthly_counts = (
-            qs.annotate(year=ExtractYear("created_at"), month=ExtractMonth("created_at"))
-            .values("year", "month")
+        weekly_counts = (
+            qs.annotate(year=ExtractYear("created_at"), month=ExtractMonth("created_at"), day=ExtractDay("created_at"))
+            .values("year", "month", "day")
             .annotate(count=Count("id"), commission=Sum("wholeseller_plan__amount"))
         )
 
-        monthly_result = []
-        for item in monthly_counts:
+        weekly_result = []
+        for item in weekly_counts:
             year_num = item["year"]
             month_num = item["month"]
+            day_num = item["day"]
+            week_num = self.get_week_number(year_num, month_num, day_num)
             try:
                 month_name = month_names[month_num]
             except KeyError:
                 month_name = None
+            week_name = "Week " + str(week_num)
             count = item["count"]
             commission = item["commission"]
-            monthly_result.append(
-                {"year": year_num, "month": month_name, "count": count, "commission": commission}
+            weekly_result.append(
+                {"year": year_num, "month": month_name, "week": week_name, "count": count, "commission": commission}
             )
 
         data = {
-            # "year": year,
-            "Earning": monthly_result,
+            "year": year,
+            "weeks": weekly_result,
         }
 
         return Response(data)
