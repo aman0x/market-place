@@ -307,7 +307,10 @@ class WholesellerCountView(views.APIView):
 
     def get_week_number(self, year, month, day):
         date_obj = date(int(year), int(month), int(day))
-        week_number = (date_obj.day - 1) // 7 + 1
+        first_day = date_obj.replace(day=1)
+        first_day_weekday = first_day.weekday()
+        shift = (first_day_weekday + 1) % 7
+        week_number = (date_obj.day + shift - 1) // 7 + 1
         return week_number
 
     def get_week_of_year(self, year, month, week_of_month):
@@ -489,8 +492,7 @@ class AgentEarningAPIView(views.APIView):
             )
 
         data = {
-            "year": year,
-            "weeks": weekly_result,
+            "Earning": weekly_result,
         }
 
         return Response(data)
