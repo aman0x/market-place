@@ -16,13 +16,12 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from wholesellerApp.models import Wholeseller
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models.functions import ExtractYear, ExtractMonth, ExtractDay
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.conf import settings
 from django.utils import timezone
 from django.db import models
 from datetime import date
 from django.db.models.functions import ExtractYear, ExtractMonth, ExtractDay
-import calendar
 
 
 common_status = settings.COMMON_STATUS
@@ -397,12 +396,11 @@ class WholesellerCountView(views.APIView):
 
         data = {
             "total_wholeseller_count": qs.count(),
-            "no_of_wholeseller_by_year": yearly_counts,
-            "no_of_wholeseller_by_month": monthly_result,
             "wholesellers": week_result,
         }
 
         return Response(data)
+
 
 class WholesellerListViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -422,97 +420,65 @@ class WholesellerListViewset(viewsets.ModelViewSet):
 class AgentEarningAPIView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
+    def get_week_number(self, year, month, day):
+        date_obj = date(int(year), int(month), int(day))
+        week_number = (date_obj.day - 1) // 7 + 1
+        return week_number
+
     def get(self, request, pk):
         year = request.query_params.get("year")
+        month = request.query_params.get("month")
+        week = request.query_params.get("week")
+        wholeseller_agent = pk
 
-        try:
-            total_wholesellers_added = Wholeseller.objects.filter(wholeseller_agent=pk)
+        qs = Wholeseller.objects.filter(wholeseller_agent=wholeseller_agent)
 
-            # Filter by year
-            if year:
-                total_wholesellers_added = total_wholesellers_added.filter(
-                    created_at__year=year
-                )
+        if year:
+            qs = qs.filter(created_at__year=year)
+        if month:
+            try:
+                month_num = int(month)
+                qs = qs.filter(created_at__month=month_num)
+            except ValueError:
+                qs = qs.filter(created_at__year=year)
+        if week:
+            try:
+                year = int(year)
+                month_num = int(month)
+                week_of_month = int(week)
+                week_of_year = self.get_week_of_year(year, month_num, week_of_month)
+                qs = qs.filter(created_at__week=week_of_year)
+            except ValueError:
+                if year and month:
+                    qs = qs.filter(created_at__year=year, created_at__month=month_num)
+                else:
+                    qs = qs.filter(created_at__year=year)
 
-            count = total_wholesellers_added.count()
-            if count > 0:
-                commission_by_month = self.get_commission_by_month(total_wholesellers_added)
-                total_commission_yearly = self.calculate_total_commission(total_wholesellers_added)
-                commission_by_year = self.get_commission_by_year(total_wholesellers_added)
+        month_names = settings.MONTH_NAMES
 
-                response_data = {
-                    "year": year,
-                    "total_wholesellers_added": count,
-                    "commission_by_month": commission_by_month,
-                    "total_commission_yearly": total_commission_yearly,
-                    "commission_by_year": commission_by_year
-                }
+        monthly_counts = (
+            qs.annotate(year=ExtractYear("created_at"), month=ExtractMonth("created_at"))
+            .values("year", "month")
+            .annotate(count=Count("id"), commission=Sum("wholeseller_plan__amount"))
+        )
 
-            else:
-                response_data = {"message": "No data available for this agent."}
-
-        except Agent.DoesNotExist:
-            response_data = {"message": "No data available for this agent."}
-
-        return Response(response_data)
-
-    def get_commission_by_month(self, wholesellers):
-        commission_by_month = {}
-        for month in range(1, 13):
-            total_commission = 0
-            month_name = calendar.month_name[month]
-
-            # Filter by month
-            total_wholesellers_added = wholesellers.filter(
-                created_at__month=month
+        monthly_result = []
+        for item in monthly_counts:
+            year_num = item["year"]
+            month_num = item["month"]
+            try:
+                month_name = month_names[month_num]
+            except KeyError:
+                month_name = None
+            count = item["count"]
+            commission = item["commission"]
+            monthly_result.append(
+                {"year": year_num, "month": month_name, "count": count, "commission": commission}
             )
 
-            for wholeseller in total_wholesellers_added:
-                if wholeseller.wholeseller_plan:
-                    total_commission += wholeseller.wholeseller_plan.amount
+        data = {
+            # "year": year,
+            "Earning": monthly_result,
+        }
 
-            commission_by_month[month_name] = total_commission
-
-        return commission_by_month
-
-    def calculate_total_commission(self, wholesellers):
-        total_commission = 0
-
-        for wholeseller in wholesellers:
-            if wholeseller.wholeseller_plan:
-                total_commission += wholeseller.wholeseller_plan.amount
-
-        return total_commission
-
-    def get_commission_by_year(self, wholesellers):
-        commission_by_year = {}
-        years = wholesellers.values_list("created_at__year", flat=True).distinct()
-
-        for year in years:
-            total_commission_year = 0
-            commission_by_month = {}
-
-            # Filter by year
-            total_wholesellers_added = wholesellers.filter(
-                created_at__year=year
-            )
-
-            for month in range(1, 13):
-                month_name = calendar.month_name[month]
-                total_commission_month = 0
-
-                # Filter by month
-                total_wholesellers_added_month = total_wholesellers_added.filter(
-                    created_at__month=month
-                )
-
-                for wholeseller in total_wholesellers_added_month:
-                    if wholeseller.wholeseller_plan:
-                        total_commission_month += wholeseller.wholeseller_plan.amount
-
-                commission_by_month[month_name] = total_commission_month
-                total_commission_year += total_commission_month
-
-            commission_by_year[str(year)] = commission_by_month
-
-        return commission_by_year
+        return Response(data)
