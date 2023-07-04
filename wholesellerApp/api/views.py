@@ -914,7 +914,7 @@ class WholesellerRetailerVerifyNumber(views.APIView):
 class WholesellerBranchAddProduct(viewsets.ModelViewSet):
 
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Branch_Product.objects.all()
+    queryset = Branch_Product.objects.all().order_by('id')
     serializer_class = BranchProductSerializer
     filter_backends = [filters.SearchFilter]
     search_fields = ["branch"]
