@@ -413,6 +413,13 @@ class BranchProductPricingUpdateSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
+    retailer_details = serializers.SerializerMethodField()
     class Meta:
         model = Order
         fields = '__all__'
+
+    def get_retailer_details(self, obj):
+        retailer_type_ids = obj.retailer_type.all()
+        retailer_type = RetailerType.objects.filter(id__in=retailer_type_ids)
+        serializer = RetailerTypeSerializer(retailer_type, many=True)
+        return serializer.data
