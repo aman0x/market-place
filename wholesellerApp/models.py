@@ -331,3 +331,38 @@ class WholesellerRetailer(models.Model):
 
     def __str__(self):
         return self.wholeseller_retailer_name
+
+ORDER_BY = (
+    ("ADMIN", "admin"),
+    ("PHOTO", "photo"),
+    ("RETAILER", "retailer")
+)
+
+ORDER_TYPE = (
+    ("CASH", "Cash"),
+    ("CREDIT", "Credit")
+)
+
+PAYMENT_STATUS = (
+    ("PAID", "Paid"),
+    ("PENDING", "Pending")
+)
+
+ORDER_STATUS = (
+    ("ORDERACCEPTED", "Order Accepted"),
+    ("PENDING", "Order Pending "),
+    ("CANCELED", "Cancelled"),
+    ("INPROGRESS", "In Progress"),
+)
+class Order(models.Model):
+    date = models.DateField()
+    order_id = models.CharField(max_length=100)
+    firm_name = models.CharField(max_length=100)
+    retailer_type = models.ManyToManyField(RetailerType, related_name="orders_retailer_type" )
+    phone = models.CharField(max_length=100)
+    city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='orders_city')
+    ordered_by = models.CharField(max_length=20, choices=ORDER_BY, default="RETAILER")
+    amount = models.IntegerField()
+    order_type = models.CharField(max_length=20, choices=ORDER_TYPE, default="CASH")
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default="PENDING")
+    order_status = models.CharField(max_length=20, choices=ORDER_STATUS, default="INPROGRESS")

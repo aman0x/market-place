@@ -410,3 +410,9 @@ class BranchProductPricingUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Branch_Product_Pricing
         fields = ['new_base_price']
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = '__all__'

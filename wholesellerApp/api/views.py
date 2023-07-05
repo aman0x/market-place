@@ -33,7 +33,7 @@ class WholesellerViewSet(viewsets.ModelViewSet):
     API endpoint that allows groups to be viewed or edited.
     """
 
-    queryset = Wholeseller.objects.all()
+    queryset = Wholeseller.objects.all().order_by("id")
     serializer_class = WholesellerSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
@@ -194,7 +194,7 @@ class WholesellerDashboardViewSet(viewsets.ModelViewSet):
     API endpoint that allows groups to be viewed or edited.
     """
 
-    queryset = Wholeseller.objects.all()
+    queryset = Wholeseller.objects.all().order_by("id")
     serializer_class = WholesellerSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
@@ -342,7 +342,7 @@ class WholesellerDashboardBazzarViewSet(viewsets.ModelViewSet):
     API endpoint that allows groups to be viewed or edited.
     """
 
-    queryset = Wholeseller.objects.all()
+    queryset = Wholeseller.objects.all().order_by("id")
     serializer_class = Wholeseller_bazzarSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
@@ -539,7 +539,7 @@ class WholesellerDashboardTopBranchesViewSet(views.APIView):
 
 
 class WholesellerBazaarListViewSet(viewsets.ModelViewSet):
-    queryset = Wholeseller.objects.all()
+    queryset = Wholeseller.objects.all().order_by("id")
     serializer_class = WholelsellerBazaarListSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -556,7 +556,7 @@ class WholesellerBranchViewSet(viewsets.ModelViewSet):
     API endpoint that allows groups to be viewed or edited.
     """
 
-    queryset = Branch.objects.all()
+    queryset = Branch.objects.all().order_by("id")
     serializer_class = WholesellerBranchSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
@@ -797,7 +797,7 @@ class RetailerViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
-    queryset = WholesellerRetailer.objects.all()
+    queryset = WholesellerRetailer.objects.all().order_by("id")
     serializer_class = WholesellerRetailerSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
@@ -938,7 +938,7 @@ class WholesellerBranchCategoryList(views.APIView):
 
 class WholesellerBranchCategoryWisePlanList(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Branch_Category_Wise_Plan.objects.all()
+    queryset = Branch_Category_Wise_Plan.objects.all().order_by("id")
     serializer_class = BranchCategoryWisePlanSerializer
 
 
@@ -960,7 +960,7 @@ class WholesellerBranchSubCategoryList(views.APIView):
 
 class WholesellerBranchSubCategoryWisePlanList(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Branch_Sub_Category_Wise_Plan.objects.all()
+    queryset = Branch_Sub_Category_Wise_Plan.objects.all().order_by("id")
     serializer_class = BranchSubCategoryWisePlanSerializer
 
 
@@ -982,7 +982,7 @@ class WholesellerBranchItemList(views.APIView):
 
 class WholesellerBranchItemWisePlanList(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Branch_Item_Wise_Plan.objects.all()
+    queryset = Branch_Item_Wise_Plan.objects.all().order_by("id")
     serializer_class = BranchItemWisePlanSerializer
 
 class WholesellerBranchProductPricingViews(viewsets.ModelViewSet):
@@ -1108,3 +1108,11 @@ class WholesellerBranchManagerVerifyOTP(views.APIView):
 #         branch_products = Branch_Product.objects.filter(branch=branch)
 #         serializer = self.serializer_class(branch_products, many=True)
 #         return Response(serializer.data)
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = OrderSerializer
+    queryset = Order.objects.all().order_by("id")
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["order_type","order_status","retailer_type","ordered_by"]
