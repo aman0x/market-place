@@ -1122,3 +1122,5 @@ class EditOrderViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.AllowAny]
     serializer_class = EditOrderSerializer
     queryset = EditOrder.objects.all().order_by("id")
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["order_id"]
