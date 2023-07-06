@@ -12,14 +12,13 @@ from datetime import date
 import jsonfield
 from django.db import IntegrityError
 from masterApp.models import WholesellerType
-from masterApp.models import RetailerType
 from planApp.models import RetailerPlan
 from productApp.models import Product
 from datetime import datetime
 from categoryApp.models import Category
 from subCategoryApp.models import SubCategory
 from masterApp.models import RetailerType
-from masterApp.api.serializers import RetailerTypeSerializer
+# from offerApp.models import Offers
 
 # WHOLESELLER_TYPE = (
 #     ("INDIVIDUAL", "Individual"),
@@ -331,3 +330,49 @@ class WholesellerRetailer(models.Model):
 
     def __str__(self):
         return self.wholeseller_retailer_name
+
+ORDER_BY = (
+    ("ADMIN", "admin"),
+    ("PHOTO", "photo"),
+    ("RETAILER", "retailer")
+)
+
+ORDER_TYPE = (
+    ("CASH", "Cash"),
+    ("CREDIT", "Credit")
+)
+
+PAYMENT_STATUS = (
+    ("PAID", "Paid"),
+    ("PENDING", "Pending")
+)
+
+ORDER_STATUS = (
+    ("ORDERACCEPTED", "Order Accepted"),
+    ("PENDING", "Order Pending "),
+    ("CANCELED", "Cancelled"),
+    ("INPROGRESS", "In Progress"),
+)
+class Order(models.Model):
+    date = models.DateField()
+    # order_id = models.CharField(max_length=100)
+    firm_name = models.CharField(max_length=100)
+    retailer_type = models.ManyToManyField(RetailerType, related_name="orders_retailer_type" )
+    phone = models.CharField(max_length=100)
+    city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='orders_city')
+    ordered_by = models.CharField(max_length=20, choices=ORDER_BY, default="RETAILER")
+    amount = models.IntegerField()
+    order_type = models.CharField(max_length=20, choices=ORDER_TYPE, default="CASH")
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default="PENDING")
+    order_status = models.CharField(max_length=20, choices=ORDER_STATUS, default="INPROGRESS")
+
+    def __str__(self):
+        return str(self.pk)
+class EditOrder(models.Model):
+    order_id = models.ForeignKey(Order, related_name="editorder_order_id", on_delete=models.CASCADE, null=True, blank=True)
+    quantity = models.IntegerField()
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True, related_name='orders_product')
+    offer = models.CharField(max_length=100, null=True, blank=True)
+
+    def __str__(self):
+        return self.order_id

@@ -18,7 +18,7 @@ from categoryApp.models import Category
 from categoryApp.api.serializers import CategorySerializer
 from subCategoryApp.models import SubCategory
 from subCategoryApp.api.serializers import SubCategorySerializer
-
+from masterApp.api.serializers import RetailerTypeSerializer
 
 # from locationApp.models import *
 
@@ -410,3 +410,37 @@ class BranchProductPricingUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Branch_Product_Pricing
         fields = ['new_base_price']
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    retailer_details = serializers.SerializerMethodField()
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+    def get_retailer_details(self, obj):
+        retailer_type_ids = obj.retailer_type.all()
+        retailer_type = RetailerType.objects.filter(id__in=retailer_type_ids)
+        serializer = RetailerTypeSerializer(retailer_type, many=True)
+        return serializer.data
+
+class EditOrderSerializer(serializers.ModelSerializer):
+    product_details = serializers.SerializerMethodField()
+    order_details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = EditOrder
+        fields = '__all__'
+
+    def get_product_details(self, obj):
+        product_id = obj.product_id
+        product = Product.objects.filter(id=product_id)
+        serializer = ProductSerializer(product, many=True)
+        return serializer.data
+
+
+    def get_order_details(self,obj):
+        order_id = obj.order_id.id
+        order = Order.objects.filter(id=order_id)
+        serializer = OrderSerializer(order, many=True)
+        return serializer.data

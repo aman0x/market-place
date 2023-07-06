@@ -395,7 +395,17 @@ class WholesellerCountView(views.APIView):
                 month_name = None
             week_name = "Week " + str(week_num)
             count = item["count"]
-            week_result.append({"year": year_num, "month": month_name, "week": week_name, "count": count})
+
+            existing_week = next((week for week in week_result if
+                                  week["year"] == year_num and week["month"] == month_name and week[
+                                      "week"] == week_name), None)
+
+            if existing_week:
+                # If the week already exists, increment the count
+                existing_week["count"] += count
+            else:
+                # If the week does not exist, create a new entry
+                week_result.append({"year": year_num, "month": month_name, "week": week_name, "count": count})
 
         data = {
             "total_wholeseller_count": qs.count(),
