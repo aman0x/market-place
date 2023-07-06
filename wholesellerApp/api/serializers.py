@@ -426,6 +426,7 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class EditOrderSerializer(serializers.ModelSerializer):
     product_details = serializers.SerializerMethodField()
+    order_details = serializers.SerializerMethodField()
 
     class Meta:
         model = EditOrder
@@ -435,4 +436,11 @@ class EditOrderSerializer(serializers.ModelSerializer):
         product_id = obj.product_id
         product = Product.objects.filter(id=product_id)
         serializer = ProductSerializer(product, many=True)
+        return serializer.data
+
+
+    def get_order_details(self,obj):
+        order_id = obj.order_id.id
+        order = Order.objects.filter(id=order_id)
+        serializer = OrderSerializer(order, many=True)
         return serializer.data
