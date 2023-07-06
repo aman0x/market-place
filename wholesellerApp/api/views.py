@@ -1116,3 +1116,9 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all().order_by("id")
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["order_type","order_status","retailer_type","ordered_by"]
+
+
+class EditOrderViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = EditOrderSerializer
+    queryset = EditOrder.objects.all().order_by("id")

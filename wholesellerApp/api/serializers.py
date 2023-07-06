@@ -18,7 +18,7 @@ from categoryApp.models import Category
 from categoryApp.api.serializers import CategorySerializer
 from subCategoryApp.models import SubCategory
 from subCategoryApp.api.serializers import SubCategorySerializer
-
+from masterApp.api.serializers import RetailerTypeSerializer
 
 # from locationApp.models import *
 
@@ -422,4 +422,17 @@ class OrderSerializer(serializers.ModelSerializer):
         retailer_type_ids = obj.retailer_type.all()
         retailer_type = RetailerType.objects.filter(id__in=retailer_type_ids)
         serializer = RetailerTypeSerializer(retailer_type, many=True)
+        return serializer.data
+
+class EditOrderSerializer(serializers.ModelSerializer):
+    product_details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = EditOrder
+        fields = '__all__'
+
+    def get_product_details(self, obj):
+        product_id = obj.product_id
+        product = Product.objects.filter(id=product_id)
+        serializer = ProductSerializer(product, many=True)
         return serializer.data
