@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
 from locationApp.models import *
-from masterApp.models import RetailerType
+# from masterApp.models import RetailerType
     
 class Bazaar(models.Model):
     bazaar_name = models.CharField(max_length=200, null=True)
@@ -15,7 +15,7 @@ class Bazaar(models.Model):
     bazaar_updated_date = models.DateTimeField(default=datetime.now, blank=True)
     bazaar_updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bazaar_updated_by', null=True)
     bazaar_steps = models.IntegerField(null=True, default=None)
-    bazaar_retailer_type = models.ManyToManyField(RetailerType, related_name="bazaar_retailer_type", blank=True)
+    # bazaar_retailer_type = models.ManyToManyField(RetailerType, related_name="bazaar_retailer_type", blank=True)
     bazaar_active = models.BooleanField(default=True)
 
     class Meta:

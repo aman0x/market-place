@@ -1,4 +1,5 @@
 from django.db import models
+from bazaarApp.models import Bazaar
 
 UNIT_TYPE = (
     ("QUANTITY", "Quantity"),
@@ -15,20 +16,17 @@ class Unit(models.Model):
         return self.unit_name
     
 class WholesellerType(models.Model):
-    wholeseller_type_image = models.ImageField(
-        upload_to="image/master/", null=True)
-    wholeseller_type_name = models.CharField(
-        max_length=30, null=True, default=None, unique=True)
-    
+    # wholeseller_type_image = models.ImageField(upload_to="image/master/", null=True)
+    wholeseller_type_name = models.CharField(max_length=30, null=True, default=None, unique=True)
+    bazaar = models.ForeignKey(Bazaar, on_delete=models.CASCADE, related_name="wholeseller_bazaar", null=True, blank=True)
     def __str__(self):
         return self.wholeseller_type_name
 
 
 class RetailerType(models.Model):
-    retailer_type_image = models.ImageField(
-        upload_to="image/master/", null=True)
-    retailer_type_name = models.CharField(
-        max_length=30, null=True, default=None, unique=True)
+    # retailer_type_image = models.ImageField(upload_to="image/master/", null=True)
+    retailer_type_name = models.CharField(max_length=30, null=True, default=None, unique=True)
+    bazaar = models.ForeignKey(Bazaar,on_delete=models.CASCADE, related_name="retailer_bazaar", null=True, blank=True)
     
     def __str__(self):
         return self.retailer_type_name
