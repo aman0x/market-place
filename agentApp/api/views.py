@@ -302,6 +302,57 @@ class ReportPlanExpireView(views.APIView):
         return Response(data)
 
 
+class WholesellerCountMonthView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, pk):
+        year = request.query_params.get("year")
+        month = request.query_params.get("month")
+        wholeseller_agent = pk
+
+        qs = Wholeseller.objects.filter(wholeseller_agent=wholeseller_agent)
+
+        if year:
+            qs = qs.filter(created_at__year=year)
+        if month:
+            try:
+                month_num = int(month)
+                qs = qs.filter(created_at__month=month_num)
+            except ValueError:
+                qs = qs.filter(created_at__year=year)
+
+        month_names = settings.MONTH_NAMES
+
+        monthly_counts = (
+            qs.annotate(
+                year=ExtractYear("created_at"), month=ExtractMonth("created_at")
+            )
+            .values("year", "month")
+            .annotate(count=Count("id"))
+        )
+
+        monthly_result = []
+        for item in monthly_counts:
+            year_num = item["year"]
+            month_num = item["month"]
+            try:
+                month_name = month_names[month_num]
+            except (KeyError, TypeError):
+                month_name = None
+            count = item["count"]
+            monthly_result.append(
+                {"year": year_num, "month": month_name, "count": count}
+            )
+
+        data = {
+            "total_wholeseller_count": qs.count(),
+            "wholesellers": monthly_result,
+        }
+
+        return Response(data)
+
+
+
 class WholesellerCountView(views.APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -414,7 +465,6 @@ class WholesellerCountView(views.APIView):
 
         return Response(data)
 
-
 class WholesellerListViewset(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Wholeseller.objects.all().order_by("id")
@@ -503,6 +553,53 @@ class AgentEarningAPIView(views.APIView):
 
         data = {
             "Earning": weekly_result,
+        }
+
+        return Response(data)
+
+class AgentEarningMonthAPIView(views.APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request, pk):
+        year = request.query_params.get("year")
+        month = request.query_params.get("month")
+        wholeseller_agent = pk
+
+        qs = Wholeseller.objects.filter(wholeseller_agent=wholeseller_agent)
+
+        if year:
+            qs = qs.filter(created_at__year=year)
+        if month:
+            try:
+                month_num = int(month)
+                qs = qs.filter(created_at__month=month_num)
+            except ValueError:
+                qs = qs.filter(created_at__year=year)
+
+        month_names = settings.MONTH_NAMES
+
+        monthly_counts = (
+            qs.annotate(year=ExtractYear("created_at"), month=ExtractMonth("created_at"))
+            .values("year", "month")
+            .annotate(count=Count("id"), commission=Sum("wholeseller_plan__amount"))
+        )
+
+        monthly_result = []
+        for item in monthly_counts:
+            year_num = item["year"]
+            month_num = item["month"]
+            try:
+                month_name = month_names[month_num]
+            except (KeyError, TypeError):
+                month_name = None
+            count = item["count"]
+            commission = item["commission"]
+            monthly_result.append(
+                {"year": year_num, "month": month_name, "count": count, "commission": commission}
+            )
+
+        data = {
+            "Earning": monthly_result,
         }
 
         return Response(data)
