@@ -534,6 +534,8 @@ class AgentEarningAPIView(views.APIView):
             .annotate(count=Count("id"), commission=Sum("wholeseller_plan__amount"))
         )
 
+        total_commission = weekly_counts.aggregate(total_commission=Sum("commission"))["total_commission"]
+
         weekly_result = []
         for item in weekly_counts:
             year_num = item["year"]
@@ -552,6 +554,7 @@ class AgentEarningAPIView(views.APIView):
             )
 
         data = {
+            "TotalCommission": total_commission,
             "Earning": weekly_result,
         }
 
@@ -584,6 +587,8 @@ class AgentEarningMonthAPIView(views.APIView):
             .annotate(count=Count("id"), commission=Sum("wholeseller_plan__amount"))
         )
 
+        total_commission = monthly_counts.aggregate(total_commission=Sum("commission"))["total_commission"]
+
         monthly_result = []
         for item in monthly_counts:
             year_num = item["year"]
@@ -599,6 +604,7 @@ class AgentEarningMonthAPIView(views.APIView):
             )
 
         data = {
+            "TotalCommission": total_commission,
             "Earning": monthly_result,
         }
 
