@@ -8,6 +8,8 @@ from masterApp.models import RetailerType
 from datetime import datetime
 from planApp.models import RetailerPlan
 from django.contrib.auth.models import User
+from productApp.models import Product
+import uuid
 
 RETAILER_STATUS = (
     ("CREATED", "Created"),
@@ -50,6 +52,29 @@ class Retailer(models.Model):
 
     def __str__(self):
         return self.retailer_name
-    
-class RetailerCart(models.Model):
-    order_id = models.CharField(max_length=100)
+#
+class SubCart(models.Model):
+    product = models.ForeignKey(Product,on_delete=models.CASCADE, related_name="cart_product", null=True, blank=True)
+    qty = models.IntegerField(null=True)
+    retailer = models.ForeignKey(Retailer, on_delete=models.CASCADE, related_name="retailer", null=True, blank=True)
+
+    def __str__(self):
+        return str(self.pk)
+
+class Cart(models.Model):
+    cart = models.ManyToManyField(SubCart, related_name="cart", null=True, blank=True)
+    order_id = models.CharField(max_length=8, unique=True, editable=False, null=True)
+
+    def __str__(self):
+        return str(self.order_id)
+
+    def save(self, *args, **kwargs):
+        if not self.order_id:
+            self.order_id = self._generate_order_id()
+        return super().save(*args, **kwargs)
+
+    def _generate_order_id(self):
+        generated_id = str(uuid.uuid4().int)[:8]
+        while Cart.objects.filter(order_id=generated_id).exists():
+            generated_id = str(uuid.uuid4().int)[:8]
+        return generated_id

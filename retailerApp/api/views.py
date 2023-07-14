@@ -1,26 +1,47 @@
 from rest_framework import viewsets, views
 from rest_framework import permissions
 from .serializers import *
-from retailerApp.models import Retailer
-from rest_framework import filters
-import random
+from retailerApp.models import *
 from django.contrib.auth.models import User
 from rest_framework.response import Response
 from datetime import timedelta, datetime
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.conf import settings
 common_status = settings.COMMON_STATUS
+import random
 
 
 class RetailerViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Retailer.objects.all()
     serializer_class = RetailerSerializer
     permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['retailer_name']
+
+    def get_queryset(self):
+        queryset = Retailer.objects.all()
+
+        state_id = self.request.query_params.get('state_id')
+        district_id = self.request.query_params.get('district_id')
+        city_id = self.request.query_params.get('city_id')
+        retailer_type = self.request.query_params.get('retailer_type_id')
+        status = self.request.query_params.get('retailer_status')
+        agent_type = self.request.query_params.get('retailer_agent_id')
+        plan = self.request.query_params.get('plan')
+
+        if state_id:
+            queryset = queryset.filter(retailer_state_id=state_id)
+        if district_id:
+            queryset = queryset.filter(retailer_district_id=district_id)
+        if city_id:
+            queryset = queryset.filter(retailer_city_id=city_id)
+        if retailer_type:
+            queryset = queryset.filter(retailer_type_id=retailer_type)
+        if status:
+            queryset = queryset.filter(retailer_status__icontains=status)
+        if agent_type:
+            queryset = queryset.filter(retailer_agent_id=agent_type)
+        if plan:
+            queryset = queryset.filter(retailer_plan_id=plan)
+
+        return queryset
 
 class RetailerVerifyNumber(views.APIView):
     permission_classes = [permissions.AllowAny]
@@ -105,3 +126,30 @@ class RetailerVerifyOTP(views.APIView):
             payload = {"details": "retailer not found"}
             status_code = common_status["unauthorized"]["code"]
             return Response(payload, status=status_code)
+
+
+class AddToCart(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = CartSerializer
+    queryset = SubCart.objects.all().order_by("id")
+
+    def get_queryset(self):
+        queryset = SubCart.objects.all().order_by("id")
+
+        retailer_id = self.request.query_params.get('retailer_id')
+
+        if retailer_id:
+            queryset = queryset.filter(retailer_id=retailer_id)
+
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+class Checkout(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = CheckoutSerializer
+    queryset = Cart.objects.all().order_by("id")
+
+    def perform_create(self, serializer):
+        serializer.save()
