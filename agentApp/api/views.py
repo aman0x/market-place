@@ -566,9 +566,17 @@ class AgentEarningAPIView(views.APIView):
             week_name = "Week " + str(week_num)
             count = item["count"]
             commission = item["commission"]
-            weekly_result.append(
-                {"year": year_num, "month": month_name, "week": week_name, "count": count, "commission": commission}
-            )
+            existing_week = next((week for week in weekly_result if
+                                  week["year"] == year_num and week["month"] == month_name and week[
+                                      "week"] == week_name), None)
+
+            if existing_week:
+                # If the week already exists, increment the count
+                existing_week["count"] += count
+            else:
+                # If the week does not exist, create a new entry
+
+                weekly_result.append({"year": year_num, "month": month_name, "week": week_name, "count": count, "commission": commission})
 
         data = {
             "TotalCommission": total_commission,
