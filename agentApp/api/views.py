@@ -34,18 +34,35 @@ class AgentViewSet(viewsets.ModelViewSet):
     API endpoint that allows groups to be viewed or edited.
     """
 
-    queryset = Agent.objects.all().order_by("id")
     serializer_class = AgentSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = ["agent_name"]
 
+    def get_queryset(self):
+        queryset = Agent.objects.all().order_by("id")
 
-# class AgentCommisionViewset(viewsets.ModelViewSet):
-#     queryset = ManageCommision.objects.all().order_by('id')
-#     serializer_class = AgentManageCommisionSerializer
-#     permission_classes = [permissions.IsAuthenticated]
+        state_id = self.request.query_params.get('state_id')
+        district_id = self.request.query_params.get('district_id')
+        city_id = self.request.query_params.get('city_id')
+        agent_type = self.request.query_params.get('agent_type')
+        status = self.request.query_params.get('agent_status')
+        active = self.request.query_params.get('active')
 
+        if state_id:
+            queryset = queryset.filter(agent_state_id=state_id)
+        if district_id:
+            queryset = queryset.filter(agent_district_id=district_id)
+        if city_id:
+            queryset = queryset.filter(agent_city_id=city_id)
+        if status:
+            queryset = queryset.filter(agent_status__icontains=status)
+        if agent_type:
+            queryset = queryset.filter(agent_type=agent_type)
+        if active:
+            queryset = queryset.filter(is_active=active)
+
+        return queryset
 
 class AgentCommisionRedeemViewset(viewsets.ModelViewSet):
     queryset = AgentCommisionRedeem.objects.all().order_by("id")
