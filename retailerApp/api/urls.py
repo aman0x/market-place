@@ -9,6 +9,8 @@ router.register(r'checkout', views.Checkout, basename='checkout')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('data/wholeseller/<int:wholeseller_id>/', views.WholesellerIdRetailerAPIView.as_view(),name="all-retailer-details-under-Wholeseller"),
+    path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/', views.WholesellerIdRetailerIdViewSet.as_view(),name="retailer-details-under-Wholeseller"),
     path('data/', views.RetailerViewSet.as_view({'get': 'list'}), name="retailer_data"),
     path('verify_phone/', views.RetailerVerifyNumber.as_view(), name="retailer-login"),
     path('verify_otp/', views.RetailerVerifyOTP.as_view(), name='verify_otp'),

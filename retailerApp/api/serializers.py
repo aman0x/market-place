@@ -3,10 +3,17 @@ from retailerApp.models import *
 from wholesellerApp.models import Wholeseller
 from wholesellerApp.api.serializers import WholesellerSerializer
 from productApp.api.serializers import FilterListSerializer
+from drf_extra_fields.fields import Base64ImageField
 
 
 class RetailerSerializer(serializers.ModelSerializer):
     wholeseller_details = serializers.SerializerMethodField()
+    retailer_image = Base64ImageField(required=False)
+    retailer_adhar_front_image = Base64ImageField(required=False)
+    retailer_adhar_back_image = Base64ImageField(required=False)
+    retailer_pancard_image = Base64ImageField(required=False)
+    retailer_gst_image = Base64ImageField(required=False)
+
     class Meta:
         model = Retailer
         fields = '__all__'
@@ -16,6 +23,17 @@ class RetailerSerializer(serializers.ModelSerializer):
         wholeseller_data = WholesellerSerializer(wholesellers, many=True).data
         return wholeseller_data
 
+    def update(self, instance, validated_data):
+        instance.retailer_image = validated_data.get(
+            'retailer_image')
+        instance.retailer_adhar_front_image = validated_data.get(
+            'retailer_adhar_front_image')
+        instance.retailer_adhar_back_image = validated_data.get(
+            'retailer_adhar_back_image')
+        instance.retailer_pancard_image = validated_data.get(
+            'retailer_pancard_image')
+        event = super().update(instance, validated_data)
+        return event
 
 class CartSerializer(serializers.ModelSerializer):
     product_price_per_qty = serializers.SerializerMethodField()
@@ -58,3 +76,11 @@ class CheckoutSerializer(serializers.ModelSerializer):
             qty = cart_item.qty
             total_per_cart += product_price * qty
         return total_per_cart
+
+
+# -----------------------wholeseller retailer-----------------------
+
+class WholesellerRetailerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Retailer
+        fields = '__all__'
