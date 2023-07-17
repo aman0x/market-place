@@ -10,6 +10,7 @@ from planApp.models import RetailerPlan
 from django.contrib.auth.models import User
 from productApp.models import Product
 import uuid
+import jsonfield
 
 RETAILER_STATUS = (
     ("CREATED", "Created"),
@@ -49,6 +50,21 @@ class Retailer(models.Model):
     retailer_created_at=models.DateTimeField(default=datetime.now, blank=True)
     retailer_otp = models.IntegerField(blank=True, null=True)
     retailer_user = models.ForeignKey(User, related_name="retailer_user", on_delete=models.CASCADE, null=True,blank=True)
+
+    retailer_altranate_mobile_number = PhoneNumberField(blank=True, null=True)
+    retailer_address = models.CharField(max_length=100, default=None, blank=True, null=True)
+    retailer_landmark = models.CharField(max_length=100, default=None, blank=True, null=True)
+    retailer_pincode = models.IntegerField(null=True)
+    retailer_image = models.ImageField(upload_to='images/retailer/', null=True)
+    retailer_adharcard_no = models.CharField(max_length=12, default=None, blank=True, null=True)
+    retailer_adhar_front_image = models.ImageField(upload_to="image/retailer/", null=True)
+    retailer_adhar_back_image = models.ImageField(upload_to="image/retailer/", default=None, null=True)
+    retailer_pancard_image = models.ImageField(upload_to="image/retailer/", default=None, null=True)
+    retailer_pancard_no = models.CharField(max_length=50, default=None, blank=True, null=True)
+    retailer_gst_no = models.CharField(max_length=50, default=None, blank=True, null=True)
+    retailer_gst_image = models.ImageField(upload_to="image/retailer/", default=None, null=True)
+    get_retailer_location_json_data = jsonfield.JSONField(default={}, null=True, )
+    is_auto_fill = models.BooleanField(null=True,)
 
     def __str__(self):
         return self.retailer_name

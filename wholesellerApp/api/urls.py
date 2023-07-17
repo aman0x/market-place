@@ -13,9 +13,6 @@ router.register(r'data/branch/add_product', views.WholesellerBranchAddProduct),
 # ------------wholeseller agent-----------
 router.register(r'agent', views.WholesellerAgentViewSet)
 
-# -------------wholeseller retailer--------
-router.register(r'retailer', views.RetailerViewSet)
-
 # -------------Wholeseller Orders---------
 router.register(r'orders', views.OrderViewSet, basename='order')
 router.register(r'editorders', views.EditOrderViewSet, basename='edit_order')
@@ -82,12 +79,6 @@ urlpatterns = [
 
     path('data/<int:wholeseller_id>/agent/', views.WholesellerIdAgentViewSet.as_view({'get': 'list'}), name="all-agent-details-under-Wholeseller"),
     path('data/<int:wholeseller_id>/agent/<int:agent_id>/', views.WholesellerIdAgentViewSetIdViewSet.as_view(), name="agent-details-under-Wholeseller"),
-
-    # ----------------- Wholeseller retailer-----------
-    path('data/<int:wholeseller_id>/retailer/', views.WholesellerIdRetailerAPIView.as_view(), name="all-retailer-details-under-Wholeseller"),
-    path('data/<int:wholeseller_id>/retailer/<int:retailer_id>/', views.WholesellerIdRetailerIdViewSet.as_view(), name="retailer-details-under-Wholeseller"),
-    path('data/retailer/verify_phone/', views.WholesellerRetailerVerifyNumber.as_view(), name="wholeseller-retailer-login"),
-    path('data/retailer/verify_otp/', views.WholesellerRetailerVerifyOTP.as_view(), name='wholeseller-retailer-verify_otp'),
 
 ]
 

@@ -287,14 +287,6 @@ class WholesellerAgentSerializer(serializers.ModelSerializer):
         return event
 
 
-# -----------------------wholeseller retailer-----------------------
-
-class WholesellerRetailerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = WholesellerRetailer
-        fields = '__all__'
-
-
 # ---------------- wholeseller branch product ---------
 class BranchProductSerializer(serializers.ModelSerializer):
     # product_details = serializers.SerializerMethodField()

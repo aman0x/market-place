@@ -9,11 +9,14 @@ from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.conf import settings
 common_status = settings.COMMON_STATUS
 import random
+from rest_framework import filters
 
 
 class RetailerViewSet(viewsets.ModelViewSet):
     serializer_class = RetailerSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["retailer_name"]
 
     def get_queryset(self):
         queryset = Retailer.objects.all()
@@ -153,3 +156,24 @@ class Checkout(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
+
+class WholesellerIdRetailerAPIView(views.APIView):
+    serializer_class = WholesellerRetailerSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, wholeseller_id):
+        retailers = Retailer.objects.filter(retailer_wholeseller=wholeseller_id)
+        serializer = self.serializer_class(retailers, many=True)
+        return Response(serializer.data)
+
+
+class WholesellerIdRetailerIdViewSet(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, wholeseller_id, retailer_id):
+        try:
+            retailer = Retailer.objects.get(id=retailer_id, retailer_wholeseller__id=wholeseller_id)
+            serializer = WholesellerRetailerSerializer(retailer)
+            return Response(serializer.data)
+        except Retailer.DoesNotExist:
+            return Response(status=404)
