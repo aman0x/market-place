@@ -5,6 +5,10 @@ from wholesellerApp.api.serializers import WholesellerSerializer
 from productApp.api.serializers import FilterListSerializer
 from drf_extra_fields.fields import Base64ImageField
 
+class RetailerNumberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RetailerMobile
+        fields = '__all__'
 
 class RetailerSerializer(serializers.ModelSerializer):
     wholeseller_details = serializers.SerializerMethodField()
@@ -13,7 +17,7 @@ class RetailerSerializer(serializers.ModelSerializer):
     retailer_adhar_back_image = Base64ImageField(required=False)
     retailer_pancard_image = Base64ImageField(required=False)
     retailer_gst_image = Base64ImageField(required=False)
-
+    retailer_number = RetailerNumberSerializer(many = True)
     class Meta:
         model = Retailer
         fields = '__all__'

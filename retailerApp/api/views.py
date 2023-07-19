@@ -46,6 +46,7 @@ class RetailerViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+
 class RetailerVerifyNumber(views.APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
@@ -58,7 +59,7 @@ class RetailerVerifyNumber(views.APIView):
         if retailer_number != "":
             retailer_otp = random.randrange(000000, 999999)
             try:
-                data = Retailer.objects.get(retailer_number=retailer_number)
+                data = RetailerMobile.objects.get(retailer_number=retailer_number)
                 data.retailer_otp = retailer_otp
                 data.save(update_fields=["retailer_otp"])
                 if data:
@@ -98,7 +99,7 @@ class RetailerVerifyOTP(views.APIView):
         retailer_otp = request.data.get("retailer_otp")
 
         try:
-            retailer = Retailer.objects.get(retailer_number=retailer_number)
+            retailer = RetailerMobile.objects.get(retailer_number=retailer_number)
             if retailer.retailer_otp == int(retailer_otp):
                 # OTP is valid
                 retailer.retailer_otp = None
@@ -177,3 +178,30 @@ class WholesellerIdRetailerIdViewSet(views.APIView):
             return Response(serializer.data)
         except Retailer.DoesNotExist:
             return Response(status=404)
+
+# class RetailerNotification(viewsets.ModelViewSet):
+#     permission_classes = [permissions.IsAuthenticated]
+#     serializer_class = RetailerSerializer
+#
+#     def get_queryset(self):
+#         retailer_id = self.request.query_params.get("retailer_id")
+#         queryset = Retailer.objects.all().order_by("id")
+#         queryset = queryset.filter(id=retailer_id)
+#
+#         return queryset
+
+
+class RetailerNumberViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = RetailerNumberSerializer
+    queryset = RetailerMobile.objects.all().order_by("id")
+
+
+class RetailerDetailsByNumberViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = RetailerSerializer
+
+    def get_queryset(self):
+        retailer_number = self.kwargs['retailer_number']
+        retailer_number = '+' + str(retailer_number)
+        queryset = Retailer.objects.filter(retailer_number__retailer_number=retailer_number)
+        return queryset

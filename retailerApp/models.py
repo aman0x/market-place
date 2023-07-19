@@ -25,6 +25,22 @@ BUSINESS_STATUS = (
     ("REGISTERED", "Registered")
 )
 
+Retailer_STATUS = (
+    ("NEW", "New Request"),
+    ("Old", "Old Request"),
+    ("REJECT", "Rejected Request"),
+    ("SAVE", "Save For Later")
+)
+
+class RetailerMobile(models.Model):
+    retailer_number = PhoneNumberField(unique=True, blank=True, null=True)
+    retailer_otp = models.IntegerField(blank=True, null=True)
+    retailer_user = models.ForeignKey(User, related_name="retailer_user", on_delete=models.CASCADE, null=True,blank=True)
+
+    def __str__(self):
+        return str(self.retailer_number)
+
+
 class Retailer(models.Model):
     
     retailer_type = models.ForeignKey(RetailerType, on_delete=models.CASCADE, related_name='retailer_type')
@@ -32,7 +48,7 @@ class Retailer(models.Model):
     retailer_name = models.CharField(max_length=20,null=True,default=None)
     retailer_description = models.TextField(blank=True, null=True)
     retailer_contact_per = models.CharField(max_length=20,null=True,default=None)
-    retailer_number = PhoneNumberField(unique=True, blank=True, null=True)
+    retailer_number = models.ManyToManyField(RetailerMobile,null=True, related_name='retailer_mobile',)
     retailer_wholeseller = models.ManyToManyField(Wholeseller,related_name='retailer_wholeseller',blank=True,null=True)
     retailer_agent = models.ForeignKey(Agent,on_delete=models.CASCADE ,related_name='retailer_agent',blank=True,null=True)
     retailer_altranate_number=PhoneNumberField(blank=True,null=True)
@@ -48,10 +64,7 @@ class Retailer(models.Model):
     retailer_status = models.CharField(max_length=20, choices=RETAILER_STATUS, default="CREATED")
     retailer_active=models.BooleanField(default=False)
     retailer_created_at=models.DateTimeField(default=datetime.now, blank=True)
-    retailer_otp = models.IntegerField(blank=True, null=True)
-    retailer_user = models.ForeignKey(User, related_name="retailer_user", on_delete=models.CASCADE, null=True,blank=True)
 
-    retailer_altranate_mobile_number = PhoneNumberField(blank=True, null=True)
     retailer_address = models.CharField(max_length=100, default=None, blank=True, null=True)
     retailer_landmark = models.CharField(max_length=100, default=None, blank=True, null=True)
     retailer_pincode = models.IntegerField(null=True)
@@ -65,6 +78,7 @@ class Retailer(models.Model):
     retailer_gst_image = models.ImageField(upload_to="image/retailer/", default=None, null=True)
     get_retailer_location_json_data = jsonfield.JSONField(default={}, null=True, )
     is_auto_fill = models.BooleanField(null=True,)
+    notification_status = models.CharField(max_length=20, choices=Retailer_STATUS, default="NEW", null=True)
 
     def __str__(self):
         return self.retailer_name
