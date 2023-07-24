@@ -147,7 +147,7 @@ class Branch_Category_Wise_Plan(models.Model):
     bronze_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
     bronze_value = models.IntegerField(null=True)
     last_update_date = models.DateTimeField(default=datetime.now, blank=True)
-    retailer_type = models.ManyToManyField(RetailerType, related_name="wholeseller_branch_category_wise_plan_retailer_type" )
+    retailer_type = models.ManyToManyField(RetailerType, related_name="wholeseller_branch_category_wise_plan_retailer_type", blank=True)
         # (max_length=20, choices=CUSTOMER_TYPE, default="RETAILER")
 
 
@@ -181,7 +181,7 @@ class Branch_Item_Wise_Plan(models.Model):
     bronze_discount_type = models.CharField(max_length=20, choices=BRANCH_PLAN, default="PERCENTAGE")
     bronze_value = models.IntegerField(null=True)
     last_update_date = models.DateTimeField(default=datetime.now, blank=True)
-    retailer_type = models.ManyToManyField(RetailerType, related_name="wholeseller_branch_item_wise_plan_retailer_type" )
+    retailer_type = models.ManyToManyField(RetailerType, related_name="wholeseller_branch_item_wise_plan_retailer_type",blank=True)
 
 
 class Branch_Product_Pricing(models.Model):
