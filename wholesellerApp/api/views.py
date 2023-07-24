@@ -860,6 +860,8 @@ class WholesellerBranchItemList(views.APIView):
                 # print(i["wholeseller_bazaar"])
                 queryset = Product.objects.filter(bazaar_id=i["wholeseller_bazaar"])
                 query.append(queryset.values())
+            if len(query):
+                return Response({f"branch {branch_id}": "No Item Found"}, status=status.HTTP_404_NOT_FOUND)
             return Response(query)
         except:
             return Response({f"branch {branch_id}": "Not Found"}, status=status.HTTP_404_NOT_FOUND)
