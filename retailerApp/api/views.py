@@ -24,7 +24,7 @@ class RetailerViewSet(viewsets.ModelViewSet):
     search_fields = ["retailer_name"]
 
     def get_queryset(self):
-        queryset = Retailer.objects.all()
+        queryset = Retailer.objects.all().order_by('id')
 
         state_id = self.request.query_params.get('state_id')
         district_id = self.request.query_params.get('district_id')
@@ -322,8 +322,7 @@ class RetailerDetailsByNumberViewSet(viewsets.ModelViewSet):
     serializer_class = RetailerSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
-    search_fields = [["retailer_wholeseller__wholeseller_name"]]
-
+    search_fields = ["retailer_wholeseller__wholeseller_name"]
 
     def get_queryset(self):
         retailer_number = self.kwargs['retailer_number']
