@@ -386,3 +386,14 @@ class ClickPhotoOrderView(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class AllProductByWholesellerId(viewsets.ModelViewSet):
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        wholeseller_id = self.kwargs.get('wholeseller_id')
+        wholeseller = get_object_or_404(Wholeseller, pk=wholeseller_id)
+        bazaar_id = wholeseller.wholeseller_bazaar.first().id
+        return Product.objects.filter(bazaar_id=bazaar_id)

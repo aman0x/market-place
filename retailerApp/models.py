@@ -119,8 +119,9 @@ class PhotoOrder(models.Model):
 class SubCart(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="cart_products", null=True, blank=True)
     qty = models.IntegerField(null=True)
-    retailer = models.ForeignKey(Retailer, on_delete=models.CASCADE, related_name="retailer_carts", null=True, blank=True)
+    retailer = models.ForeignKey(Retailer, on_delete=models.CASCADE, related_name="carts_retailer", null=True, blank=True)
     used_in_cart = models.BooleanField(default=False)
+    wholeseller = models.ForeignKey(Wholeseller, on_delete=models.CASCADE, related_name="cart_wholeseller", null=True, blank=True)
 
     def __str__(self):
         return str(self.pk)
