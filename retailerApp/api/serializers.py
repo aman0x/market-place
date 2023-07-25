@@ -2,7 +2,7 @@ from rest_framework import serializers
 from retailerApp.models import *
 from wholesellerApp.models import Wholeseller
 from wholesellerApp.api.serializers import WholesellerSerializer
-from productApp.api.serializers import FilterListSerializer
+from productApp.api.serializers import ProductSerializer
 from drf_extra_fields.fields import Base64ImageField
 
 class RetailerNumberSerializer(serializers.ModelSerializer):
@@ -17,7 +17,8 @@ class RetailerSerializer(serializers.ModelSerializer):
     retailer_adhar_back_image = Base64ImageField(required=False)
     retailer_pancard_image = Base64ImageField(required=False)
     retailer_gst_image = Base64ImageField(required=False)
-    retailer_number = RetailerNumberSerializer(many = True)
+    retailer_number_and_details = serializers.SerializerMethodField()
+
     class Meta:
         model = Retailer
         fields = '__all__'
@@ -26,6 +27,11 @@ class RetailerSerializer(serializers.ModelSerializer):
         wholesellers = obj.retailer_wholeseller.all().order_by("id")
         wholeseller_data = WholesellerSerializer(wholesellers, many=True).data
         return wholeseller_data
+
+    def get_retailer_number_and_details(self,obj):
+        retailer_number = obj.retailer_number.all().order_by('id')
+        retailer_numb = RetailerNumberSerializer(retailer_number, many=True).data
+        return retailer_numb
 
     def update(self, instance, validated_data):
         instance.retailer_image = validated_data.get(
@@ -39,24 +45,31 @@ class RetailerSerializer(serializers.ModelSerializer):
         event = super().update(instance, validated_data)
         return event
 
-class CartSerializer(serializers.ModelSerializer):
-    product_price_per_qty = serializers.SerializerMethodField()
-    total_per_product = serializers.SerializerMethodField()
+class SubCartSerializer(serializers.ModelSerializer):
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    total_price = serializers.SerializerMethodField()
+
     class Meta:
         model = SubCart
-        fields = '__all__'
+        fields = "__all__"
 
-    def get_product_price_per_qty(self, obj):
-        product_id = obj.product_id
-        product = Product.objects.filter(id=product_id)
-        product_details = FilterListSerializer(product, many=True).data
-        product_price = product_details[0]['product_selling_price']
-        return product_price
+    def get_total_price(self, obj):
+        if obj.product:
+            return obj.qty * obj.product.product_selling_price
+        return 0
 
-    def get_total_per_product(self, obj):
-        product_price = self.get_product_price_per_qty(obj)
-        qty = obj.qty
-        total = product_price * qty
+class CartSerializer(serializers.ModelSerializer):
+    # cart_items = SubCartSerializer(many=True)
+    total = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Cart
+        fields = "__all__"
+
+    def get_total(self, obj):
+        total = 0
+        for cart_item in obj.cart_items.all():
+            total += cart_item.qty * cart_item.product.product_selling_price
         return total
 
 
@@ -87,4 +100,11 @@ class CheckoutSerializer(serializers.ModelSerializer):
 class WholesellerRetailerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Retailer
+        fields = '__all__'
+
+
+class PhotoOrderSerializer(serializers.ModelSerializer):
+    order_image = Base64ImageField(required=False)
+    class Meta:
+        model = PhotoOrder
         fields = '__all__'

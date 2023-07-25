@@ -7,9 +7,14 @@ from rest_framework.response import Response
 from datetime import timedelta, datetime
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from django.conf import settings
-common_status = settings.COMMON_STATUS
 import random
-from rest_framework import filters
+from rest_framework import filters, status
+from django.core.exceptions import ValidationError
+from categoryApp.api.serializers import CategorySerializer
+from categoryApp.models import Category
+from productApp.api.serializers import ProductSerializer
+from rest_framework.generics import get_object_or_404
+common_status = settings.COMMON_STATUS
 
 
 class RetailerViewSet(viewsets.ModelViewSet):
@@ -90,6 +95,7 @@ class RetailerVerifyNumber(views.APIView):
 
         return Response(payload, status=status_code)
 
+
 class RetailerVerifyOTP(views.APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
@@ -132,23 +138,94 @@ class RetailerVerifyOTP(views.APIView):
             return Response(payload, status=status_code)
 
 
-class AddToCart(viewsets.ModelViewSet):
+class SubCartViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = CartSerializer
-    queryset = SubCart.objects.all().order_by("id")
+    queryset = SubCart.objects.all()
+    serializer_class = SubCartSerializer
 
+    def create(self, request, *args, **kwargs):
+        product_id = request.data.get("product")
+        qty = int(request.data.get("qty"))
+        retailer_id = request.data.get("retailer")
+
+        try:
+            product = Product.objects.get(pk=product_id)
+            retailer = Retailer.objects.get(pk=retailer_id)
+
+            # Check if the SubCart has already been used in a cart
+            existing_subcart = SubCart.objects.filter(
+                product=product, retailer=retailer, used_in_cart=True
+            ).first()
+
+            if existing_subcart:
+                subcart_item = SubCart.objects.filter(product=product, retailer=retailer, used_in_cart=False).first()
+                if not subcart_item:
+                    subcart_item = SubCart.objects.create(product=product, retailer=retailer, qty=qty, used_in_cart=False)
+                else:
+                    subcart_item.qty += qty
+                    subcart_item.save()
+            else:
+                subcart_item, created = SubCart.objects.get_or_create(
+                    product=product,
+                    retailer=retailer,
+                    defaults={"qty": qty, "used_in_cart": False},
+                )
+
+                if not created:
+                    # Item already exists, increase the quantity
+                    subcart_item.qty += qty
+                    subcart_item.save()
+
+            serializer = self.get_serializer(subcart_item)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except Product.DoesNotExist:
+            return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        except Retailer.DoesNotExist:
+            return Response({"error": "Retailer not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+class subcart_retailer(viewsets.ModelViewSet):
+    serializer_class = SubCartSerializer
     def get_queryset(self):
-        queryset = SubCart.objects.all().order_by("id")
-
-        retailer_id = self.request.query_params.get('retailer_id')
-
-        if retailer_id:
-            queryset = queryset.filter(retailer_id=retailer_id)
-
+        retailer_id = self.kwargs.get('retailer_id')
+        queryset = SubCart.objects.filter(retailer_id=retailer_id, used_in_cart=False)
         return queryset
 
-    def perform_create(self, serializer):
-        serializer.save()
+
+class CartViewSet(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    queryset = Cart.objects.all().order_by('id')
+
+
+class UpdateSubCartUsedInCartView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, format=None):
+        try:
+            cart_ids = request.data.get('cart_ids', [])  # List of cart IDs
+            subcarts_to_update = SubCart.objects.filter(carts__id__in=cart_ids)
+
+            # Update used_in_cart field for SubCart instances present in the specified carts
+            for subcart in subcarts_to_update:
+                subcart.used_in_cart = True
+                subcart.save()
+
+            return Response({"message": "used_in_cart updated for SubCart instances present in the specified carts."},
+                            status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class cart_retailer(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id).distinct()
+        return queryset
+
 
 class Checkout(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -157,6 +234,7 @@ class Checkout(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save()
+
 
 class WholesellerIdRetailerAPIView(views.APIView):
     serializer_class = WholesellerRetailerSerializer
@@ -179,16 +257,30 @@ class WholesellerIdRetailerIdViewSet(views.APIView):
         except Retailer.DoesNotExist:
             return Response(status=404)
 
-# class RetailerNotification(viewsets.ModelViewSet):
-#     permission_classes = [permissions.IsAuthenticated]
-#     serializer_class = RetailerSerializer
-#
-#     def get_queryset(self):
-#         retailer_id = self.request.query_params.get("retailer_id")
-#         queryset = Retailer.objects.all().order_by("id")
-#         queryset = queryset.filter(id=retailer_id)
-#
-#         return queryset
+
+class RetailerNotification(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = RetailerSerializer
+
+    def get_queryset(self):
+        if self.request.query_params.get('retailer_number') and not self.request.query_params.get('retailer_wholeseller'):
+            retailer_number = None
+            try:
+                retailer_number = self.request.query_params.get('retailer_number')
+                retailer_number = '+' + retailer_number
+            except:
+                if retailer_number is None:
+                    raise ValidationError("Retailer number not provided")
+
+            queryset = Retailer.objects.filter(retailer_number__retailer_number=retailer_number)
+            return queryset
+
+        elif self.request.query_params.get('retailer_number') and self.request.query_params.get('retailer_wholeseller'):
+                retailer_number = self.request.query_params.get('retailer_number')
+                retailer_number = '+' + retailer_number
+                retailer_wholeseller = self.request.query_params.get('retailer_wholeseller')
+                queryset = Retailer.objects.filter(retailer_number__retailer_number=retailer_number, retailer_wholeseller=retailer_wholeseller)
+                return queryset
 
 
 class RetailerNumberViewSet(viewsets.ModelViewSet):
@@ -196,12 +288,101 @@ class RetailerNumberViewSet(viewsets.ModelViewSet):
     serializer_class = RetailerNumberSerializer
     queryset = RetailerMobile.objects.all().order_by("id")
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-class RetailerDetailsByNumberViewSet(viewsets.ReadOnlyModelViewSet):
+        retailer_number = serializer.validated_data.get("retailer_number")
+
+        # Check if retailer number already exists
+        existing_retailer = RetailerMobile.objects.filter(retailer_number=retailer_number).first()
+        if existing_retailer:
+            # Return the existing retailer's ID
+            return Response({
+                "id": existing_retailer.id,
+                "retailer_number": retailer_number
+            } , status=status.HTTP_200_OK)
+
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+
+        # Update only the is_auto_fill field
+        serializer.save(is_auto_fill=request.data.get("is_auto_fill", instance.is_auto_fill))
+
+        return Response(serializer.data)
+
+
+class RetailerDetailsByNumberViewSet(viewsets.ModelViewSet):
     serializer_class = RetailerSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = [["retailer_wholeseller__wholeseller_name"]]
+
 
     def get_queryset(self):
         retailer_number = self.kwargs['retailer_number']
         retailer_number = '+' + str(retailer_number)
         queryset = Retailer.objects.filter(retailer_number__retailer_number=retailer_number)
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
+
+class RetailerIdWholesellerIdCreateOrderNew(viewsets.ModelViewSet):
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        wholeseller_id = self.kwargs.get('wholeseller_id')
+        wholeseller = get_object_or_404(Wholeseller, pk=wholeseller_id)
+        bazaar_id = wholeseller.wholeseller_bazaar.first().id
+        return Category.objects.filter(bazaar_id=bazaar_id)
+
+
+class FilterProductByCategory(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, retailer_id, wholeseller_id, category_id):
+        # Assuming you have the appropriate import statements and models defined
+
+        # Get the category object based on the category_id
+        category = get_object_or_404(Category, id=category_id)
+
+        # Filter products based on the given category
+        products = Product.objects.filter(category=category)
+
+        # You can serialize the products data and return the response as JSON
+        # Replace 'ProductSerializer' with the appropriate serializer for your Product model
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
+
+
+class ClickPhotoOrderView(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = PhotoOrderSerializer
+    queryset = PhotoOrder.objects.all().order_by("id")
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)

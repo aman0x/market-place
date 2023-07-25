@@ -25,25 +25,26 @@ BUSINESS_STATUS = (
     ("REGISTERED", "Registered")
 )
 
-Retailer_STATUS = (
+RETAILER_NOTIFICATION_STATUS = (
     ("NEW", "New Request"),
     ("Old", "Old Request"),
+    ("ACCEPT", "Accepted Request"),
     ("REJECT", "Rejected Request"),
     ("SAVE", "Save For Later")
 )
 
 class RetailerMobile(models.Model):
-    retailer_number = PhoneNumberField(unique=True, blank=True, null=True)
+    retailer_number = PhoneNumberField(blank=True, null=True)
     retailer_otp = models.IntegerField(blank=True, null=True)
     retailer_user = models.ForeignKey(User, related_name="retailer_user", on_delete=models.CASCADE, null=True,blank=True)
-
+    is_auto_fill = models.BooleanField(null=True)
     def __str__(self):
         return str(self.retailer_number)
 
 
 class Retailer(models.Model):
     
-    retailer_type = models.ForeignKey(RetailerType, on_delete=models.CASCADE, related_name='retailer_type')
+    retailer_type = models.ForeignKey(RetailerType, on_delete=models.CASCADE, related_name='retailer_type',null=True,default=None)
     retailer_business_status = models.CharField(max_length=20, choices=BUSINESS_STATUS, default="REGISTERED")
     retailer_name = models.CharField(max_length=20,null=True,default=None)
     retailer_description = models.TextField(blank=True, null=True)
@@ -77,22 +78,55 @@ class Retailer(models.Model):
     retailer_gst_no = models.CharField(max_length=50, default=None, blank=True, null=True)
     retailer_gst_image = models.ImageField(upload_to="image/retailer/", default=None, null=True)
     get_retailer_location_json_data = jsonfield.JSONField(default={}, null=True, )
-    is_auto_fill = models.BooleanField(null=True,)
-    notification_status = models.CharField(max_length=20, choices=Retailer_STATUS, default="NEW", null=True)
+    notification_status = models.CharField(max_length=20, choices=RETAILER_NOTIFICATION_STATUS, default="NEW", null=True)
 
     def __str__(self):
         return self.retailer_name
-#
+
+
+PAYMENT_TYPE = (
+    ("CASH", "Cash"),
+    ("CREDIT", "Credit")
+)
+ORDER_STATUS = (
+    ("PENDING", 'Pending'),
+    ("APPROVED", 'Approved'),
+    ('REJECTED', 'Rejected')
+)
+class PhotoOrder(models.Model):
+    order_image = models.ImageField(upload_to='images/photo_order/', null=True)
+    retailer = models.ForeignKey(Retailer,related_name="retailer_order_photo", on_delete=models.CASCADE, null=True, blank=True)
+    order_id = models.CharField(max_length=8, unique=True, editable=False, null=True)
+    payment_type = models.CharField(max_length=20, choices=PAYMENT_TYPE, default="NEW", null=True)
+    status = models.CharField(max_length=20, choices=ORDER_STATUS, default="NEW", null=True)
+    created_at = models.DateTimeField(default=datetime.now, blank=True)
+
+    def __str__(self):
+        return str(self.order_id)
+
+    def save(self, *args, **kwargs):
+        if not self.order_id:
+            self.order_id = self._generate_order_id()
+        super(PhotoOrder, self).save(*args, **kwargs)
+
+    def _generate_order_id(self):
+        generated_id = str(uuid.uuid4().int)[:8]
+        while PhotoOrder.objects.filter(order_id=generated_id).exists():
+            generated_id = str(uuid.uuid4().int)[:8]
+        return generated_id
+
+
 class SubCart(models.Model):
-    product = models.ForeignKey(Product,on_delete=models.CASCADE, related_name="cart_product", null=True, blank=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="cart_products", null=True, blank=True)
     qty = models.IntegerField(null=True)
-    retailer = models.ForeignKey(Retailer, on_delete=models.CASCADE, related_name="retailer", null=True, blank=True)
+    retailer = models.ForeignKey(Retailer, on_delete=models.CASCADE, related_name="retailer_carts", null=True, blank=True)
+    used_in_cart = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.pk)
 
 class Cart(models.Model):
-    cart = models.ManyToManyField(SubCart, related_name="cart", null=True, blank=True)
+    cart_items = models.ManyToManyField(SubCart, related_name="carts", blank=True)
     order_id = models.CharField(max_length=8, unique=True, editable=False, null=True)
 
     def __str__(self):
@@ -101,7 +135,7 @@ class Cart(models.Model):
     def save(self, *args, **kwargs):
         if not self.order_id:
             self.order_id = self._generate_order_id()
-        return super().save(*args, **kwargs)
+        super(Cart, self).save(*args, **kwargs)
 
     def _generate_order_id(self):
         generated_id = str(uuid.uuid4().int)[:8]
