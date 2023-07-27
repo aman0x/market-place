@@ -335,6 +335,16 @@ CREATE_OFFER_BY_TYPE = (
     ("SUBCATEGORY", "SubCategory"),
     ("PRODUCT", "Item")
 )
+
+PLAN = (
+    ('CASH', 'Cash'),
+    ('PLATINUM', 'Platinum'),
+    ('DIAMOND', 'Diamond'),
+    ('GOLD', 'Gold'),
+    ('BRONZE', 'Bronze')
+
+)
+
 class Offers(models.Model):
     create_offer_by_item = models.CharField(max_length=20, choices=CREATE_OFFER_BY_TYPE, default="GROUP")
     category_group = models.ForeignKey(ParentCategory, on_delete=models.CASCADE,null=True,related_name='offer')
@@ -359,7 +369,7 @@ class Offers(models.Model):
     offer_active = models.BooleanField(default=True)
     offer_for = models.CharField(max_length=200)
     customer_type = models.ForeignKey(RetailerType, on_delete=models.CASCADE, null=True,related_name='offer')
-    # customer = models.ForeignKey(Retailer, on_delete=models.CASCADE, null=True, related_name='offer_customer')
+    customer = models.CharField(max_length=20, choices=PLAN, default="CASH")
 
 
     class Meta:
