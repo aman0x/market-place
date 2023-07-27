@@ -17,6 +17,9 @@ router.register(r'agent', views.WholesellerAgentViewSet)
 router.register(r'orders', views.OrderViewSet, basename='order')
 router.register(r'editorders', views.EditOrderViewSet, basename='edit_order')
 
+#--------------Wholeseller_offer------------
+router.register(r'offer', views.OfferViewSet)
+
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
