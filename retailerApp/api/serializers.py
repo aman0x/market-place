@@ -120,3 +120,11 @@ class DeliveryAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = DeliveryAddress
         fields = '__all__'
+
+
+class RecentProductSerializer(serializers.ModelSerializer):
+    product = ProductSerializer()
+
+    class Meta:
+        model = SubCart
+        fields = "__all__"

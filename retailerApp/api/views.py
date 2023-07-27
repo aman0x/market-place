@@ -191,6 +191,8 @@ class SubCartViewSet(viewsets.ModelViewSet):
 
 class subcart_retailer(viewsets.ModelViewSet):
     serializer_class = SubCartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
     def get_queryset(self):
         retailer_id = self.kwargs.get('retailer_id')
         queryset = SubCart.objects.filter(retailer_id=retailer_id, used_in_cart=False)
@@ -224,6 +226,7 @@ class UpdateSubCartUsedInCartView(views.APIView):
 
 class cart_retailer(viewsets.ModelViewSet):
     serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
         retailer_id = self.kwargs.get('retailer_id')
         queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id).distinct()
@@ -363,16 +366,8 @@ class FilterProductByCategory(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, retailer_id, wholeseller_id, category_id):
-        # Assuming you have the appropriate import statements and models defined
-
-        # Get the category object based on the category_id
         category = get_object_or_404(Category, id=category_id)
-
-        # Filter products based on the given category
         products = Product.objects.filter(category=category)
-
-        # You can serialize the products data and return the response as JSON
-        # Replace 'ProductSerializer' with the appropriate serializer for your Product model
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
 
@@ -436,3 +431,32 @@ class RetailerOffer(viewsets.ModelViewSet):
 
         return queryset
 
+
+class recent_order(viewsets.ModelViewSet):
+    serializer_class = RecentProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        queryset = SubCart.objects.filter(retailer_id=retailer_id, used_in_cart=True)
+        return queryset
+
+
+class completed_order(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status='SUCCESS',payment_status = 'COMPLETED' ).distinct()
+        return queryset
+
+
+class pending_order(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status='SUCCESS',payment_status = 'PENDING' ).distinct()
+        return queryset

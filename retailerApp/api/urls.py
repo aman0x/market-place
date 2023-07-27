@@ -5,7 +5,7 @@ from . import views
 router = routers.DefaultRouter()
 router.register(r'data', views.RetailerViewSet, basename='retailer')
 router.register(r'notification', views.RetailerNotification, basename='retailer_notification')
-router.register(r'retailer_number', views.RetailerNumberViewSet, basename='retailer')
+router.register(r'retailer_number', views.RetailerNumberViewSet, basename='retailer_number')
 router.register(r'carts', views.CartViewSet,basename="cartviewset")
 router.register(r'subcarts', views.SubCartViewSet,basename="subcartviewset")
 router.register(r'click_photo_order', views.ClickPhotoOrderView, basename='click_photo_order')
@@ -35,6 +35,27 @@ urlpatterns = [
     path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/create_new_order/category/<int:category_id>/', views.FilterProductByCategory.as_view(), name="filter-product-by-category"),
     path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/create_new_order/allProduct/', views.AllProductByWholesellerId.as_view({'get': 'list'}), name="all-product-by-wholeseller"),
     # path('data/<int:pk>/all_product/', views.AllProductRetailer.as_view({'get': 'list'}), name='all_product'),
+
+    #orders
+    # recent Orders
+    path('recent_order/retailer/<int:retailer_id>/', views.recent_order.as_view({'get': 'list'}), name="recent_order"),
+    # completed orders
+    path('completed_order/retailer/<int:retailer_id>/', views.completed_order.as_view({'get': 'list'}), name="completed_order"),
+    # pending orders
+    path('pending_order/retailer/<int:retailer_id>/', views.pending_order.as_view({'get': 'list'}), name="pending_order"),
+
+    # reports
+    # my performance
+
+    #Payments
+    # my transactions
+    # credit details
+    # payments
+
+
+
+
+
 ]
 
 
