@@ -342,7 +342,6 @@ PLAN = (
     ('DIAMOND', 'Diamond'),
     ('GOLD', 'Gold'),
     ('BRONZE', 'Bronze')
-
 )
 
 class Offers(models.Model):

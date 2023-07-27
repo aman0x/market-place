@@ -19,6 +19,7 @@ urlpatterns = [
 
     path('data/wholeseller/<int:wholeseller_id>/', views.WholesellerIdRetailerAPIView.as_view(),name="all-retailer-details-under-Wholeseller"),
     path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/', views.WholesellerIdRetailerIdViewSet.as_view(),name="retailer-details-under-Wholeseller"),
+    path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/offer/', views.RetailerOffer.as_view({'get': 'list'}),name="retailer-offer"),
 
     #login
     path('verify_phone/', views.RetailerVerifyNumber.as_view(), name="retailer-login"),

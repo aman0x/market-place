@@ -44,7 +44,10 @@ class RetailerMobile(models.Model):
 
 RETAILER_PLAN= (
     ('CASH', 'Cash'),
-    ('CREDIT','Credit')
+    ('PLATINUM', 'Platinum'),
+    ('DIAMOND', 'Diamond'),
+    ('GOLD', 'Gold'),
+    ('BRONZE', 'Bronze')
 )
 
 class Retailer(models.Model):
@@ -58,7 +61,7 @@ class Retailer(models.Model):
     retailer_wholeseller = models.ManyToManyField(Wholeseller,related_name='retailer_wholeseller',blank=True,null=True)
     retailer_agent = models.ForeignKey(Agent,on_delete=models.CASCADE ,related_name='retailer_agent',blank=True,null=True)
     retailer_altranate_number=PhoneNumberField(blank=True,null=True)
-    retailer_plan = models.CharField(max_length=20, choices=RETAILER_PLAN, default="NEW", null=True)
+    retailer_plan = models.CharField(max_length=20, choices=RETAILER_PLAN, null=True)
     retailer_credit_limit = models.IntegerField(null=True)
     retailer_credit_days = models.IntegerField(null=True)
     retailer_credit_amount = models.IntegerField(null=True)
