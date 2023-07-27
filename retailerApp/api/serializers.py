@@ -108,3 +108,15 @@ class PhotoOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = PhotoOrder
         fields = '__all__'
+
+
+class FavoritesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favorites
+        fields = "__all__"
+
+
+class DeliveryAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DeliveryAddress
+        fields = '__all__'

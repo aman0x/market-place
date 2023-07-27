@@ -3,14 +3,14 @@ from rest_framework import routers
 from . import views
 
 router = routers.DefaultRouter()
-# home
-router.register(r'notification', views.RetailerNotification, basename='retailer_notification')
 router.register(r'data', views.RetailerViewSet, basename='retailer')
+router.register(r'notification', views.RetailerNotification, basename='retailer_notification')
 router.register(r'retailer_number', views.RetailerNumberViewSet, basename='retailer')
 router.register(r'carts', views.CartViewSet,basename="cartviewset")
 router.register(r'subcarts', views.SubCartViewSet,basename="subcartviewset")
 router.register(r'click_photo_order', views.ClickPhotoOrderView, basename='click_photo_order')
-# router.register(r'checkout', views.Checkout, basename='checkout')
+router.register(r'favorites', views.FavoritesViewSet, basename='favorites')
+router.register(r'delivery_addresses', views.DeliveryAddressViewSet, basename='delivery-addresses')
 urlpatterns = [
     path('', include(router.urls)),
     #home
