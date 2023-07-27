@@ -13,7 +13,10 @@ from django.core.exceptions import ValidationError
 from categoryApp.api.serializers import CategorySerializer
 from categoryApp.models import Category
 from productApp.api.serializers import ProductSerializer
+from wholesellerApp.models import Offers
+from wholesellerApp.api.serializers import OfferSerializer
 from rest_framework.generics import get_object_or_404
+from django.http import Http404
 common_status = settings.COMMON_STATUS
 
 
@@ -140,7 +143,7 @@ class RetailerVerifyOTP(views.APIView):
 
 class SubCartViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    queryset = SubCart.objects.all()
+    queryset = SubCart.objects.all().order_by('id')
     serializer_class = SubCartSerializer
 
     def create(self, request, *args, **kwargs):
@@ -396,3 +399,40 @@ class AllProductByWholesellerId(viewsets.ModelViewSet):
         wholeseller = get_object_or_404(Wholeseller, pk=wholeseller_id)
         bazaar_id = wholeseller.wholeseller_bazaar.first().id
         return Product.objects.filter(bazaar_id=bazaar_id)
+
+
+class FavoritesViewSet(viewsets.ModelViewSet):
+    queryset = Favorites.objects.all()
+    serializer_class = FavoritesSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+class DeliveryAddressViewSet(viewsets.ModelViewSet):
+    serializer_class = DeliveryAddressSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = DeliveryAddress.objects.all()
+        retailer_id = self.request.query_params.get('retailer_id')
+        if retailer_id:
+            queryset = queryset.filter(retailer_id=retailer_id)
+        return queryset
+
+class RetailerOffer(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = OfferSerializer
+
+    def get_queryset(self):
+        queryset = Offers.objects.all().order_by('id')
+        wholeseller_id = self.kwargs.get('wholeseller_id')
+        if wholeseller_id:
+            queryset = queryset.filter(wholeseller_id=wholeseller_id)
+
+        if not queryset.exists():
+            raise Response(f"No offers found for the given wholeseller.")
+
+        return queryset
+

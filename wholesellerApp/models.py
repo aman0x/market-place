@@ -1,9 +1,5 @@
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import User
 from phonenumber_field.modelfields import PhoneNumberField
-from bazaarApp.models import Bazaar
-from agentApp.models import Agent
 from locationApp.models import *
 from planApp.models import Plan
 from agencyApp.models import Agency
@@ -12,12 +8,13 @@ from datetime import date
 import jsonfield
 from django.db import IntegrityError
 from masterApp.models import WholesellerType
-from planApp.models import RetailerPlan
-from productApp.models import Product
 from datetime import datetime
-from categoryApp.models import Category
-from subCategoryApp.models import SubCategory
+from django.db import models
+from subCategoryApp.models import SubCategory, Category, ParentCategory, Bazaar
+from productApp.models import Product
 from masterApp.models import RetailerType
+from agentApp.models import Agent
+
 # from offerApp.models import Offers
 
 # WHOLESELLER_TYPE = (
@@ -323,3 +320,62 @@ class EditOrder(models.Model):
 
     def __str__(self):
         return self.order_id
+
+#----- offer---------------
+
+
+DISCOUNT_BY_TYPE = (
+    ("PERCENTAGE", "Percentage"),
+    ("AMOUNT", "Amount")
+)
+
+CREATE_OFFER_BY_TYPE = (
+    ("GROUP", "Group"),
+    ("CATEGORY", "Category"),
+    ("SUBCATEGORY", "SubCategory"),
+    ("PRODUCT", "Item")
+)
+
+PLAN = (
+    ('CASH', 'Cash'),
+    ('PLATINUM', 'Platinum'),
+    ('DIAMOND', 'Diamond'),
+    ('GOLD', 'Gold'),
+    ('BRONZE', 'Bronze')
+)
+
+class Offers(models.Model):
+    create_offer_by_item = models.CharField(max_length=20, choices=CREATE_OFFER_BY_TYPE, default="GROUP")
+    category_group = models.ForeignKey(ParentCategory, on_delete=models.CASCADE,null=True,related_name='offer')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE,null=True, related_name='offer')
+    subcategory = models.ForeignKey(SubCategory, on_delete=models.CASCADE,null=True, related_name='offer')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE,null=True, related_name='offer')
+
+    offer_base_price = models.DecimalField(decimal_places=2, max_digits=12, null=True)
+    offer_discount_value_type = models.CharField(max_length=20,choices=DISCOUNT_BY_TYPE,default="PERCENTAGE")
+    offer_discount_value = models.CharField(max_length=20, null=True, default=None)
+    offer_discounted_price = models.CharField(max_length=20, null=True, default=None)
+    offer_coupon_code = models.CharField(max_length=200, null=True, blank=True, default='')
+    offer_start_date = models.DateField(default=datetime.now, blank=True)
+    offer_end_date = models.DateField(default=datetime.now, blank=True)
+    offer_min_qty = models.IntegerField()
+    offer_max_qty = models.IntegerField()
+
+    wholeseller = models.ForeignKey(Wholeseller, on_delete=models.CASCADE, related_name='offer')
+    wholeseller_agent = models.ForeignKey(WholesellerAgent, on_delete=models.CASCADE, related_name='offer')
+
+    offer_image = models.ImageField(upload_to="image/offer/", null=True)
+    offer_active = models.BooleanField(default=True)
+    offer_for = models.CharField(max_length=200)
+    customer_type = models.ForeignKey(RetailerType, on_delete=models.CASCADE, null=True,related_name='offer')
+    customer = models.CharField(max_length=20, choices=PLAN, default="CASH")
+
+
+    class Meta:
+        verbose_name_plural = "offers"
+
+    def __str__(self):
+        if self.product is not None:
+            return self.product
+        else:
+            return "None"

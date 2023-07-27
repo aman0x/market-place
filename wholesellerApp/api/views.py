@@ -1011,3 +1011,11 @@ class EditOrderViewSet(viewsets.ModelViewSet):
     queryset = EditOrder.objects.all().order_by("id")
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["order_id"]
+
+
+class OfferViewSet(viewsets.ModelViewSet):
+    queryset = Offers.objects.all().order_by('id')
+    serializer_class = OfferSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["offer_coupon_code"]
