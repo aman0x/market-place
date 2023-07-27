@@ -149,7 +149,6 @@ class DeliveryAddress(models.Model):
     pincode = models.IntegerField(null=True)
     get_delivery_address_location_json_data = jsonfield.JSONField(default={}, null=True, )
     # payment_type = models.CharField(max_length=20, choices=PAYMENT_TYPE,  null=True)
-    # status = models.CharField(max_length=20, choices=ORDER_STATUS, default="PENDING", null=True)
 
     def __str__(self):
         return f"{self.retailer}'s Delivery Address: {self.address}, {self.landmark}, {self.city}, {self.state} - {self.pincode}"
@@ -167,9 +166,12 @@ class Cart(models.Model):
     payment_by_cheque_bank_cheque_number = models.IntegerField(null=True)
     payment_date = models.DateTimeField(default=datetime.now, blank=True)
     payment_image = models.ImageField(upload_to="image/retailer/payment_image", null=True)
-    created_at = models.DateTimeField(default=datetime.now, blank=True)
+    order_created_at = models.DateTimeField(default=datetime.now, blank=True)
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS, null=True)
     deliver_to = models.ForeignKey(DeliveryAddress, on_delete=models.CASCADE, related_name='delivery_cart',null=True, blank=True)
+    order_status = models.CharField(max_length=20, choices=ORDER_STATUS, default="PENDING", null=True)
+    order_status_change_at = models.DateTimeField(default=datetime.now, blank=True)
+
 
 
     def __str__(self):
