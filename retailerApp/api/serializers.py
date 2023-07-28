@@ -4,6 +4,7 @@ from wholesellerApp.models import Wholeseller
 from wholesellerApp.api.serializers import WholesellerSerializer
 from productApp.api.serializers import ProductSerializer
 from drf_extra_fields.fields import Base64ImageField
+from django.db.models import Sum
 
 class RetailerNumberSerializer(serializers.ModelSerializer):
     class Meta:
@@ -60,17 +61,21 @@ class SubCartSerializer(serializers.ModelSerializer):
 
 class CartSerializer(serializers.ModelSerializer):
     # cart_items = SubCartSerializer(many=True)
-    total = serializers.SerializerMethodField()
+    total_value = serializers.SerializerMethodField()
+    total_items = serializers.SerializerMethodField()
 
     class Meta:
         model = Cart
         fields = "__all__"
 
-    def get_total(self, obj):
+    def get_total_value(self, obj):
         total = 0
         for cart_item in obj.cart_items.all():
             total += cart_item.qty * cart_item.product.product_selling_price
         return total
+
+    def get_total_items(self, obj):
+        return obj.cart_items.aggregate(Sum('qty'))['qty__sum'] or 0
 
 
 class CheckoutSerializer(serializers.ModelSerializer):

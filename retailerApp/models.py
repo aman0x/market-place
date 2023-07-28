@@ -174,7 +174,7 @@ class Cart(models.Model):
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS, null=True)
     deliver_to = models.ForeignKey(DeliveryAddress, on_delete=models.CASCADE, related_name='delivery_cart',null=True, blank=True)
     order_status = models.CharField(max_length=20, choices=ORDER_STATUS, default="PENDING", null=True)
-    order_status_change_at = models.DateTimeField(default=datetime.now, blank=True)
+    order_status_change_at = models.DateTimeField(blank=True)
 
 
     def __str__(self):

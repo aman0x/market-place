@@ -17,6 +17,8 @@ from wholesellerApp.models import Offers
 from wholesellerApp.api.serializers import OfferSerializer
 from rest_framework.generics import get_object_or_404
 from django.http import Http404
+from django.db.models import Sum, Count
+from rest_framework.decorators import action
 common_status = settings.COMMON_STATUS
 
 
@@ -460,3 +462,80 @@ class pending_order(viewsets.ModelViewSet):
         retailer_id = self.kwargs.get('retailer_id')
         queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status='SUCCESS',payment_status = 'PENDING' ).distinct()
         return queryset
+
+class nav_notification(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status= "SUCCESS" ).distinct()
+        return queryset
+
+
+class report_orders(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS")
+
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        total_orders = queryset.count()
+
+        # Use serializer method to calculate total value
+        total_values = sum(cart.get('total_value', 0) for cart in self.serializer_class(queryset, many=True).data)
+
+        pending_orders = queryset.filter(order_status="PENDING").count()
+        accepted_orders = queryset.filter(order_status="APPROVED").count()
+        rejected_orders = queryset.filter(order_status="REJECTED").count()
+        success_orders = queryset.filter(order_status="SUCCESS").count()
+
+
+        data = {
+            'total_orders': total_orders,
+            'total_values': total_values,
+            'pending_orders': pending_orders,
+            'accepted_orders': accepted_orders,
+            'rejected_orders': rejected_orders,
+            'success_orders': success_orders,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class report_orders_cart(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        payment_type = self.request.query_params.get('payment_type', '').upper()
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id,payment_status='COMPLETED',order_status='SUCCESS')
+        queryset = queryset.distinct()
+
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+
+        if payment_type == 'CREDIT':
+            queryset = queryset.filter(payment_type='CREDIT')
+        elif payment_type in ['CASH', 'CHEQUE', 'NEFT/RTGS']:
+            queryset = queryset.filter(payment_type__in=['CASH', 'CHEQUE', 'NEFT/RTGS'])
+        else:
+            return queryset
+
+        return queryset
+
+
