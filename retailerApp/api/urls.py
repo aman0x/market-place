@@ -49,8 +49,9 @@ urlpatterns = [
     # reports
     path('report/retailer/<int:retailer_id>/orders/', views.report_orders.as_view({'get': 'list'}), name='report_order'),
     path('report/retailer/<int:retailer_id>/orders_details/', views.report_orders_cart.as_view({'get': 'list'}), name='report_order_details'),
-    # path('report/retailer/<int:retailer_id>/products', views.report.as_view({'get': 'list'}), name='nav_notification'),
-    # path('report/retailer/<int:retailer_id>/payments', views.report.as_view({'get': 'list'}), name='nav_notification'),
+    path('report/retailer/<int:retailer_id>/products/', views.report_product.as_view({'get': 'list'}), name='report_product'),
+    path('report/retailer/<int:retailer_id>/products_top_product/', views.report_products_top_product.as_view({'get': 'list'}), name='report_product'),
+    # path('report/retailer/<int:retailer_id>/payments', views.report_payment.as_view({'get': 'list'}), name='nav_notification'),
 
     # my performance
 

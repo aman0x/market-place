@@ -539,3 +539,116 @@ class report_orders_cart(viewsets.ModelViewSet):
         return queryset
 
 
+class report_product(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS")
+
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        total_values = sum(cart.get('total_value', 0) for cart in self.serializer_class(queryset, many=True).data)
+        total_products = queryset.aggregate(Sum('cart_items__qty'))['cart_items__qty__sum'] or 0
+        data = {
+            'total_values': total_values,
+            'total_products': total_products,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class report_product(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS")
+
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        total_values = sum(cart.get('total_value', 0) for cart in self.serializer_class(queryset, many=True).data)
+        total_products = queryset.aggregate(Sum('cart_items__qty'))['cart_items__qty__sum'] or 0
+        data = {
+            'total_values': total_values,
+            'total_products': total_products,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class report_products_top_product(viewsets.ModelViewSet):
+    serializer_class = SubCartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = SubCart.objects.filter(retailer=retailer_id, used_in_cart=True)
+
+        if year_filter:
+            queryset = queryset.filter(cart__order_created_at__year=year_filter)
+
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        # Serialize subcart objects to get product details
+        subcart_serializer = self.serializer_class(queryset, many=True)
+
+        # Create a dictionary to store product details using the product_id as the key
+        product_details = {}
+
+        for subcart_data in subcart_serializer.data:
+            product_id = subcart_data['product']
+            product_qty = subcart_data['qty']
+            product_total_value = subcart_data['total_price']
+
+            if product_id not in product_details:
+                # Retrieve the product object from the database
+                product = get_object_or_404(Product, pk=product_id)
+
+                # Store product details in the dictionary
+                product_details[product_id] = {
+                    'product_id': product_id,
+                    'product_name': product.product_name,
+                    'product_brand_name': product.product_brand_name,
+                    'product_description': product.product_description,
+                    'category': product.category.category_name,
+                    'subcategory': product.subcategory.subcategory_name,
+                    'quantity': product_qty,
+                    'total_value': product_total_value,
+                }
+            else:
+                # If product_id is already present, increase the quantity and total value
+                product_details[product_id]['quantity'] += product_qty
+                product_details[product_id]['total_value'] += product_total_value
+
+        # List of product details
+        products_list = list(product_details.values())
+
+        data = {
+            'products': products_list,
+        }
+        return Response(data, status=status.HTTP_200_OK)
