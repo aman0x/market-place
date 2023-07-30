@@ -604,9 +604,9 @@ class report_products_top_product(viewsets.ModelViewSet):
         year_filter = self.request.query_params.get('year', None)
 
         queryset = SubCart.objects.filter(retailer=retailer_id, used_in_cart=True)
-
-        if year_filter:
-            queryset = queryset.filter(cart__order_created_at__year=year_filter)
+        #
+        # if year_filter:
+        #     queryset = queryset.filter(cart__order_created_at__year=year_filter)
 
         queryset = queryset.distinct()
         return queryset
