@@ -28,20 +28,15 @@ urlpatterns = [
     path('subcarts/retailer/<int:retailer_id>/', views.subcart_retailer.as_view({'get': 'list'}), name='sub-cart-retailer'),
     path('carts/retailer/<int:retailer_id>/', views.cart_retailer.as_view({'get': 'list','post': 'create'}), name='cart-retailer'),
     path('update-subcart-used-in-cart/', views.UpdateSubCartUsedInCartView.as_view(), name='update-subcart-used-in-cart'),
-    # path('checkout/', views.Checkout.as_view({'get': 'list'}), name='all_product'),
 
     #create Order
     path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/create_new_order/category/', views.RetailerIdWholesellerIdCreateOrderNew.as_view({'get': 'list'}),name="wholeseller_category"),
     path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/create_new_order/category/<int:category_id>/', views.FilterProductByCategory.as_view(), name="filter-product-by-category"),
     path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/create_new_order/allProduct/', views.AllProductByWholesellerId.as_view({'get': 'list'}), name="all-product-by-wholeseller"),
-    # path('data/<int:pk>/all_product/', views.AllProductRetailer.as_view({'get': 'list'}), name='all_product'),
 
     #orders
-    # recent Orders
     path('recent_order/retailer/<int:retailer_id>/', views.recent_order.as_view({'get': 'list'}), name="recent_order"),
-    # completed orders
     path('completed_order/retailer/<int:retailer_id>/', views.completed_order.as_view({'get': 'list'}), name="completed_order"),
-    # pending orders
     path('pending_order/retailer/<int:retailer_id>/', views.pending_order.as_view({'get': 'list'}), name="pending_order"),
 
     # nav-bar
@@ -51,7 +46,7 @@ urlpatterns = [
     path('report/retailer/<int:retailer_id>/orders_details/', views.report_orders_cart.as_view({'get': 'list'}), name='report_order_details'),
     path('report/retailer/<int:retailer_id>/products/', views.report_product.as_view({'get': 'list'}), name='report_product'),
     path('report/retailer/<int:retailer_id>/products_top_product/', views.report_products_top_product.as_view({'get': 'list'}), name='report_product'),
-    # path('report/retailer/<int:retailer_id>/payments', views.report_payment.as_view({'get': 'list'}), name='nav_notification'),
+    path('report/retailer/<int:retailer_id>/payments/', views.report_payment.as_view({'get': 'list'}), name='report_payment'),
 
     # my performance
 

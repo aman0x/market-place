@@ -531,8 +531,8 @@ class report_orders_cart(viewsets.ModelViewSet):
 
         if payment_type == 'CREDIT':
             queryset = queryset.filter(payment_type='CREDIT')
-        elif payment_type in ['CASH', 'CHEQUE', 'NEFT/RTGS']:
-            queryset = queryset.filter(payment_type__in=['CASH', 'CHEQUE', 'NEFT/RTGS'])
+        elif payment_type in ['CASH','UPI', 'CHEQUE', 'NEFT/RTGS']:
+            queryset = queryset.filter(payment_type__in=['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'])
         else:
             return queryset
 
@@ -651,4 +651,49 @@ class report_products_top_product(viewsets.ModelViewSet):
         data = {
             'products': products_list,
         }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class report_payment(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id)
+
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        # Calculate total amounts for cash and credit payments
+        cash_total = queryset.filter(payment_type__in = ['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'], order_status='SUCCESS', payment_status='COMPLETED').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        credit_total = queryset.filter(payment_type='CREDIT', order_status='SUCCESS', payment_status='COMPLETED').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+
+        # Calculate total amounts for pending cash and credit payments
+        pending_cash_total = queryset.filter(payment_type__in=['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'], order_status='PENDING').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        pending_credit_total = queryset.filter(payment_type='CREDIT', order_status='PENDING').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+
+        # Calculate total amount paid (cash + credit) and total amount pending (pending cash + pending credit)
+        total_paid = cash_total + credit_total
+        total_pending = pending_cash_total + pending_credit_total
+
+        successful_payments = queryset.filter(payment_status='COMPLETED', order_status='SUCCESS').values('payment_date', 'payment_type', 'payment_amount')
+        data = {
+            'total_paid': total_paid,
+            'cash_total': cash_total,
+            'credit_total': credit_total,
+            'total_pending': total_pending,
+            'pending_cash_total': pending_cash_total,
+            'pending_credit_total': pending_credit_total,
+            'successful_payments': successful_payments,
+        }
+
         return Response(data, status=status.HTTP_200_OK)
