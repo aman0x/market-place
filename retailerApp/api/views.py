@@ -759,3 +759,64 @@ class my_performance(viewsets.ModelViewSet):
         }
         return Response(data, status=status.HTTP_200_OK)
 
+
+class my_transactions(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS")
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        total_amount_spent = queryset.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        data = {
+            'total_amount_paid': total_amount_spent,
+            'advance_amount': 17000,
+            'pending_amount': 12343,
+
+            'added_advanced_fund': {
+                'amount': 20000,
+                'transactions_id': 12313412,
+                'payment_type': 'UPI',
+                'order_id': 123414,
+                "created_at": "2023-01-27T13:49:48.035120",
+            },
+            'added_advanced_fund2': {
+                'amount': 20000,
+                'transactions_id': 12313412,
+                'payment_type': 'UPI',
+                'order_id': 123414,
+                "created_at": "2023-02-27T13:49:48.035120",
+            },
+            'added_advanced_fund3': {
+                'amount': 20000,
+                'transactions_id': 12313412,
+                'payment_type': 'UPI',
+                'order_id': 123414,
+                "created_at": "2023-08-27T13:49:48.035120",
+            },
+            'added_advanced_fund4': {
+                'amount': 20000,
+                'transactions_id': 12313412,
+                'payment_type': 'UPI',
+                'order_id': 123414,
+                "created_at": "2023-07-27T13:49:48.035120",
+            },
+            'added_advanced_fund5': {
+                'amount': 20000,
+                'transactions_id': 12313412,
+                'payment_type': 'UPI',
+                'order_id': 123414,
+                "created_at": "2023-05-27T13:49:48.035120",
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
