@@ -27,7 +27,7 @@ BUSINESS_STATUS = (
 
 RETAILER_NOTIFICATION_STATUS = (
     ("NEW", "New Request"),
-    ("Old", "Old Request"),
+    ("OLD", "Old Request"),
     ("ACCEPT", "Accepted Request"),
     ("REJECT", "Rejected Request"),
     ("SAVE", "Save For Later")

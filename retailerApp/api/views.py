@@ -697,3 +697,65 @@ class report_payment(viewsets.ModelViewSet):
         }
 
         return Response(data, status=status.HTTP_200_OK)
+
+
+class my_performance(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS")
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        num_orders = queryset.count()
+        total_amount_spent = queryset.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        data = {
+            'number_of_orders': num_orders,
+            'amount_spent': total_amount_spent,
+            'available_credid_amount': 10000,
+            'allowed_bills': 1,
+            'credit_days': 10,
+            'credit_limit': 50000,
+            'used_allowed_bills': 5,
+            'used_credid_days': 10,
+
+            'wholeseller_1': {
+                'payment_type': 'Cash',
+                'items': 5,
+                'amount': 1200,
+            },
+            'wholeseller_2': {
+                'payment_type': 'Credit',
+                'items': 8,
+                'amount': 1800,
+            },
+            'wholeseller_3': {
+                'payment_type': 'Cash',
+                'items': 1,
+                'amount': 1000,
+            },
+            'wholeseller_4': {
+                'payment_type': 'Credit',
+                'items': 8,
+                'amount': 12000,
+            },
+            'wholeseller_5': {
+                'payment_type': 'Cash',
+                'items': 51,
+                'amount': 1200000,
+            },
+            'wholeseller_6': {
+                'payment_type': 'Credit',
+                'items': 56,
+                'amount': 142200,
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
