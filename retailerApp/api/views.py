@@ -17,6 +17,8 @@ from wholesellerApp.models import Offers
 from wholesellerApp.api.serializers import OfferSerializer
 from rest_framework.generics import get_object_or_404
 from django.http import Http404
+from django.db.models import Sum, Count
+from rest_framework.decorators import action
 common_status = settings.COMMON_STATUS
 
 
@@ -191,6 +193,8 @@ class SubCartViewSet(viewsets.ModelViewSet):
 
 class subcart_retailer(viewsets.ModelViewSet):
     serializer_class = SubCartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
     def get_queryset(self):
         retailer_id = self.kwargs.get('retailer_id')
         queryset = SubCart.objects.filter(retailer_id=retailer_id, used_in_cart=False)
@@ -198,6 +202,7 @@ class subcart_retailer(viewsets.ModelViewSet):
 
 
 class CartViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = CartSerializer
     queryset = Cart.objects.all().order_by('id')
 
@@ -224,6 +229,7 @@ class UpdateSubCartUsedInCartView(views.APIView):
 
 class cart_retailer(viewsets.ModelViewSet):
     serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
     def get_queryset(self):
         retailer_id = self.kwargs.get('retailer_id')
         queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id).distinct()
@@ -363,16 +369,8 @@ class FilterProductByCategory(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, retailer_id, wholeseller_id, category_id):
-        # Assuming you have the appropriate import statements and models defined
-
-        # Get the category object based on the category_id
         category = get_object_or_404(Category, id=category_id)
-
-        # Filter products based on the given category
         products = Product.objects.filter(category=category)
-
-        # You can serialize the products data and return the response as JSON
-        # Replace 'ProductSerializer' with the appropriate serializer for your Product model
         serializer = ProductSerializer(products, many=True)
         return Response(serializer.data)
 
@@ -435,4 +433,459 @@ class RetailerOffer(viewsets.ModelViewSet):
             raise Response(f"No offers found for the given wholeseller.")
 
         return queryset
+
+
+class recent_order(viewsets.ModelViewSet):
+    serializer_class = RecentProductSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        queryset = SubCart.objects.filter(retailer_id=retailer_id, used_in_cart=True)
+        return queryset
+
+
+class completed_order(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status='SUCCESS',payment_status = 'COMPLETED' ).distinct()
+        return queryset
+
+
+class pending_order(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status='SUCCESS',payment_status = 'PENDING' ).distinct()
+        return queryset
+
+class nav_notification(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status= "SUCCESS" ).distinct()
+        return queryset
+
+
+class report_orders(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS")
+
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        total_orders = queryset.count()
+
+        # Use serializer method to calculate total value
+        total_values = sum(cart.get('total_value', 0) for cart in self.serializer_class(queryset, many=True).data)
+
+        pending_orders = queryset.filter(order_status="PENDING").count()
+        accepted_orders = queryset.filter(order_status="APPROVED").count()
+        rejected_orders = queryset.filter(order_status="REJECTED").count()
+        success_orders = queryset.filter(order_status="SUCCESS").count()
+
+
+        data = {
+            'total_orders': total_orders,
+            'total_values': total_values,
+            'pending_orders': pending_orders,
+            'accepted_orders': accepted_orders,
+            'rejected_orders': rejected_orders,
+            'success_orders': success_orders,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class report_orders_cart(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        payment_type = self.request.query_params.get('payment_type', '').upper()
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id,payment_status='COMPLETED',order_status='SUCCESS')
+        queryset = queryset.distinct()
+
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+
+        if payment_type == 'CREDIT':
+            queryset = queryset.filter(payment_type='CREDIT')
+        elif payment_type in ['CASH','UPI', 'CHEQUE', 'NEFT/RTGS']:
+            queryset = queryset.filter(payment_type__in=['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'])
+        else:
+            return queryset
+
+        return queryset
+
+
+class report_product(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS")
+
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        total_values = sum(cart.get('total_value', 0) for cart in self.serializer_class(queryset, many=True).data)
+        total_products = queryset.aggregate(Sum('cart_items__qty'))['cart_items__qty__sum'] or 0
+        data = {
+            'total_values': total_values,
+            'total_products': total_products,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class report_product(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS")
+
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        total_values = sum(cart.get('total_value', 0) for cart in self.serializer_class(queryset, many=True).data)
+        total_products = queryset.aggregate(Sum('cart_items__qty'))['cart_items__qty__sum'] or 0
+        data = {
+            'total_values': total_values,
+            'total_products': total_products,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class report_products_top_product(viewsets.ModelViewSet):
+    serializer_class = SubCartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = SubCart.objects.filter(retailer=retailer_id, used_in_cart=True)
+        #
+        # if year_filter:
+        #     queryset = queryset.filter(cart__order_created_at__year=year_filter)
+
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        # Serialize subcart objects to get product details
+        subcart_serializer = self.serializer_class(queryset, many=True)
+
+        # Create a dictionary to store product details using the product_id as the key
+        product_details = {}
+
+        for subcart_data in subcart_serializer.data:
+            product_id = subcart_data['product']
+            product_qty = subcart_data['qty']
+            product_total_value = subcart_data['total_price']
+
+            if product_id not in product_details:
+                # Retrieve the product object from the database
+                product = get_object_or_404(Product, pk=product_id)
+
+                # Store product details in the dictionary
+                product_details[product_id] = {
+                    'product_id': product_id,
+                    'product_name': product.product_name,
+                    'product_brand_name': product.product_brand_name,
+                    'product_description': product.product_description,
+                    'category': product.category.category_name,
+                    'subcategory': product.subcategory.subcategory_name,
+                    'quantity': product_qty,
+                    'total_value': product_total_value,
+                }
+            else:
+                # If product_id is already present, increase the quantity and total value
+                product_details[product_id]['quantity'] += product_qty
+                product_details[product_id]['total_value'] += product_total_value
+
+        # List of product details
+        products_list = list(product_details.values())
+
+        data = {
+            'products': products_list,
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class report_payment(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id)
+
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        # Calculate total amounts for cash and credit payments
+        cash_total = queryset.filter(payment_type__in = ['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'], order_status='SUCCESS', payment_status='COMPLETED').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        credit_total = queryset.filter(payment_type='CREDIT', order_status='SUCCESS', payment_status='COMPLETED').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+
+        # Calculate total amounts for pending cash and credit payments
+        pending_cash_total = queryset.filter(payment_type__in=['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'], order_status='PENDING').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        pending_credit_total = queryset.filter(payment_type='CREDIT', order_status='PENDING').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+
+        # Calculate total amount paid (cash + credit) and total amount pending (pending cash + pending credit)
+        total_paid = cash_total + credit_total
+        total_pending = pending_cash_total + pending_credit_total
+
+        successful_payments = queryset.filter(payment_status='COMPLETED', order_status='SUCCESS').values('payment_date', 'payment_type', 'payment_amount')
+        data = {
+            'total_paid': total_paid,
+            'cash_total': cash_total,
+            'credit_total': credit_total,
+            'total_pending': total_pending,
+            'pending_cash_total': pending_cash_total,
+            'pending_credit_total': pending_credit_total,
+            'successful_payments': successful_payments,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class my_performance(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS")
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        num_orders = queryset.count()
+        total_amount_spent = queryset.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        data = {
+            'number_of_orders': num_orders,
+            'amount_spent': total_amount_spent,
+            'available_credit_amount': 10000,
+            'allowed_bills': 1,
+            'credit_days': 10,
+            'credit_limit': 50000,
+            'used_allowed_bills': 5,
+            'used_credit_days': 10,
+
+            'wholeseller_1': {
+                'payment_type': 'Cash',
+                'items': 5,
+                'amount': 1200,
+            },
+            'wholeseller_2': {
+                'payment_type': 'Credit',
+                'items': 8,
+                'amount': 1800,
+            },
+            'wholeseller_3': {
+                'payment_type': 'Cash',
+                'items': 1,
+                'amount': 1000,
+            },
+            'wholeseller_4': {
+                'payment_type': 'Credit',
+                'items': 8,
+                'amount': 12000,
+            },
+            'wholeseller_5': {
+                'payment_type': 'Cash',
+                'items': 51,
+                'amount': 1200000,
+            },
+            'wholeseller_6': {
+                'payment_type': 'Credit',
+                'items': 56,
+                'amount': 142200,
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class my_transactions(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS")
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        total_amount_spent = queryset.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        data = {
+            'total_amount_paid': total_amount_spent,
+            'advance_amount': 17000,
+            'pending_amount': 12343,
+
+            'added_advanced_fund': {
+                'amount': 20000,
+                'transactions_id': 12313412,
+                'payment_type': 'UPI',
+                'order_id': 123414,
+                "created_at": "2023-01-27T13:49:48.035120",
+            },
+            'added_advanced_fund2': {
+                'amount': 20000,
+                'transactions_id': 12313412,
+                'payment_type': 'UPI',
+                'order_id': 123414,
+                "created_at": "2023-02-27T13:49:48.035120",
+            },
+            'added_advanced_fund3': {
+                'amount': 20000,
+                'transactions_id': 12313412,
+                'payment_type': 'UPI',
+                'order_id': 123414,
+                "created_at": "2023-08-27T13:49:48.035120",
+            },
+            'added_advanced_fund4': {
+                'amount': 20000,
+                'transactions_id': 12313412,
+                'payment_type': 'UPI',
+                'order_id': 123414,
+                "created_at": "2023-07-27T13:49:48.035120",
+            },
+            'added_advanced_fund5': {
+                'amount': 20000,
+                'transactions_id': 12313412,
+                'payment_type': 'UPI',
+                'order_id': 123414,
+                "created_at": "2023-05-27T13:49:48.035120",
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class credit_details(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS")
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        total_amount_spent = queryset.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        data = {
+            'amount_spent': total_amount_spent,
+            'available_credit_amount': 10000,
+            'allowed_bills': 1,
+            'credit_days': 10,
+            'credit_limit': 50000,
+            'used_allowed_bills': 5,
+            'used_credit_days': 10,
+
+            123123231: {
+                'amount': 1000,
+                'status': 'success',
+                'NO. of Items': 12,
+                'payment_status': 'pending',
+                'payment_type': 'UPI'
+            },
+            12123231: {
+                'amount': 1000,
+                'status': 'success',
+                'NO. of Items': 12,
+                'payment_status': 'pending',
+                'payment_type': 'UPI'
+            },
+            1231223231: {
+                'amount': 1000,
+                'status': 'success',
+                'NO. of Items': 12,
+                'payment_status': 'pending',
+                'payment_type': 'UPI'
+            },
+            12312321: {
+                'amount': 1000,
+                'status': 'success',
+                'NO. of Items': 12,
+                'payment_status': 'complete',
+                'payment_type': 'UPI'
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class WholesellerOrders(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        wholeseller_id = self.kwargs.get('wholeseller_id')
+        queryset = Cart.objects.filter(cart_items__wholeseller_id=wholeseller_id).distinct()
+        return queryset
+
+
 

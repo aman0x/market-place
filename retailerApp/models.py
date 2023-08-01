@@ -27,7 +27,7 @@ BUSINESS_STATUS = (
 
 RETAILER_NOTIFICATION_STATUS = (
     ("NEW", "New Request"),
-    ("Old", "Old Request"),
+    ("OLD", "Old Request"),
     ("ACCEPT", "Accepted Request"),
     ("REJECT", "Rejected Request"),
     ("SAVE", "Save For Later")
@@ -94,7 +94,10 @@ class Retailer(models.Model):
 
 PAYMENT_TYPE = (
     ("CASH", "Cash"),
-    ("CREDIT", "Credit")
+    ("CREDIT", "Credit"),
+    ('UPI', 'UPI'),
+    ('CHEQUE', 'Cheque'),
+    ('NEFT/RTGS', 'NEFT/RTGS')
 )
 PAYMENT_STATUS = (
     ("PENDING", "Pending"),
@@ -104,7 +107,8 @@ PAYMENT_STATUS = (
 ORDER_STATUS = (
     ("PENDING", 'Pending'),
     ("APPROVED", 'Approved'),
-    ('REJECTED', 'Rejected')
+    ('REJECTED', 'Rejected'),
+    ('SUCCESS', 'Success')
 )
 class PhotoOrder(models.Model):
     order_image = models.ImageField(upload_to='images/photo_order/', null=True)
@@ -170,8 +174,7 @@ class Cart(models.Model):
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS, null=True)
     deliver_to = models.ForeignKey(DeliveryAddress, on_delete=models.CASCADE, related_name='delivery_cart',null=True, blank=True)
     order_status = models.CharField(max_length=20, choices=ORDER_STATUS, default="PENDING", null=True)
-    order_status_change_at = models.DateTimeField(default=datetime.now, blank=True)
-
+    order_status_change_at = models.DateTimeField(blank=True)
 
 
     def __str__(self):
