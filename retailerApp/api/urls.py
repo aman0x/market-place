@@ -57,6 +57,8 @@ urlpatterns = [
     path('<int:retailer_id>/credit_details/', views.credit_details.as_view({'get': 'list'}), name='credit_details'),
 
 
+    #-------------------Wholeseller orders------------------------
+    path('orders/wholeseller/<int:wholeseller_id>/', views.WholesellerOrders.as_view({'get': 'list'}), name="Wholeseller-Orders"),
 
 
 

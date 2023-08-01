@@ -202,6 +202,7 @@ class subcart_retailer(viewsets.ModelViewSet):
 
 
 class CartViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = CartSerializer
     queryset = Cart.objects.all().order_by('id')
 
@@ -875,6 +876,16 @@ class credit_details(viewsets.ModelViewSet):
             }
         }
         return Response(data, status=status.HTTP_200_OK)
+
+
+class WholesellerOrders(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        wholeseller_id = self.kwargs.get('wholeseller_id')
+        queryset = Cart.objects.filter(cart_items__wholeseller_id=wholeseller_id).distinct()
+        return queryset
 
 
 
