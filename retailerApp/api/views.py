@@ -719,12 +719,12 @@ class my_performance(viewsets.ModelViewSet):
         data = {
             'number_of_orders': num_orders,
             'amount_spent': total_amount_spent,
-            'available_credid_amount': 10000,
+            'available_credit_amount': 10000,
             'allowed_bills': 1,
             'credit_days': 10,
             'credit_limit': 50000,
             'used_allowed_bills': 5,
-            'used_credid_days': 10,
+            'used_credit_days': 10,
 
             'wholeseller_1': {
                 'payment_type': 'Cash',
@@ -818,5 +818,63 @@ class my_transactions(viewsets.ModelViewSet):
             }
         }
         return Response(data, status=status.HTTP_200_OK)
+
+
+class credit_details(viewsets.ModelViewSet):
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS")
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        total_amount_spent = queryset.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        data = {
+            'amount_spent': total_amount_spent,
+            'available_credit_amount': 10000,
+            'allowed_bills': 1,
+            'credit_days': 10,
+            'credit_limit': 50000,
+            'used_allowed_bills': 5,
+            'used_credit_days': 10,
+
+            123123231: {
+                'amount': 1000,
+                'status': 'success',
+                'NO. of Items': 12,
+                'payment_status': 'pending',
+                'payment_type': 'UPI'
+            },
+            12123231: {
+                'amount': 1000,
+                'status': 'success',
+                'NO. of Items': 12,
+                'payment_status': 'pending',
+                'payment_type': 'UPI'
+            },
+            1231223231: {
+                'amount': 1000,
+                'status': 'success',
+                'NO. of Items': 12,
+                'payment_status': 'pending',
+                'payment_type': 'UPI'
+            },
+            12312321: {
+                'amount': 1000,
+                'status': 'success',
+                'NO. of Items': 12,
+                'payment_status': 'complete',
+                'payment_type': 'UPI'
+            }
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
 
 
