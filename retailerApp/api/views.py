@@ -19,6 +19,7 @@ from rest_framework.generics import get_object_or_404
 from django.http import Http404
 from django.db.models import Sum, Count
 from rest_framework.decorators import action
+from django_filters.rest_framework import DjangoFilterBackend
 common_status = settings.COMMON_STATUS
 
 
@@ -379,6 +380,8 @@ class ClickPhotoOrderView(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = PhotoOrderSerializer
     queryset = PhotoOrder.objects.all().order_by("id")
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['wholeseller_id']
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()

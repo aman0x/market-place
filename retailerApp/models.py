@@ -111,6 +111,7 @@ ORDER_STATUS = (
     ('SUCCESS', 'Success')
 )
 class PhotoOrder(models.Model):
+    wholeseller = models.ForeignKey(Wholeseller, on_delete=models.CASCADE, related_name="photo_wholeseller", null=True,blank=True)
     order_image = models.ImageField(upload_to='images/photo_order/', null=True)
     retailer = models.ForeignKey(Retailer,related_name="retailer_order_photo", on_delete=models.CASCADE, null=True, blank=True)
     order_id = models.CharField(max_length=8, unique=True, editable=False, null=True)

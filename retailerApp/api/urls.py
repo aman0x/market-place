@@ -60,7 +60,7 @@ urlpatterns = [
     #-------------------Wholeseller orders------------------------
     path('orders/wholeseller/<int:wholeseller_id>/', views.WholesellerOrders.as_view({'get': 'list'}), name="Wholeseller-Orders"),
 
-
+    # path('photoOrder/<int:wholeseller_id>/', views.ClickPhotoOrderView.as_view({'get': 'list'}), name='photoOrder-wholeseller'),
 
 
 ]
