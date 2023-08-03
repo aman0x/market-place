@@ -1,4 +1,6 @@
 # Create your models here.
+import datetime
+
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from wholesellerApp.models import Wholeseller
@@ -235,3 +237,16 @@ class OutForDelivery(models.Model):
     def __str__(self):
         return str(self.bill_number)
 
+
+class OrderStatus(models.Model):
+    # order_id = models.CharField(max_length=10, blank=True)
+    order_pending_date = models.DateTimeField(default=datetime.now, blank=True)
+    order_accept_date = models.DateTimeField(default=datetime.now, blank=True)
+    order_in_progress_date = models.DateTimeField(default=datetime.now, blank=True)
+    order_ready_to_dispatch_date = models.DateTimeField(default=datetime.now, blank=True)
+    order_for_delivery_date = models.DateTimeField(default=datetime.now, blank=True)
+    delivered_at = models.DateTimeField(default=datetime.now, blank=True)
+
+
+    def __str__(self):
+        return str(self.order_id)
