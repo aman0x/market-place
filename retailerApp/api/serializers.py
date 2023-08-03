@@ -133,3 +133,12 @@ class RecentProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubCart
         fields = "__all__"
+
+
+
+class OutForDeliverySerializer(serializers.ModelSerializer):
+    image = Base64ImageField(required=False)
+    class Meta:
+        model = OutForDelivery
+        fields = "__all__"
+

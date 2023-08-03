@@ -892,3 +892,11 @@ class WholesellerOrders(viewsets.ModelViewSet):
 
 
 
+class OutForDeliveryViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = OutForDeliverySerializer
+
+    def get_queryset(self):
+        wholeseller_id = self.kwargs.get('wholeseller_id')
+        queryset = OutForDelivery.objects.filter(wholeseller_id=wholeseller_id).distinct()
+        return queryset

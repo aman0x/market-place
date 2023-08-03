@@ -108,6 +108,7 @@ ORDER_STATUS = (
     ("PENDING", 'Pending'),
     ("APPROVED", 'Approved'),
     ('REJECTED', 'Rejected'),
+    ('INPROGRESS', 'InProgress'),
     ('SUCCESS', 'Success')
 )
 class PhotoOrder(models.Model):
@@ -116,8 +117,9 @@ class PhotoOrder(models.Model):
     retailer = models.ForeignKey(Retailer,related_name="retailer_order_photo", on_delete=models.CASCADE, null=True, blank=True)
     order_id = models.CharField(max_length=8, unique=True, editable=False, null=True)
     payment_type = models.CharField(max_length=20, choices=PAYMENT_TYPE, null=True)
-    status = models.CharField(max_length=20, choices=ORDER_STATUS, default="NEW", null=True)
+    status = models.CharField(max_length=20, choices=ORDER_STATUS, default="PENDING", null=True)
     created_at = models.DateTimeField(default=datetime.now, blank=True)
+    message = models.TextField(max_length=200, null=True, blank=True)
 
     def __str__(self):
         return str(self.order_id)
@@ -140,9 +142,12 @@ class SubCart(models.Model):
     retailer = models.ForeignKey(Retailer, on_delete=models.CASCADE, related_name="carts_retailer", null=True, blank=True)
     used_in_cart = models.BooleanField(default=False)
     wholeseller = models.ForeignKey(Wholeseller, on_delete=models.CASCADE, related_name="cart_wholeseller", null=True, blank=True)
+    status = models.CharField(max_length=20, choices=ORDER_STATUS, default="PENDING", null=True)
+    message = models.TextField(max_length=200, null=True, blank=True)
 
     def __str__(self):
         return str(self.pk)
+
 
 class DeliveryAddress(models.Model):
     retailer = models.ForeignKey(Retailer, on_delete=models.CASCADE, related_name="delivery_addresses_retailer", null=True,
@@ -176,6 +181,7 @@ class Cart(models.Model):
     deliver_to = models.ForeignKey(DeliveryAddress, on_delete=models.CASCADE, related_name='delivery_cart',null=True, blank=True)
     order_status = models.CharField(max_length=20, choices=ORDER_STATUS, default="PENDING", null=True)
     order_status_change_at = models.DateTimeField(blank=True)
+    message = models.TextField(max_length=200, null=True, blank=True)
 
 
     def __str__(self):
@@ -198,3 +204,34 @@ class Favorites(models.Model):
 
     def __str__(self):
         return f" {self.retailer} Favorite:- {self.product}"
+
+
+class OutForDelivery(models.Model):
+    retailer = models.ForeignKey(Retailer, related_name="retailer", on_delete=models.CASCADE, null=True,
+                                 blank=True)
+    wholeseller = models.ForeignKey(Wholeseller, on_delete=models.CASCADE, related_name="wholeseller", null=True,
+                                    blank=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="products", null=True,
+                                blank=True)
+
+    image = models.ImageField(upload_to="image/OutForDelivery/", default=None, null=True)
+    bill_created_at = models.DateTimeField(default=datetime.now, blank=True)
+    bill_number = models.IntegerField(null=True, blank=True)
+    bill_amount = models.IntegerField(null=True)
+
+    deliver_date = models.DateField(null=True)
+    driver_number = PhoneNumberField(blank=True, null=True)
+    driver_vehicle_number = models.CharField(max_length=50, null=True)
+
+    current_address = models.CharField(max_length=50, null=True)
+    is_delivery_address_same_as_current_address = models.BooleanField(default=True)
+
+    landmark = models.CharField(max_length=50, null=True)
+    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='outfordelivery_state', null=True, blank=True)
+    city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='outfordelivery_city', null=True, blank=True)
+    pincode = models.IntegerField(null=True)
+    get_delivery_address_location_json_data = jsonfield.JSONField(default={}, null=True)
+
+    def __str__(self):
+        return str(self.bill_number)
+

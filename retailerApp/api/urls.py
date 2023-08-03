@@ -11,6 +11,7 @@ router.register(r'subcarts', views.SubCartViewSet,basename="subcartviewset")
 router.register(r'click_photo_order', views.ClickPhotoOrderView, basename='click_photo_order')
 router.register(r'favorites', views.FavoritesViewSet, basename='favorites')
 router.register(r'delivery_addresses', views.DeliveryAddressViewSet, basename='delivery-addresses')
+router.register(r'out_for_delivery', views.OutForDeliveryViewSet, basename='delivery-addresses')
 urlpatterns = [
     path('', include(router.urls)),
     #home
@@ -50,9 +51,12 @@ urlpatterns = [
 
     # my performance
     path('<int:retailer_id>/my_performance/', views.my_performance.as_view({'get': 'list'}), name='my_performance'),
+
     #Payments
     # my transactions
+
     path('<int:retailer_id>/my_transactions/', views.my_transactions.as_view({'get': 'list'}), name='my_transactions'),
+
     # credit details
     path('<int:retailer_id>/credit_details/', views.credit_details.as_view({'get': 'list'}), name='credit_details'),
 
@@ -62,6 +66,7 @@ urlpatterns = [
 
     # path('photoOrder/<int:wholeseller_id>/', views.ClickPhotoOrderView.as_view({'get': 'list'}), name='photoOrder-wholeseller'),
 
+    path('out_for_delivery/wholeseller/<int:wholeseller_id>/', views.OutForDeliveryViewSet.as_view({'get': 'list'}), name="Out-For-Delivery"),
 
 ]
 
