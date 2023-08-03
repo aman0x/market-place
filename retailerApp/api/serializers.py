@@ -133,3 +133,22 @@ class RecentProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubCart
         fields = "__all__"
+
+
+class OutForDeliverySerializer(serializers.ModelSerializer):
+    image = Base64ImageField(required=False)
+
+    class Meta:
+        model = OutForDelivery
+        fields = "__all__"
+
+
+class OrderStatusSerializer(serializers.ModelSerializer):
+    order_id = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OrderStatus
+        fields = "__all__"
+
+    def get_order_id(self,obj):
+        return 12321

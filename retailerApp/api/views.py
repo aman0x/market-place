@@ -892,3 +892,83 @@ class WholesellerOrders(viewsets.ModelViewSet):
 
 
 
+class OutForDeliveryViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = OutForDeliverySerializer
+
+    def get_queryset(self):
+        wholeseller_id = self.kwargs.get('wholeseller_id')
+        retailer_id = self.kwargs.get('retailer_id')
+
+        queryset = OutForDelivery.objects.all().order_by('id')
+
+        if retailer_id and not wholeseller_id:
+            queryset = OutForDelivery.objects.filter(retailer_id=retailer_id).distinct()
+
+        if not retailer_id and wholeseller_id:
+            queryset = OutForDelivery.objects.filter(wholeseller_id=wholeseller_id).distinct()
+
+        if retailer_id and wholeseller_id:
+            queryset = OutForDelivery.objects.filter(wholeseller_id=wholeseller_id, retailer_id=retailer_id).distinct()
+
+        if queryset:
+            return queryset
+        else: return Response({data:"no data found"})
+
+
+class OrderStatusViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = OrderStatusSerializer
+
+    def get_queryset(self):
+        wholeseller_id = self.kwargs.get('wholeseller_id')
+        retailer_id = self.kwargs.get('retailer_id')
+
+        queryset = OrderStatus.objects.all().order_by('id')
+        if retailer_id and not wholeseller_id:
+            queryset = OrderStatus.objects.filter(retailer_id=retailer_id).distinct()
+
+        if not retailer_id and wholeseller_id:
+            queryset = OrderStatus.objects.filter(wholeseller_id=wholeseller_id).distinct()
+
+        if retailer_id and wholeseller_id:
+            queryset = OrderStatus.objects.filter(wholeseller_id=wholeseller_id, retailer_id=retailer_id).distinct()
+
+        if queryset:
+            return queryset
+        else:
+            data = {'data': 'no data found'}
+            return Response(data, status=status.HTTP_404_NOT_FOUND)
+
+
+class PaymentDetailsView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        data = [
+            {
+                "total_amount": 2000,
+                "amount_paid": 5000,
+                "outstanding_amount": 3000,
+            },
+            {
+                "date": datetime.today().isoformat(),
+                "order_id": "1213211",
+                "transaction_id": "12412dq21",
+                "payment_mode": "UPI",
+                "amount_paid": 2900,
+                "payment_receipt_image": "image_url_here",
+                "confirm_received": True,
+            },
+            {
+                "date": datetime.today().isoformat(),
+                "order_id": "231",
+                "transaction_id": "1121dq21",
+                "payment_mode": "CASH",
+                "amount_paid": 29032,
+                "payment_receipt_image": "image_url_here",
+                "confirm_received": True,
+            }
+        ]
+        return Response(data)
+
