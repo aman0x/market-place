@@ -68,7 +68,7 @@ class RetailerVerifyNumber(views.APIView):
         password = data.get("retailer_otp")
         payload = {}
         if retailer_number != "":
-            retailer_otp = random.randrange(000000, 999999)
+            retailer_otp = random.randrange(100000, 999999)
             try:
                 data = RetailerMobile.objects.get(retailer_number=retailer_number)
                 data.retailer_otp = retailer_otp
