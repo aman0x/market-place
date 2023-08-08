@@ -57,7 +57,7 @@ class Retailer(models.Model):
     retailer_type = models.ForeignKey(RetailerType, on_delete=models.CASCADE, related_name='retailer_type',null=True,default=None)
     retailer_business_status = models.CharField(max_length=20, choices=BUSINESS_STATUS, default="REGISTERED")
     retailer_name = models.CharField(max_length=20,null=True,default=None)
-    retailer_description = models.TextField(blank=True, null=True)
+    retailer_firmName = models.TextField(blank=True, null=True)
     retailer_contact_per = models.CharField(max_length=20,null=True,default=None)
     retailer_number = models.ManyToManyField(RetailerMobile,null=True, related_name='retailer_mobile',)
     retailer_wholeseller = models.ManyToManyField(Wholeseller,related_name='retailer_wholeseller',blank=True,null=True)
