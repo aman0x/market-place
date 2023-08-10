@@ -501,6 +501,7 @@ class report_orders(viewsets.ModelViewSet):
         total_values = sum(cart.get('total_value', 0) for cart in self.serializer_class(queryset, many=True).data)
 
         pending_orders = queryset.filter(order_status="PENDING").count()
+        out_for_delivery_orders = queryset.filter(order_status="OUT_FOR_DELIVERY").count()
         accepted_orders = queryset.filter(order_status="APPROVED").count()
         rejected_orders = queryset.filter(order_status="REJECTED").count()
         success_orders = queryset.filter(order_status="SUCCESS").count()
@@ -510,6 +511,7 @@ class report_orders(viewsets.ModelViewSet):
             'total_orders': total_orders,
             'total_values': total_values,
             'pending_orders': pending_orders,
+            'out_for_delivery_orders': out_for_delivery_orders,
             'accepted_orders': accepted_orders,
             'rejected_orders': rejected_orders,
             'success_orders': success_orders,
@@ -730,35 +732,37 @@ class my_performance(viewsets.ModelViewSet):
             'used_allowed_bills': 5,
             'used_credit_days': 10,
 
-            'wholeseller_1': {
-                'payment_type': 'Cash',
-                'items': 5,
-                'amount': 1200,
-            },
-            'wholeseller_2': {
-                'payment_type': 'Credit',
-                'items': 8,
-                'amount': 1800,
-            },
-            'wholeseller_3': {
-                'payment_type': 'Cash',
-                'items': 1,
-                'amount': 1000,
-            },
-            'wholeseller_4': {
-                'payment_type': 'Credit',
-                'items': 8,
-                'amount': 12000,
-            },
-            'wholeseller_5': {
-                'payment_type': 'Cash',
-                'items': 51,
-                'amount': 1200000,
-            },
-            'wholeseller_6': {
-                'payment_type': 'Credit',
-                'items': 56,
-                'amount': 142200,
+            "wholeseller_data": {
+                'wholeseller_1': {
+                    'payment_type': 'Cash',
+                    'items': 5,
+                    'amount': 1200,
+                },
+                'wholeseller_2': {
+                    'payment_type': 'Credit',
+                    'items': 8,
+                    'amount': 1800,
+                },
+                'wholeseller_3': {
+                    'payment_type': 'Cash',
+                    'items': 1,
+                    'amount': 1000,
+                },
+                'wholeseller_4': {
+                    'payment_type': 'Credit',
+                    'items': 8,
+                    'amount': 12000,
+                },
+                'wholeseller_5': {
+                    'payment_type': 'Cash',
+                    'items': 51,
+                    'amount': 1200000,
+                },
+                'wholeseller_6': {
+                    'payment_type': 'Credit',
+                    'items': 56,
+                    'amount': 142200,
+                }
             }
         }
         return Response(data, status=status.HTTP_200_OK)
