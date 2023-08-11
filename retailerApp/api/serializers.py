@@ -6,10 +6,12 @@ from productApp.api.serializers import ProductSerializer
 from drf_extra_fields.fields import Base64ImageField
 from django.db.models import Sum
 
+
 class RetailerNumberSerializer(serializers.ModelSerializer):
     class Meta:
         model = RetailerMobile
         fields = '__all__'
+
 
 class RetailerSerializer(serializers.ModelSerializer):
     wholeseller_details = serializers.SerializerMethodField()
@@ -29,7 +31,7 @@ class RetailerSerializer(serializers.ModelSerializer):
         wholeseller_data = WholesellerSerializer(wholesellers, many=True).data
         return wholeseller_data
 
-    def get_retailer_number_and_details(self,obj):
+    def get_retailer_number_and_details(self, obj):
         retailer_number = obj.retailer_number.all().order_by('id')
         retailer_numb = RetailerNumberSerializer(retailer_number, many=True).data
         return retailer_numb
@@ -46,6 +48,7 @@ class RetailerSerializer(serializers.ModelSerializer):
         event = super().update(instance, validated_data)
         return event
 
+
 class SubCartSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     total_price = serializers.SerializerMethodField()
@@ -58,6 +61,7 @@ class SubCartSerializer(serializers.ModelSerializer):
         if obj.product:
             return obj.qty * obj.product.product_selling_price
         return 0
+
 
 class CartSerializer(serializers.ModelSerializer):
     total_value = serializers.SerializerMethodField()
@@ -102,6 +106,7 @@ class CartDetailedSerializer(serializers.ModelSerializer):
 class CheckoutSerializer(serializers.ModelSerializer):
     cart_details = serializers.SerializerMethodField()
     total_per_cart = serializers.SerializerMethodField()
+
     class Meta:
         model = Cart
         fields = '__all__'
@@ -131,6 +136,7 @@ class WholesellerRetailerSerializer(serializers.ModelSerializer):
 
 class PhotoOrderSerializer(serializers.ModelSerializer):
     order_image = Base64ImageField(required=False)
+
     class Meta:
         model = PhotoOrder
         fields = '__all__'
@@ -171,5 +177,5 @@ class OrderStatusSerializer(serializers.ModelSerializer):
         model = OrderStatus
         fields = "__all__"
 
-    def get_order_id(self,obj):
+    def get_order_id(self, obj):
         return 12321
