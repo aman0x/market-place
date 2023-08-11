@@ -537,6 +537,7 @@ class report_orders_cart(viewsets.ModelViewSet):
 
         if payment_type == 'CREDIT':
             queryset = queryset.filter(payment_type='CREDIT')
+
         elif payment_type == 'CASH':
             queryset = queryset.filter(payment_type__in=['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'])
         else:
@@ -761,11 +762,18 @@ class report_payment(viewsets.ModelViewSet):
     def get_queryset(self):
         retailer_id = self.kwargs.get('retailer_id')
         year_filter = self.request.query_params.get('year', None)
+        payment_type = self.request.query_params.get('payment_type','').upper()
 
         queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id)
 
         if year_filter:
             queryset = queryset.filter(order_created_at__year=year_filter)
+
+        if payment_type == 'CREDIT':
+            queryset = queryset.filter(payment_type='CREDIT')
+
+        elif payment_type == 'CASH':
+            queryset = queryset.filter(payment_type__in=['CASH', 'UPI', 'CHEQUE', 'NEFT/RTGS'])
 
         queryset = queryset.distinct()
         return queryset
