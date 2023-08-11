@@ -60,6 +60,24 @@ class SubCartSerializer(serializers.ModelSerializer):
         return 0
 
 class CartSerializer(serializers.ModelSerializer):
+    total_value = serializers.SerializerMethodField()
+    total_items = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Cart
+        fields = "__all__"
+
+    def get_total_value(self, obj):
+        total = 0
+        for cart_item in obj.cart_items.all():
+            total += cart_item.qty * cart_item.product.product_selling_price
+        return total
+
+    def get_total_items(self, obj):
+        return obj.cart_items.aggregate(Sum('qty'))['qty__sum'] or 0
+
+
+class CartDetailedSerializer(serializers.ModelSerializer):
     cart_items = SubCartSerializer(many=True)
     total_value = serializers.SerializerMethodField()
     total_items = serializers.SerializerMethodField()

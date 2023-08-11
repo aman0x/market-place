@@ -449,7 +449,7 @@ class recent_order(viewsets.ModelViewSet):
 
 
 class completed_order(viewsets.ModelViewSet):
-    serializer_class = CartSerializer
+    serializer_class = CartDetailedSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -459,7 +459,7 @@ class completed_order(viewsets.ModelViewSet):
 
 
 class pending_order(viewsets.ModelViewSet):
-    serializer_class = CartSerializer
+    serializer_class = CartDetailedSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -478,7 +478,7 @@ class nav_notification(viewsets.ModelViewSet):
 
 
 class report_orders(viewsets.ModelViewSet):
-    serializer_class = CartSerializer
+    serializer_class = CartDetailedSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -521,7 +521,7 @@ class report_orders(viewsets.ModelViewSet):
 
 
 class report_orders_cart(viewsets.ModelViewSet):
-    serializer_class = CartSerializer
+    serializer_class = CartDetailedSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -537,7 +537,7 @@ class report_orders_cart(viewsets.ModelViewSet):
 
         if payment_type == 'CREDIT':
             queryset = queryset.filter(payment_type='CREDIT')
-        elif payment_type in ['CASH','UPI', 'CHEQUE', 'NEFT/RTGS']:
+        elif payment_type == 'CASH':
             queryset = queryset.filter(payment_type__in=['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'])
         else:
             return queryset
@@ -610,9 +610,9 @@ class report_products_top_product(viewsets.ModelViewSet):
         year_filter = self.request.query_params.get('year', None)
 
         queryset = SubCart.objects.filter(retailer=retailer_id, used_in_cart=True)
-        #
+
         # if year_filter:
-        #     queryset = queryset.filter(cart__order_created_at__year=year_filter)
+        #     queryset = queryset.filter(Subcart.Carts__order_created_at__year=year_filter)
 
         queryset = queryset.distinct()
         return queryset
