@@ -449,7 +449,7 @@ class recent_order(viewsets.ModelViewSet):
 
 
 class completed_order(viewsets.ModelViewSet):
-    serializer_class = CartSerializer
+    serializer_class = CartDetailedSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -459,7 +459,7 @@ class completed_order(viewsets.ModelViewSet):
 
 
 class pending_order(viewsets.ModelViewSet):
-    serializer_class = CartSerializer
+    serializer_class = CartDetailedSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -478,7 +478,7 @@ class nav_notification(viewsets.ModelViewSet):
 
 
 class report_orders(viewsets.ModelViewSet):
-    serializer_class = CartSerializer
+    serializer_class = CartDetailedSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -521,7 +521,7 @@ class report_orders(viewsets.ModelViewSet):
 
 
 class report_orders_cart(viewsets.ModelViewSet):
-    serializer_class = CartSerializer
+    serializer_class = CartDetailedSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -537,7 +537,8 @@ class report_orders_cart(viewsets.ModelViewSet):
 
         if payment_type == 'CREDIT':
             queryset = queryset.filter(payment_type='CREDIT')
-        elif payment_type in ['CASH','UPI', 'CHEQUE', 'NEFT/RTGS']:
+
+        elif payment_type == 'CASH':
             queryset = queryset.filter(payment_type__in=['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'])
         else:
             return queryset
@@ -610,9 +611,9 @@ class report_products_top_product(viewsets.ModelViewSet):
         year_filter = self.request.query_params.get('year', None)
 
         queryset = SubCart.objects.filter(retailer=retailer_id, used_in_cart=True)
-        #
-        # if year_filter:
-        #     queryset = queryset.filter(cart__order_created_at__year=year_filter)
+
+        if year_filter:
+            queryset = queryset.filter(carts__order_created_at__year=year_filter)
 
         queryset = queryset.distinct()
         return queryset
@@ -620,10 +621,8 @@ class report_products_top_product(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
 
-        # Serialize subcart objects to get product details
         subcart_serializer = self.serializer_class(queryset, many=True)
 
-        # Create a dictionary to store product details using the product_id as the key
         product_details = {}
 
         for subcart_data in subcart_serializer.data:
@@ -632,30 +631,126 @@ class report_products_top_product(viewsets.ModelViewSet):
             product_total_value = subcart_data['total_price']
 
             if product_id not in product_details:
-                # Retrieve the product object from the database
                 product = get_object_or_404(Product, pk=product_id)
 
-                # Store product details in the dictionary
                 product_details[product_id] = {
-                    'product_id': product_id,
                     'product_name': product.product_name,
-                    'product_brand_name': product.product_brand_name,
-                    'product_description': product.product_description,
                     'category': product.category.category_name,
                     'subcategory': product.subcategory.subcategory_name,
                     'quantity': product_qty,
                     'total_value': product_total_value,
                 }
             else:
-                # If product_id is already present, increase the quantity and total value
+
                 product_details[product_id]['quantity'] += product_qty
                 product_details[product_id]['total_value'] += product_total_value
 
-        # List of product details
         products_list = list(product_details.values())
 
         data = {
             'products': products_list,
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class report_products_top_category(viewsets.ModelViewSet):
+    serializer_class = SubCartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = SubCart.objects.filter(retailer=retailer_id, used_in_cart=True)
+
+        if year_filter:
+            queryset = queryset.filter(carts__order_created_at__year=year_filter)
+
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        subcart_serializer = self.serializer_class(queryset, many=True)
+
+        category_details = {}
+
+        for subcart_data in subcart_serializer.data:
+            product_id = subcart_data['product']
+            product_qty = subcart_data['qty']
+            product_total_value = subcart_data['total_price']
+
+            if product_id:
+                product = get_object_or_404(Product, pk=product_id)
+                category_name = product.category.category_name  # Define category_name here
+
+                if category_name not in category_details:
+                    category_details[category_name] = {
+                        'category_name': category_name,
+                        'total_quantity': product_qty,
+                        'total_value': product_total_value,
+                    }
+                else:
+                    # If category_name is already present, increase the quantity and total value
+                    category_details[category_name]['total_quantity'] += product_qty
+                    category_details[category_name]['total_value'] += product_total_value
+
+        categories_list = list(category_details.values())
+
+        data = {
+            'categories': categories_list,
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class report_products_top_sub_category(viewsets.ModelViewSet):
+    serializer_class = SubCartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = SubCart.objects.filter(retailer=retailer_id, used_in_cart=True)
+
+        if year_filter:
+            queryset = queryset.filter(carts__order_created_at__year=year_filter)
+
+        queryset = queryset.distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        subcart_serializer = self.serializer_class(queryset, many=True)
+
+        subcategory_details = {}
+
+        for subcart_data in subcart_serializer.data:
+            product_id = subcart_data['product']
+            product_qty = subcart_data['qty']
+            product_total_value = subcart_data['total_price']
+
+            if product_id:
+                product = get_object_or_404(Product, pk=product_id)
+                subcategory_name = product.subcategory.subcategory_name  # Define subcategory_name here
+
+                if subcategory_name not in subcategory_details:
+                    subcategory_details[subcategory_name] = {
+                        'subcategory_name': subcategory_name,
+                        'total_quantity': product_qty,
+                        'total_value': product_total_value,
+                    }
+                else:
+                    # If subcategory_name is already present, increase the quantity and total value
+                    subcategory_details[subcategory_name]['total_quantity'] += product_qty
+                    subcategory_details[subcategory_name]['total_value'] += product_total_value
+
+        subcategories_list = list(subcategory_details.values())
+
+        data = {
+            'subcategories': subcategories_list,
         }
         return Response(data, status=status.HTTP_200_OK)
 
@@ -667,11 +762,18 @@ class report_payment(viewsets.ModelViewSet):
     def get_queryset(self):
         retailer_id = self.kwargs.get('retailer_id')
         year_filter = self.request.query_params.get('year', None)
+        payment_type = self.request.query_params.get('payment_type','').upper()
 
         queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id)
 
         if year_filter:
             queryset = queryset.filter(order_created_at__year=year_filter)
+
+        if payment_type == 'CREDIT':
+            queryset = queryset.filter(payment_type='CREDIT')
+
+        elif payment_type == 'CASH':
+            queryset = queryset.filter(payment_type__in=['CASH', 'UPI', 'CHEQUE', 'NEFT/RTGS'])
 
         queryset = queryset.distinct()
         return queryset
