@@ -1019,3 +1019,19 @@ class OfferViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
     search_fields = ["offer_coupon_code"]
+
+
+class OfferDetailsViewSet(viewsets.ModelViewSet):
+    queryset = Offers.objects.all().order_by('id')
+    serializer_class = OfferDetailsSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["offer_coupon_code"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        pk = self.kwargs.get("wholeseller_id")
+        if pk:
+            queryset = queryset.filter(id=pk)
+        return queryset
+

@@ -14,7 +14,7 @@ from categoryApp.api.serializers import CategorySerializer
 from categoryApp.models import Category
 from productApp.api.serializers import ProductSerializer
 from wholesellerApp.models import Offers
-from wholesellerApp.api.serializers import OfferSerializer
+from wholesellerApp.api.serializers import OfferDetailsSerializer
 from rest_framework.generics import get_object_or_404
 from django.http import Http404
 from django.db.models import Sum, Count
@@ -424,7 +424,7 @@ class DeliveryAddressViewSet(viewsets.ModelViewSet):
 
 class RetailerOffer(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = OfferSerializer
+    serializer_class = OfferDetailsSerializer
 
     def get_queryset(self):
         queryset = Offers.objects.all().order_by('id')
