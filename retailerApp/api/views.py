@@ -168,7 +168,7 @@ class SubCartViewSet(viewsets.ModelViewSet):
                 if not subcart_item:
                     subcart_item = SubCart.objects.create(product=product, retailer=retailer, qty=qty, used_in_cart=False)
                 else:
-                    subcart_item.qty += qty
+                    subcart_item.qty = qty
                     subcart_item.save()
             else:
                 subcart_item, created = SubCart.objects.get_or_create(

@@ -1,6 +1,6 @@
 # Create your models here.
 import datetime
-
+from commonToall.common import *
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from wholesellerApp.models import Wholeseller
@@ -14,26 +14,6 @@ from productApp.models import Product
 import uuid
 import jsonfield
 
-RETAILER_STATUS = (
-    ("CREATED", "Created"),
-    ("PENDING", "Pending Approval"),
-    ("KYCAPPROVED", "KYC Approved"),
-    ("KYCREJECTED", "KYC Rejected"),
-    ("APPROVED", "Approved"),
-)
-
-BUSINESS_STATUS = (
-    ("NOTREGISTERED", "Not Registered"),
-    ("REGISTERED", "Registered")
-)
-
-RETAILER_NOTIFICATION_STATUS = (
-    ("NEW", "New Request"),
-    ("OLD", "Old Request"),
-    ("ACCEPT", "Accepted Request"),
-    ("REJECT", "Rejected Request"),
-    ("SAVE", "Save For Later")
-)
 
 class RetailerMobile(models.Model):
     retailer_number = PhoneNumberField(blank=True, null=True)
@@ -44,13 +24,6 @@ class RetailerMobile(models.Model):
         return str(self.retailer_number)
 
 
-RETAILER_PLAN= (
-    ('CASH', 'Cash'),
-    ('PLATINUM', 'Platinum'),
-    ('DIAMOND', 'Diamond'),
-    ('GOLD', 'Gold'),
-    ('BRONZE', 'Bronze')
-)
 
 class Retailer(models.Model):
     
@@ -94,25 +67,7 @@ class Retailer(models.Model):
         return self.retailer_name
 
 
-PAYMENT_TYPE = (
-    ("CASH", "Cash"),
-    ("CREDIT", "Credit"),
-    ('UPI', 'UPI'),
-    ('CHEQUE', 'Cheque'),
-    ('NEFT/RTGS', 'NEFT/RTGS')
-)
-PAYMENT_STATUS = (
-    ("PENDING", "Pending"),
-    ("COMPLETED", "Completed")
-)
 
-ORDER_STATUS = (
-    ("PENDING", 'Pending'),
-    ("APPROVED", 'Approved'),
-    ('REJECTED', 'Rejected'),
-    ('INPROGRESS', 'InProgress'),
-    ('SUCCESS', 'Success')
-)
 class PhotoOrder(models.Model):
     wholeseller = models.ForeignKey(Wholeseller, on_delete=models.CASCADE, related_name="photo_wholeseller", null=True,blank=True)
     order_image = models.ImageField(upload_to='images/photo_order/', null=True)
