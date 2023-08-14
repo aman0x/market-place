@@ -17,7 +17,7 @@ from wholesellerApp.models import Offers
 from wholesellerApp.api.serializers import OfferDetailsSerializer
 from rest_framework.generics import get_object_or_404
 from django.http import Http404
-from django.db.models import Sum, Count
+from django.db.models import Sum, F, ExpressionWrapper, FloatField, Count
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 common_status = settings.COMMON_STATUS
@@ -827,52 +827,21 @@ class my_performance(viewsets.ModelViewSet):
 
         num_orders = queryset.count()
         total_amount_spent = queryset.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
-        used_credit_amount = cart_qsets.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
         credit_allowed_bills = retailer_qsets.aggregate(Sum('retailer_no_of_bills_allowed'))['retailer_no_of_bills_allowed__sum'] or 0
         credit_limit = retailer_qsets.aggregate(Sum('retailer_credit_limit'))['retailer_credit_limit__sum'] or 0
         credit_amount = retailer_qsets.aggregate(Sum('retailer_credit_amount'))['retailer_credit_amount__sum'] or 0
+        used_credit_amount = cart_qsets.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        used_allowed_bills = cart_qsets.count()
         data = {
             'number_of_orders': num_orders,
             'amount_spent': total_amount_spent,
             'allowed_bills': credit_allowed_bills,
+            'remaining_allowed_bills': credit_allowed_bills - used_allowed_bills,
             'credit_limit': credit_limit,
             'available_credit_amount': credit_amount - used_credit_amount,
             'credit_days': 10,
-            'used_allowed_bills': 5,
+            'used_allowed_bills': used_allowed_bills,
             'used_credit_days': 10,
-
-            "wholeseller_data": {
-                'wholeseller_1': {
-                    'payment_type': 'Cash',
-                    'items': 5,
-                    'amount': 1200,
-                },
-                'wholeseller_2': {
-                    'payment_type': 'Credit',
-                    'items': 8,
-                    'amount': 1800,
-                },
-                'wholeseller_3': {
-                    'payment_type': 'Cash',
-                    'items': 1,
-                    'amount': 1000,
-                },
-                'wholeseller_4': {
-                    'payment_type': 'Credit',
-                    'items': 8,
-                    'amount': 12000,
-                },
-                'wholeseller_5': {
-                    'payment_type': 'Cash',
-                    'items': 51,
-                    'amount': 1200000,
-                },
-                'wholeseller_6': {
-                    'payment_type': 'Credit',
-                    'items': 56,
-                    'amount': 142200,
-                }
-            }
         }
         return Response(data, status=status.HTTP_200_OK)
 
@@ -917,51 +886,57 @@ class my_transactions(viewsets.ModelViewSet):
         queryset = queryset.distinct()
         return queryset
 
+
+
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
-        total_amount_spent = queryset.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
-        data = {
-            'total_amount_paid': total_amount_spent,
-            'advance_amount': 17000,
-            'pending_amount': 12343,
 
-            'added_advanced_fund': {
-                'amount': 20000,
-                'transactions_id': 12313412,
-                'payment_type': 'UPI',
-                'order_id': 123414,
-                "created_at": "2023-01-27T13:49:48.035120",
-            },
-            'added_advanced_fund2': {
-                'amount': 20000,
-                'transactions_id': 12313412,
-                'payment_type': 'UPI',
-                'order_id': 123414,
-                "created_at": "2023-02-27T13:49:48.035120",
-            },
-            'added_advanced_fund3': {
-                'amount': 20000,
-                'transactions_id': 12313412,
-                'payment_type': 'UPI',
-                'order_id': 123414,
-                "created_at": "2023-08-27T13:49:48.035120",
-            },
-            'added_advanced_fund4': {
-                'amount': 20000,
-                'transactions_id': 12313412,
-                'payment_type': 'UPI',
-                'order_id': 123414,
-                "created_at": "2023-07-27T13:49:48.035120",
-            },
-            'added_advanced_fund5': {
-                'amount': 20000,
-                'transactions_id': 12313412,
-                'payment_type': 'UPI',
-                'order_id': 123414,
-                "created_at": "2023-05-27T13:49:48.035120",
+        # Calculate total_amount_spent
+        total_amount_spent = queryset.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+
+        # Calculate order_amount
+        order_amount_expression = ExpressionWrapper(
+            Sum(F('cart_items__product__product_selling_price') * F('cart_items__qty')),
+            output_field=FloatField()
+        )
+        order_amount = total_amount_spent - queryset.aggregate(order_amount=order_amount_expression)['order_amount']
+
+        # Calculate advanced_amount and pending_amount
+        if order_amount > 0:
+            advanced_amount = order_amount
+            pending_amount = 0
+        else:
+            pending_amount = -order_amount
+            advanced_amount = 0
+
+        # Include additional fields for each cart
+        cart_data = []
+        for cart in queryset:
+            cart_total_value = 0
+            for cart_item in cart.cart_items.all():
+                cart_total_value += cart_item.qty * cart_item.product.product_selling_price
+
+            cart_info = {
+                'transaction_id': cart.pk,
+                'amount_paid': cart.payment_amount,
+                'payment_type': cart.payment_type,
+                'payment_date': cart.payment_date,
+                'order_id': cart.order_id,
+                'advanced_paid_amount': cart.payment_amount - cart_total_value if (cart.payment_amount - cart_total_value) > 0 else 0,
+                'total_value': cart_total_value,
+
+                # Include any other relevant fields here
             }
+            cart_data.append(cart_info)
+
+        response_data = {
+            'total_amount_spent': total_amount_spent,
+            'advanced_amount': advanced_amount,
+            'pending_amount': pending_amount,
+            'transactions': cart_data
         }
-        return Response(data, status=status.HTTP_200_OK)
+
+        return Response(response_data)
 
 
 class credit_details(viewsets.ModelViewSet):
