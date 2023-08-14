@@ -120,6 +120,7 @@ class DeliveryAddress(models.Model):
     def __str__(self):
         return f"{self.retailer}'s Delivery Address: {self.address}, {self.landmark}, {self.city}, {self.state} - {self.pincode}"
 
+
 class Cart(models.Model):
     cart_items = models.ManyToManyField(SubCart, related_name="carts", blank=True)
     order_id = models.CharField(max_length=8, unique=True, editable=False, null=True)

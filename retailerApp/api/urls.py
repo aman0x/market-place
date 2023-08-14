@@ -54,7 +54,7 @@ urlpatterns = [
 
     # my performance
     path('<int:retailer_id>/my_performance/', views.my_performance.as_view({'get': 'list'}), name='my_performance'),
-
+    path('<int:retailer_id>/my_performance/orders/', views.my_performance_order.as_view({'get': 'list'}), name='my_performance_order'),
     #Payments
     # my transactions
 

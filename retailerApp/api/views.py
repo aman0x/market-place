@@ -822,15 +822,22 @@ class my_performance(viewsets.ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
+        retailer_qsets = Retailer.objects.filter(id=self.kwargs.get('retailer_id')).distinct()
+        cart_qsets = Cart.objects.filter(cart_items__retailer_id=self.kwargs.get('retailer_id'), order_status="SUCCESS",payment_type="CREDIT").distinct()
+
         num_orders = queryset.count()
         total_amount_spent = queryset.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        used_credit_amount = cart_qsets.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        credit_allowed_bills = retailer_qsets.aggregate(Sum('retailer_no_of_bills_allowed'))['retailer_no_of_bills_allowed__sum'] or 0
+        credit_limit = retailer_qsets.aggregate(Sum('retailer_credit_limit'))['retailer_credit_limit__sum'] or 0
+        credit_amount = retailer_qsets.aggregate(Sum('retailer_credit_amount'))['retailer_credit_amount__sum'] or 0
         data = {
             'number_of_orders': num_orders,
             'amount_spent': total_amount_spent,
-            'available_credit_amount': 10000,
-            'allowed_bills': 1,
+            'allowed_bills': credit_allowed_bills,
+            'credit_limit': credit_limit,
+            'available_credit_amount': credit_amount - used_credit_amount,
             'credit_days': 10,
-            'credit_limit': 50000,
             'used_allowed_bills': 5,
             'used_credit_days': 10,
 
@@ -868,6 +875,33 @@ class my_performance(viewsets.ModelViewSet):
             }
         }
         return Response(data, status=status.HTTP_200_OK)
+
+
+class my_performance_order(viewsets.ModelViewSet):
+    serializer_class = MyPerformanceOrder
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+        payment_type = self.request.query_params.get('payment_type', '').upper()
+
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS")
+        if year_filter:
+            queryset = queryset.filter(order_created_at__year=year_filter)
+
+        if payment_type == "CREDIT":
+            queryset = queryset.filter(payment_type=payment_type)
+        elif payment_type == "CASH":
+            queryset = queryset.filter(payment_type__in=['CASH', 'UPI', 'CHEQUE', 'NEFT/RTGS'])
+        else:
+            return queryset.distinct()
+        return queryset.distinct()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class my_transactions(viewsets.ModelViewSet):
