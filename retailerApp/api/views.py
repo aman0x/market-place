@@ -939,61 +939,18 @@ class my_transactions(viewsets.ModelViewSet):
         return Response(response_data)
 
 
-class credit_details(viewsets.ModelViewSet):
+class credit_orders_details(viewsets.ModelViewSet):
     serializer_class = CartSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         retailer_id = self.kwargs.get('retailer_id')
         year_filter = self.request.query_params.get('year', None)
-        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS")
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS", payment_type="CREDIT")
         if year_filter:
             queryset = queryset.filter(order_created_at__year=year_filter)
         queryset = queryset.distinct()
         return queryset
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        total_amount_spent = queryset.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
-        data = {
-            'amount_spent': total_amount_spent,
-            'available_credit_amount': 10000,
-            'allowed_bills': 1,
-            'credit_days': 10,
-            'credit_limit': 50000,
-            'used_allowed_bills': 5,
-            'used_credit_days': 10,
-
-            123123231: {
-                'amount': 1000,
-                'status': 'success',
-                'NO. of Items': 12,
-                'payment_status': 'pending',
-                'payment_type': 'UPI'
-            },
-            12123231: {
-                'amount': 1000,
-                'status': 'success',
-                'NO. of Items': 12,
-                'payment_status': 'pending',
-                'payment_type': 'UPI'
-            },
-            1231223231: {
-                'amount': 1000,
-                'status': 'success',
-                'NO. of Items': 12,
-                'payment_status': 'pending',
-                'payment_type': 'UPI'
-            },
-            12312321: {
-                'amount': 1000,
-                'status': 'success',
-                'NO. of Items': 12,
-                'payment_status': 'complete',
-                'payment_type': 'UPI'
-            }
-        }
-        return Response(data, status=status.HTTP_200_OK)
 
 
 class WholesellerOrders(viewsets.ModelViewSet):
@@ -1004,7 +961,6 @@ class WholesellerOrders(viewsets.ModelViewSet):
         wholeseller_id = self.kwargs.get('wholeseller_id')
         queryset = Cart.objects.filter(cart_items__wholeseller_id=wholeseller_id).distinct()
         return queryset
-
 
 
 class OutForDeliveryViewSet(viewsets.ModelViewSet):
@@ -1056,34 +1012,17 @@ class OrderStatusViewSet(viewsets.ModelViewSet):
             return Response(data, status=status.HTTP_404_NOT_FOUND)
 
 
-class PaymentDetailsView(views.APIView):
+class PaymentDetailsView(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = CartSerializer
 
-    def get(self, request):
-        data = [
-            {
-                "total_amount": 2000,
-                "amount_paid": 5000,
-                "outstanding_amount": 3000,
-            },
-            {
-                "date": datetime.today().isoformat(),
-                "order_id": "1213211",
-                "transaction_id": "12412dq21",
-                "payment_mode": "UPI",
-                "amount_paid": 2900,
-                "payment_receipt_image": "image_url_here",
-                "confirm_received": True,
-            },
-            {
-                "date": datetime.today().isoformat(),
-                "order_id": "231",
-                "transaction_id": "1121dq21",
-                "payment_mode": "CASH",
-                "amount_paid": 29032,
-                "payment_receipt_image": "image_url_here",
-                "confirm_received": True,
-            }
-        ]
-        return Response(data)
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        payment_status = self.request.query_params.get('payment_status', 'PENDING').upper()
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS",)
+        if payment_status:
+            queryset = queryset.filter(payment_status=payment_status)
+        queryset = queryset.distinct()
+        return queryset
+
 

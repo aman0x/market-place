@@ -61,8 +61,8 @@ urlpatterns = [
     path('<int:retailer_id>/my_transactions/', views.my_transactions.as_view({'get': 'list'}), name='my_transactions'),
 
     # credit details
-    path('<int:retailer_id>/credit_details/', views.credit_details.as_view({'get': 'list'}), name='credit_details'),
-
+    path('<int:retailer_id>/credit_details/', views.my_performance.as_view({'get': 'list'}), name='credit_details'),
+    path('<int:retailer_id>/credit_details/orders/', views.credit_orders_details.as_view({'get': 'list'}), name='credit_orders_details'),
 
     #-------------------Wholeseller orders------------------------
     path('orders/wholeseller/<int:wholeseller_id>/', views.WholesellerOrders.as_view({'get': 'list'}), name="Wholeseller-Orders"),
@@ -77,7 +77,7 @@ urlpatterns = [
     path('order_status/retailer/<int:retailer_id>/', views.OrderStatusViewSet.as_view({'get': 'list'}), name="order_status"),
     path('order_status/wholeseller/<int:wholeseller_id>/', views.OrderStatusViewSet.as_view({'get': 'list'}), name="order_status"),
 
-    path('payment_details/', views.PaymentDetailsView.as_view(), name="payment_details"),
+    path('<int:retailer_id>/payment_details/', views.PaymentDetailsView.as_view({'get': 'list'}), name="payment_details"),
 ]
 
 
