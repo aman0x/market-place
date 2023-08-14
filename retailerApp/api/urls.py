@@ -48,21 +48,21 @@ urlpatterns = [
     path('report/retailer/<int:retailer_id>/orders_details/', views.report_orders_cart.as_view({'get': 'list'}), name='report_order_details'),
     path('report/retailer/<int:retailer_id>/products/', views.report_product.as_view({'get': 'list'}), name='report_product'),
     path('report/retailer/<int:retailer_id>/products_top_category/', views.report_products_top_category.as_view({'get': 'list'}), name='report_category'),
-path('report/retailer/<int:retailer_id>/products_top_sub_category/', views.report_products_top_sub_category.as_view({'get': 'list'}), name='report_sub_category'),
+    path('report/retailer/<int:retailer_id>/products_top_sub_category/', views.report_products_top_sub_category.as_view({'get': 'list'}), name='report_sub_category'),
     path('report/retailer/<int:retailer_id>/products_top_product/', views.report_products_top_product.as_view({'get': 'list'}), name='report_product'),
     path('report/retailer/<int:retailer_id>/payments/', views.report_payment.as_view({'get': 'list'}), name='report_payment'),
 
     # my performance
     path('<int:retailer_id>/my_performance/', views.my_performance.as_view({'get': 'list'}), name='my_performance'),
-
+    path('<int:retailer_id>/my_performance/orders/', views.my_performance_order.as_view({'get': 'list'}), name='my_performance_order'),
     #Payments
     # my transactions
 
     path('<int:retailer_id>/my_transactions/', views.my_transactions.as_view({'get': 'list'}), name='my_transactions'),
 
     # credit details
-    path('<int:retailer_id>/credit_details/', views.credit_details.as_view({'get': 'list'}), name='credit_details'),
-
+    path('<int:retailer_id>/credit_details/', views.my_performance.as_view({'get': 'list'}), name='credit_details'),
+    path('<int:retailer_id>/credit_details/orders/', views.credit_orders_details.as_view({'get': 'list'}), name='credit_orders_details'),
 
     #-------------------Wholeseller orders------------------------
     path('orders/wholeseller/<int:wholeseller_id>/', views.WholesellerOrders.as_view({'get': 'list'}), name="Wholeseller-Orders"),
@@ -77,7 +77,7 @@ path('report/retailer/<int:retailer_id>/products_top_sub_category/', views.repor
     path('order_status/retailer/<int:retailer_id>/', views.OrderStatusViewSet.as_view({'get': 'list'}), name="order_status"),
     path('order_status/wholeseller/<int:wholeseller_id>/', views.OrderStatusViewSet.as_view({'get': 'list'}), name="order_status"),
 
-    path('payment_details/', views.PaymentDetailsView.as_view(), name="payment_details"),
+    path('<int:retailer_id>/payment_details/', views.PaymentDetailsView.as_view({'get': 'list'}), name="payment_details"),
 ]
 
 

@@ -82,6 +82,7 @@ urlpatterns = [
 
     path('data/<int:wholeseller_id>/agent/', views.WholesellerIdAgentViewSet.as_view({'get': 'list'}), name="all-agent-details-under-Wholeseller"),
     path('data/<int:wholeseller_id>/agent/<int:agent_id>/', views.WholesellerIdAgentViewSetIdViewSet.as_view(), name="agent-details-under-Wholeseller"),
+    path('data/<int:wholeseller_id>/offers/', views.OfferDetailsViewSet.as_view({'get': 'list'}), name="offer_details"),
 
 ]
 
