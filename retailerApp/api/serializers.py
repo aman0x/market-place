@@ -102,7 +102,6 @@ class MyPerformanceOrder(serializers.ModelSerializer):
     def get_cart_items(self, obj):
         return obj.cart_items
 
-
 class CartDetailedSerializer(serializers.ModelSerializer):
     cart_items = SubCartSerializer(many=True)
     total_value = serializers.SerializerMethodField()
