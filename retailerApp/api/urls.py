@@ -29,7 +29,7 @@ urlpatterns = [
 
     path('subcarts/retailer/<int:retailer_id>/', views.subcart_retailer.as_view({'get': 'list'}), name='sub-cart-retailer'),
     path('carts/retailer/<int:retailer_id>/', views.cart_retailer.as_view({'get': 'list','post': 'create'}), name='cart-retailer'),
-    path('update-subcart-used-in-cart/', views.UpdateSubCartUsedInCartView.as_view(), name='update-subcart-used-in-cart'),
+    path('update_subcart_used_in_cart/', views.UpdateSubCartUsedInCartView.as_view(), name='update-subcart-used-in-cart'),
 
     #create Order
     path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/create_new_order/category/', views.RetailerIdWholesellerIdCreateOrderNew.as_view({'get': 'list'}),name="wholeseller_category"),

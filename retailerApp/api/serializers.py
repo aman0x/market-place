@@ -50,7 +50,7 @@ class RetailerSerializer(serializers.ModelSerializer):
 
 
 class SubCartSerializer(serializers.ModelSerializer):
-    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    product_details = ProductSerializer(source='product', read_only=True)
     total_price = serializers.SerializerMethodField()
 
     class Meta:
@@ -62,10 +62,14 @@ class SubCartSerializer(serializers.ModelSerializer):
             return obj.qty * obj.product.product_selling_price
         return 0
 
+    def get_product_details(self, obj):
+        return obj.product
+
 
 class CartSerializer(serializers.ModelSerializer):
     total_value = serializers.SerializerMethodField()
     total_items = serializers.SerializerMethodField()
+    cart_product_details = SubCartSerializer(source='cart_items', read_only=True, many=True)
 
     class Meta:
         model = Cart
