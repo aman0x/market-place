@@ -388,15 +388,15 @@ class ClickPhotoOrderView(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class AllProductByWholesellerId(viewsets.ModelViewSet):
-    serializer_class = ProductWithOfferSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        wholeseller_id = self.kwargs.get('wholeseller_id')
-        wholeseller = get_object_or_404(Wholeseller, pk=wholeseller_id)
-        bazaar_id = wholeseller.wholeseller_bazaar.first().id
-        return Product.objects.filter(bazaar_id=bazaar_id)
+# class AllProductByWholesellerId(viewsets.ModelViewSet):
+#     serializer_class = ProductWithOfferSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+#
+#     def get_queryset(self):
+#         wholeseller_id = self.kwargs.get('wholeseller_id')
+#         wholeseller = get_object_or_404(Wholeseller, pk=wholeseller_id)
+#         bazaar_id = wholeseller.wholeseller_bazaar.first().id
+#         return Product.objects.filter(bazaar_id=bazaar_id)
 
 
 class ProductFilterAPIView(viewsets.ModelViewSet):
@@ -655,32 +655,32 @@ class report_products_top_product(viewsets.ModelViewSet):
 
         subcart_serializer = self.serializer_class(queryset, many=True)
 
-        product_details = {}
+        product_details = []
+        total_values = sum(subcart.get('total_price', 0) for subcart in subcart_serializer.data)
 
         for subcart_data in subcart_serializer.data:
             product_id = subcart_data['product']
             product_qty = subcart_data['qty']
             product_total_value = subcart_data['total_price']
 
-            if product_id not in product_details:
-                product = get_object_or_404(Product, pk=product_id)
+            product = get_object_or_404(Product, pk=product_id)
 
-                product_details[product_id] = {
-                    'product_name': product.product_name,
-                    'category': product.category.category_name,
-                    'subcategory': product.subcategory.subcategory_name,
-                    'quantity': product_qty,
-                    'total_value': product_total_value,
-                }
-            else:
+            product_percentage = (product_total_value / total_values) * 100
 
-                product_details[product_id]['quantity'] += product_qty
-                product_details[product_id]['total_value'] += product_total_value
+            product_info = {
+                'product_name': product.product_name,
+                'category': product.category.category_name,
+                'subcategory': product.subcategory.subcategory_name,
+                'quantity': product_qty,
+                'total_value': product_total_value,
+                'product_percentage': product_percentage,
+                'product_photo': product.product_upload_front_image.url if product.product_upload_front_image else None,
+            }
 
-        products_list = list(product_details.values())
+            product_details.append(product_info)
 
         data = {
-            'products': products_list,
+            'products': product_details,
         }
         return Response(data, status=status.HTTP_200_OK)
 

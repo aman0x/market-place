@@ -34,7 +34,7 @@ urlpatterns = [
     #create Order
     path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/create_new_order/category/', views.RetailerIdWholesellerIdCreateOrderNew.as_view({'get': 'list'}),name="wholeseller_category"),
     path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/create_new_order/category/<int:category_id>/', views.FilterProductByCategory.as_view(), name="filter-product-by-category"),
-    path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/create_new_order/allProduct/', views.AllProductByWholesellerId.as_view({'get': 'list'}), name="all-product-by-wholeseller"),
+    # path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/create_new_order/allProduct/', views.AllProductByWholesellerId.as_view({'get': 'list'}), name="all-product-by-wholeseller"),
     path('product/', views.ProductFilterAPIView.as_view({'get': 'list'}), name="product"),
     #orders
     path('recent_order/retailer/<int:retailer_id>/', views.recent_order.as_view({'get': 'list'}), name="recent_order"),
@@ -50,6 +50,8 @@ urlpatterns = [
     path('report/retailer/<int:retailer_id>/products_top_category/', views.report_products_top_category.as_view({'get': 'list'}), name='report_category'),
     path('report/retailer/<int:retailer_id>/products_top_sub_category/', views.report_products_top_sub_category.as_view({'get': 'list'}), name='report_sub_category'),
     path('report/retailer/<int:retailer_id>/products_top_product/', views.report_products_top_product.as_view({'get': 'list'}), name='report_product'),
+    # path('report/retailer/<int:retailer_id>/products_top_offer_based_product/', views.report_products_top_offer_based_product.as_view({'get': 'list'}), name='report_product'),
+
     path('report/retailer/<int:retailer_id>/payments/', views.report_payment.as_view({'get': 'list'}), name='report_payment'),
 
     # my performance
