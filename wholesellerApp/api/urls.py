@@ -6,19 +6,19 @@ router = routers.DefaultRouter()
 router.register(r'data', views.WholesellerViewSet),
 
 # -------------wholeseller branch-------
-router.register(r'branch', views.WholesellerBranchViewSet),
-router.register(r'data/branch/add_product', views.WholesellerBranchAddProduct),
+router.register(r'branch', views.WholesellerBranchViewSet,basename='wholeseller_branch'),
+router.register(r'data/branch/add_product', views.WholesellerBranchAddProduct, basename='wholeseller_branch_add_product'),
 # router.register(r'data/branch/category_wise_plan_list', views.WholesellerBranchCategoryWisePlanList),
 
 # ------------wholeseller agent-----------
-router.register(r'agent', views.WholesellerAgentViewSet)
+router.register(r'agent', views.WholesellerAgentViewSet, basename='wholeseller_agent')
 
 # -------------Wholeseller Orders---------
 router.register(r'orders', views.OrderViewSet, basename='order')
 router.register(r'editorders', views.EditOrderViewSet, basename='edit_order')
 
 #--------------Wholeseller_offer------------
-router.register(r'offer', views.OfferViewSet)
+router.register(r'offer', views.OfferViewSet, basename='wholeseller_offer')
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

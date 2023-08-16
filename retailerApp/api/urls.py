@@ -35,7 +35,7 @@ urlpatterns = [
     path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/create_new_order/category/', views.RetailerIdWholesellerIdCreateOrderNew.as_view({'get': 'list'}),name="wholeseller_category"),
     path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/create_new_order/category/<int:category_id>/', views.FilterProductByCategory.as_view(), name="filter-product-by-category"),
     path('data/<int:retailer_id>/wholeseller/<int:wholeseller_id>/create_new_order/allProduct/', views.AllProductByWholesellerId.as_view({'get': 'list'}), name="all-product-by-wholeseller"),
-
+    path('product/', views.ProductFilterAPIView.as_view({'get': 'list'}), name="product"),
     #orders
     path('recent_order/retailer/<int:retailer_id>/', views.recent_order.as_view({'get': 'list'}), name="recent_order"),
     path('completed_order/retailer/<int:retailer_id>/', views.completed_order.as_view({'get': 'list'}), name="completed_order"),

@@ -188,9 +188,6 @@ class SubCartViewSet(viewsets.ModelViewSet):
         except Product.DoesNotExist:
             return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        except Retailer.DoesNotExist:
-            return Response({"error": "Retailer not found."}, status=status.HTTP_404_NOT_FOUND)
-
 
 class subcart_retailer(viewsets.ModelViewSet):
     serializer_class = SubCartSerializer
@@ -392,7 +389,7 @@ class ClickPhotoOrderView(viewsets.ModelViewSet):
 
 
 class AllProductByWholesellerId(viewsets.ModelViewSet):
-    serializer_class = ProductSerializer
+    serializer_class = ProductWithOfferSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -400,6 +397,14 @@ class AllProductByWholesellerId(viewsets.ModelViewSet):
         wholeseller = get_object_or_404(Wholeseller, pk=wholeseller_id)
         bazaar_id = wholeseller.wholeseller_bazaar.first().id
         return Product.objects.filter(bazaar_id=bazaar_id)
+
+
+class ProductFilterAPIView(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Product.objects.all()
+    serializer_class = ProductWithOfferSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['bazaar','category_group','category','subcategory']
 
 
 class FavoritesViewSet(viewsets.ModelViewSet):
@@ -422,6 +427,7 @@ class DeliveryAddressViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(retailer_id=retailer_id)
         return queryset
 
+
 class RetailerOffer(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = OfferDetailsSerializer
@@ -436,6 +442,32 @@ class RetailerOffer(viewsets.ModelViewSet):
             raise Response(f"No offers found for the given wholeseller.")
 
         return queryset
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+
+        modified_offer_list = []
+
+        for offer in serializer.data:
+            product_details = offer['productIdetails']
+            offer_discounted_price = float(offer['offer_discounted_price'])
+            product_selling_price = float(product_details['product_selling_price'])
+
+            # Calculate the discount percentage
+            discount_percentage = round(((product_selling_price - offer_discounted_price) / product_selling_price) * 100)
+
+            modified_offer = {
+                **offer,  # Include all original fields from the serializer data
+                'discount_percentage': discount_percentage,
+            }
+
+            modified_offer_list.append(modified_offer)
+
+        response_data = {
+            'results': modified_offer_list,
+        }
+
+        return Response(response_data)
 
 
 class recent_order(viewsets.ModelViewSet):
@@ -466,6 +498,7 @@ class pending_order(viewsets.ModelViewSet):
         retailer_id = self.kwargs.get('retailer_id')
         queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status='SUCCESS',payment_status = 'PENDING' ).distinct()
         return queryset
+
 
 class nav_notification(viewsets.ModelViewSet):
     serializer_class = CartSerializer
@@ -505,7 +538,6 @@ class report_orders(viewsets.ModelViewSet):
         accepted_orders = queryset.filter(order_status="APPROVED").count()
         rejected_orders = queryset.filter(order_status="REJECTED").count()
         success_orders = queryset.filter(order_status="SUCCESS").count()
-
 
         data = {
             'total_orders': total_orders,
@@ -1024,5 +1056,4 @@ class PaymentDetailsView(viewsets.ModelViewSet):
             queryset = queryset.filter(payment_status=payment_status)
         queryset = queryset.distinct()
         return queryset
-
 
