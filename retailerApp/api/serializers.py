@@ -216,3 +216,62 @@ class OrderStatusSerializer(serializers.ModelSerializer):
 
     def get_order_id(self, obj):
         return 12321
+
+# class ProductWithOfferSerializer(serializers.ModelSerializer):
+#     product_details = ProductSerializer(source='*', read_only=True)
+#     offer_price = serializers.SerializerMethodField()
+#     discount = serializers.SerializerMethodField()
+#     price_after_discount = serializers.SerializerMethodField()
+#
+#     class Meta:
+#         model = Product
+#         fields = ("product_details", "offer_price", "discount", "price_after_discount")
+#
+#     def get_offer_price(self, product):
+#         # Retrieve the lowest offer price for the product
+#         lowest_offer = Offers.objects.filter(product=product).order_by('offer_discounted_price').first()
+#         if lowest_offer:
+#             return lowest_offer.offer_discounted_price
+#         return None
+#
+#     def get_discount(self, product):
+#         offer_price = self.get_offer_price(product)
+#         if offer_price is not None:
+#             return product.product_selling_price - float(offer_price)
+#         return 0
+#
+#     def get_price_after_discount(self, product):
+#         offer_price = self.get_offer_price(product)
+#         if offer_price is not None:
+#             return offer_price
+#         return product.product_selling_price
+
+
+class ProductWithOfferSerializer(serializers.ModelSerializer):
+    product_details = ProductSerializer(source='*', read_only=True)
+    offer_price = serializers.SerializerMethodField()
+    discount = serializers.SerializerMethodField()
+    discount_percentage = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = ("product_details", "offer_price", "discount", "discount_percentage")
+
+    def get_offer_price(self, product):
+        # Retrieve the lowest offer price for the product
+        lowest_offer = Offers.objects.filter(product=product).order_by('offer_discounted_price').first()
+        if lowest_offer:
+            return lowest_offer.offer_discounted_price
+        return None
+
+    def get_discount(self, product):
+        offer_price = self.get_offer_price(product)
+        if offer_price is not None:
+            return product.product_selling_price - float(offer_price)
+        return 0
+
+    def get_discount_percentage(self, product):
+        offer_price = self.get_offer_price(product)
+        if offer_price is not None:
+            return ((product.product_selling_price - float(offer_price)) / product.product_selling_price) * 100
+        return 0

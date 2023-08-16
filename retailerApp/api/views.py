@@ -389,7 +389,7 @@ class ClickPhotoOrderView(viewsets.ModelViewSet):
 
 
 class AllProductByWholesellerId(viewsets.ModelViewSet):
-    serializer_class = ProductSerializer
+    serializer_class = ProductWithOfferSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -397,6 +397,14 @@ class AllProductByWholesellerId(viewsets.ModelViewSet):
         wholeseller = get_object_or_404(Wholeseller, pk=wholeseller_id)
         bazaar_id = wholeseller.wholeseller_bazaar.first().id
         return Product.objects.filter(bazaar_id=bazaar_id)
+
+
+class ProductFilterAPIView(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Product.objects.all()
+    serializer_class = ProductWithOfferSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['bazaar','category_group','category','subcategory']
 
 
 class FavoritesViewSet(viewsets.ModelViewSet):
@@ -1048,5 +1056,4 @@ class PaymentDetailsView(viewsets.ModelViewSet):
             queryset = queryset.filter(payment_status=payment_status)
         queryset = queryset.distinct()
         return queryset
-
 
