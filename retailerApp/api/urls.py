@@ -50,7 +50,7 @@ urlpatterns = [
     path('report/retailer/<int:retailer_id>/products_top_category/', views.report_products_top_category.as_view({'get': 'list'}), name='report_category'),
     path('report/retailer/<int:retailer_id>/products_top_sub_category/', views.report_products_top_sub_category.as_view({'get': 'list'}), name='report_sub_category'),
     path('report/retailer/<int:retailer_id>/products_top_product/', views.report_products_top_product.as_view({'get': 'list'}), name='report_product'),
-    # path('report/retailer/<int:retailer_id>/products_top_offer_based_product/', views.report_products_top_offer_based_product.as_view({'get': 'list'}), name='report_product'),
+    path('report/retailer/<int:retailer_id>/products_top_offer_based_product/', views.report_products_top_offer_based_product.as_view({'get': 'list'}), name='report_product'),
 
     path('report/retailer/<int:retailer_id>/payments/', views.report_payment.as_view({'get': 'list'}), name='report_payment'),
 

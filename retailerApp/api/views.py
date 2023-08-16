@@ -803,6 +803,59 @@ class report_products_top_sub_category(viewsets.ModelViewSet):
         return Response(data, status=status.HTTP_200_OK)
 
 
+class report_products_top_offer_based_product(viewsets.ModelViewSet):
+    serializer_class = SubCartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = SubCart.objects.filter(retailer=retailer_id, used_in_cart=True)
+
+        if year_filter:
+            queryset = queryset.filter(carts__order_created_at__year=year_filter)
+
+        product_ids_with_offers = Offers.objects.filter(product_id__in=queryset.values_list('product', flat=True)).values_list('product_id', flat=True)
+        queryset = queryset.filter(product__in=product_ids_with_offers).distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        subcart_qset = SubCart.objects.filter(retailer=self.kwargs.get('retailer_id'), used_in_cart=True)
+
+        subcart_serializer = self.serializer_class(subcart_qset, many=True)
+
+        product_details = []
+        total_values = sum(subcart.get('total_price', 0) for subcart in subcart_serializer.data)
+
+        for subcart_data in subcart_serializer.data:
+            product_id = subcart_data['product']
+            product_qty = subcart_data['qty']
+            product_total_value = subcart_data['total_price']
+
+            product = get_object_or_404(Product, pk=product_id)
+
+            product_percentage = (product_total_value / total_values) * 100
+
+            product_info = {
+                'product_name': product.product_name,
+                'category': product.category.category_name,
+                'subcategory': product.subcategory.subcategory_name,
+                'quantity': product_qty,
+                'total_value': product_total_value,
+                'product_percentage': product_percentage,
+                'product_photo': product.product_upload_front_image.url if product.product_upload_front_image else None,
+            }
+
+            product_details.append(product_info)
+
+        data = {
+            'products': product_details,
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
 class report_payment(viewsets.ModelViewSet):
     serializer_class = CartSerializer
     permission_classes = [permissions.IsAuthenticated]
