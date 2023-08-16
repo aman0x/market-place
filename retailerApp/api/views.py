@@ -188,9 +188,6 @@ class SubCartViewSet(viewsets.ModelViewSet):
         except Product.DoesNotExist:
             return Response({"error": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        except Retailer.DoesNotExist:
-            return Response({"error": "Retailer not found."}, status=status.HTTP_404_NOT_FOUND)
-
 
 class subcart_retailer(viewsets.ModelViewSet):
     serializer_class = SubCartSerializer
@@ -493,6 +490,7 @@ class pending_order(viewsets.ModelViewSet):
         retailer_id = self.kwargs.get('retailer_id')
         queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status='SUCCESS',payment_status = 'PENDING' ).distinct()
         return queryset
+
 
 class nav_notification(viewsets.ModelViewSet):
     serializer_class = CartSerializer

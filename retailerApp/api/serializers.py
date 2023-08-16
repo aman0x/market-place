@@ -1,10 +1,10 @@
 from rest_framework import serializers
 from retailerApp.models import *
-from wholesellerApp.models import Wholeseller
+from wholesellerApp.models import Wholeseller, Offers
 from wholesellerApp.api.serializers import WholesellerSerializer
 from productApp.api.serializers import ProductSerializer
 from drf_extra_fields.fields import Base64ImageField
-from django.db.models import Sum
+from django.db.models import Sum, Min
 
 
 class RetailerNumberSerializer(serializers.ModelSerializer):
@@ -59,7 +59,19 @@ class SubCartSerializer(serializers.ModelSerializer):
 
     def get_total_price(self, obj):
         if obj.product:
-            return obj.qty * obj.product.product_selling_price
+            total_price = obj.qty * obj.product.product_selling_price
+
+            # Check if the product has any offers
+            product_offers = Offers.objects.filter(product=obj.product)
+
+            if product_offers.exists():
+                # Select the lowest offer price
+                lowest_offer_price = product_offers.aggregate(Min('offer_discounted_price'))['offer_discounted_price__min']
+                if lowest_offer_price:
+                    lowest_offer_price = int(lowest_offer_price)  # Convert to integer
+                    total_price = min(total_price, obj.qty * lowest_offer_price)
+
+            return total_price
         return 0
 
     def get_product_details(self, obj):
