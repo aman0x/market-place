@@ -422,6 +422,7 @@ class DeliveryAddressViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(retailer_id=retailer_id)
         return queryset
 
+
 class RetailerOffer(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = OfferDetailsSerializer
