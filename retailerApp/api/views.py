@@ -388,15 +388,15 @@ class ClickPhotoOrderView(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class AllProductByWholesellerId(viewsets.ModelViewSet):
-    serializer_class = ProductWithOfferSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        wholeseller_id = self.kwargs.get('wholeseller_id')
-        wholeseller = get_object_or_404(Wholeseller, pk=wholeseller_id)
-        bazaar_id = wholeseller.wholeseller_bazaar.first().id
-        return Product.objects.filter(bazaar_id=bazaar_id)
+# class AllProductByWholesellerId(viewsets.ModelViewSet):
+#     serializer_class = ProductWithOfferSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+#
+#     def get_queryset(self):
+#         wholeseller_id = self.kwargs.get('wholeseller_id')
+#         wholeseller = get_object_or_404(Wholeseller, pk=wholeseller_id)
+#         bazaar_id = wholeseller.wholeseller_bazaar.first().id
+#         return Product.objects.filter(bazaar_id=bazaar_id)
 
 
 class ProductFilterAPIView(viewsets.ModelViewSet):
@@ -655,32 +655,32 @@ class report_products_top_product(viewsets.ModelViewSet):
 
         subcart_serializer = self.serializer_class(queryset, many=True)
 
-        product_details = {}
+        product_details = []
+        total_values = sum(subcart.get('total_price', 0) for subcart in subcart_serializer.data)
 
         for subcart_data in subcart_serializer.data:
             product_id = subcart_data['product']
             product_qty = subcart_data['qty']
             product_total_value = subcart_data['total_price']
 
-            if product_id not in product_details:
-                product = get_object_or_404(Product, pk=product_id)
+            product = get_object_or_404(Product, pk=product_id)
 
-                product_details[product_id] = {
-                    'product_name': product.product_name,
-                    'category': product.category.category_name,
-                    'subcategory': product.subcategory.subcategory_name,
-                    'quantity': product_qty,
-                    'total_value': product_total_value,
-                }
-            else:
+            product_percentage = (product_total_value / total_values) * 100
 
-                product_details[product_id]['quantity'] += product_qty
-                product_details[product_id]['total_value'] += product_total_value
+            product_info = {
+                'product_name': product.product_name,
+                'category': product.category.category_name,
+                'subcategory': product.subcategory.subcategory_name,
+                'quantity': product_qty,
+                'total_value': product_total_value,
+                'product_percentage': product_percentage,
+                'product_photo': product.product_upload_front_image.url if product.product_upload_front_image else None,
+            }
 
-        products_list = list(product_details.values())
+            product_details.append(product_info)
 
         data = {
-            'products': products_list,
+            'products': product_details,
         }
         return Response(data, status=status.HTTP_200_OK)
 
@@ -707,6 +707,7 @@ class report_products_top_category(viewsets.ModelViewSet):
         subcart_serializer = self.serializer_class(queryset, many=True)
 
         category_details = {}
+        total_values = sum(subcart.get('total_price', 0) for subcart in subcart_serializer.data)
 
         for subcart_data in subcart_serializer.data:
             product_id = subcart_data['product']
@@ -715,25 +716,32 @@ class report_products_top_category(viewsets.ModelViewSet):
 
             if product_id:
                 product = get_object_or_404(Product, pk=product_id)
-                category_name = product.category.category_name  # Define category_name here
+                category = product.category
+
+                category_name = category.category_name
+                category_image = category.category_ref_image.url if category.category_ref_image else None
+
+                product_percentage = (product_total_value / total_values) * 100
 
                 if category_name not in category_details:
                     category_details[category_name] = {
                         'category_name': category_name,
+                        'category_image': category_image,
                         'total_quantity': product_qty,
                         'total_value': product_total_value,
+                        'category_percentage': product_percentage,
                     }
                 else:
                     # If category_name is already present, increase the quantity and total value
                     category_details[category_name]['total_quantity'] += product_qty
                     category_details[category_name]['total_value'] += product_total_value
 
-        categories_list = list(category_details.values())
+            categories_list = list(category_details.values())
 
-        data = {
-            'categories': categories_list,
-        }
-        return Response(data, status=status.HTTP_200_OK)
+            data = {
+                'categories': categories_list,
+            }
+            return Response(data, status=status.HTTP_200_OK)
 
 
 class report_products_top_sub_category(viewsets.ModelViewSet):
@@ -756,6 +764,7 @@ class report_products_top_sub_category(viewsets.ModelViewSet):
         queryset = self.get_queryset()
 
         subcart_serializer = self.serializer_class(queryset, many=True)
+        total_values = sum(subcart.get('total_price', 0) for subcart in subcart_serializer.data)
 
         subcategory_details = {}
 
@@ -766,13 +775,20 @@ class report_products_top_sub_category(viewsets.ModelViewSet):
 
             if product_id:
                 product = get_object_or_404(Product, pk=product_id)
-                subcategory_name = product.subcategory.subcategory_name  # Define subcategory_name here
+                subcategory = product.subcategory
+
+                subcategory_name = subcategory.subcategory_name
+                subcategory_image = subcategory.subcategory_ref_image.url if subcategory.subcategory_ref_image else None
+
+                product_percentage = (product_total_value / total_values) * 100
 
                 if subcategory_name not in subcategory_details:
                     subcategory_details[subcategory_name] = {
                         'subcategory_name': subcategory_name,
+                        'subcategory_image': subcategory_image,
                         'total_quantity': product_qty,
                         'total_value': product_total_value,
+                        'subcategory_percentage': product_percentage,
                     }
                 else:
                     # If subcategory_name is already present, increase the quantity and total value
