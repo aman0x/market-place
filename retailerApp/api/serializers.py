@@ -52,6 +52,7 @@ class RetailerSerializer(serializers.ModelSerializer):
 class SubCartSerializer(serializers.ModelSerializer):
     product_details = ProductSerializer(source='product', read_only=True)
     total_price = serializers.SerializerMethodField()
+    wholeseller_data = WholesellerSerializer(source='wholeseller', read_only=True)
 
     class Meta:
         model = SubCart

@@ -20,6 +20,7 @@ from django.http import Http404
 from django.db.models import Sum, F, ExpressionWrapper, FloatField, Count
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
+from datetime import datetime, timezone
 common_status = settings.COMMON_STATUS
 
 
@@ -509,6 +510,35 @@ class nav_notification(viewsets.ModelViewSet):
         queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status= "SUCCESS" ).distinct()
         return queryset
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        serializer = self.serializer_class(queryset, many=True, context={'request': request})
+        data = serializer.data
+
+        response_data = []
+        for item in data:
+            order_id = item['order_id']
+            wholeseller_firm_name = item['cart_product_details'][0]['wholeseller_data']['wholeseller_firm_name']
+            order_status = item['order_status']
+
+            order_status_change_at_str = item['order_status_change_at']
+            order_status_change_at = datetime.strptime(order_status_change_at_str, '%Y-%m-%dT%H:%M:%S.%f').replace(
+                tzinfo=timezone.utc)
+
+            current_time = datetime.now(timezone.utc)
+            time_difference = current_time - order_status_change_at
+
+            response_data.append({
+                'order_id': order_id,
+                'wholeseller_firm_name': wholeseller_firm_name,
+                'order_status': order_status,
+                'order_status_change_at': order_status_change_at,
+                'time_difference_seconds': time_difference.total_seconds()
+            })
+
+        return Response(response_data)
+
 
 class report_orders(viewsets.ModelViewSet):
     serializer_class = CartDetailedSerializer
@@ -895,7 +925,11 @@ class report_payment(viewsets.ModelViewSet):
         total_pending = pending_cash_total + pending_credit_total
 
         successful_payments = queryset.filter(payment_status='COMPLETED', order_status='SUCCESS').values('payment_date', 'payment_type', 'payment_amount')
+
+        order_frequency_by_payment_type = queryset.filter(payment_status='COMPLETED', order_status='SUCCESS') \
+            .values('payment_type').annotate(order_count=Count('id'))
         data = {
+            'order_frequency_by_payment_type': order_frequency_by_payment_type,
             'total_paid': total_paid,
             'cash_total': cash_total,
             'credit_total': credit_total,
@@ -971,7 +1005,8 @@ class my_performance_order(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        serializer_data = serializer.data
+        return Response(serializer_data)
 
 
 class my_transactions(viewsets.ModelViewSet):
