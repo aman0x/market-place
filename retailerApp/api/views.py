@@ -20,6 +20,7 @@ from django.http import Http404
 from django.db.models import Sum, F, ExpressionWrapper, FloatField, Count
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
+from datetime import datetime, timezone
 common_status = settings.COMMON_STATUS
 
 
@@ -509,6 +510,35 @@ class nav_notification(viewsets.ModelViewSet):
         queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status= "SUCCESS" ).distinct()
         return queryset
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        serializer = self.serializer_class(queryset, many=True, context={'request': request})
+        data = serializer.data
+
+        response_data = []
+        for item in data:
+            order_id = item['order_id']
+            wholeseller_firm_name = item['cart_product_details'][0]['wholeseller_data']['wholeseller_firm_name']
+            order_status = item['order_status']
+
+            order_status_change_at_str = item['order_status_change_at']
+            order_status_change_at = datetime.strptime(order_status_change_at_str, '%Y-%m-%dT%H:%M:%S.%f').replace(
+                tzinfo=timezone.utc)
+
+            current_time = datetime.now(timezone.utc)
+            time_difference = current_time - order_status_change_at
+
+            response_data.append({
+                'order_id': order_id,
+                'wholeseller_firm_name': wholeseller_firm_name,
+                'order_status': order_status,
+                'order_status_change_at': order_status_change_at,
+                'time_difference_seconds': time_difference.total_seconds()
+            })
+
+        return Response(response_data)
+
 
 class report_orders(viewsets.ModelViewSet):
     serializer_class = CartDetailedSerializer
@@ -803,6 +833,59 @@ class report_products_top_sub_category(viewsets.ModelViewSet):
         return Response(data, status=status.HTTP_200_OK)
 
 
+class report_products_top_offer_based_product(viewsets.ModelViewSet):
+    serializer_class = SubCartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.kwargs.get('retailer_id')
+        year_filter = self.request.query_params.get('year', None)
+
+        queryset = SubCart.objects.filter(retailer=retailer_id, used_in_cart=True)
+
+        if year_filter:
+            queryset = queryset.filter(carts__order_created_at__year=year_filter)
+
+        product_ids_with_offers = Offers.objects.filter(product_id__in=queryset.values_list('product', flat=True)).values_list('product_id', flat=True)
+        queryset = queryset.filter(product__in=product_ids_with_offers).distinct()
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        subcart_qset = SubCart.objects.filter(retailer=self.kwargs.get('retailer_id'), used_in_cart=True)
+
+        subcart_serializer = self.serializer_class(subcart_qset, many=True)
+
+        product_details = []
+        total_values = sum(subcart.get('total_price', 0) for subcart in subcart_serializer.data)
+
+        for subcart_data in subcart_serializer.data:
+            product_id = subcart_data['product']
+            product_qty = subcart_data['qty']
+            product_total_value = subcart_data['total_price']
+
+            product = get_object_or_404(Product, pk=product_id)
+
+            product_percentage = (product_total_value / total_values) * 100
+
+            product_info = {
+                'product_name': product.product_name,
+                'category': product.category.category_name,
+                'subcategory': product.subcategory.subcategory_name,
+                'quantity': product_qty,
+                'total_value': product_total_value,
+                'product_percentage': product_percentage,
+                'product_photo': product.product_upload_front_image.url if product.product_upload_front_image else None,
+            }
+
+            product_details.append(product_info)
+
+        data = {
+            'products': product_details,
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
 class report_payment(viewsets.ModelViewSet):
     serializer_class = CartSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -842,7 +925,11 @@ class report_payment(viewsets.ModelViewSet):
         total_pending = pending_cash_total + pending_credit_total
 
         successful_payments = queryset.filter(payment_status='COMPLETED', order_status='SUCCESS').values('payment_date', 'payment_type', 'payment_amount')
+
+        order_frequency_by_payment_type = queryset.filter(payment_status='COMPLETED', order_status='SUCCESS') \
+            .values('payment_type').annotate(order_count=Count('id'))
         data = {
+            'order_frequency_by_payment_type': order_frequency_by_payment_type,
             'total_paid': total_paid,
             'cash_total': cash_total,
             'credit_total': credit_total,
@@ -918,7 +1005,22 @@ class my_performance_order(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        data = serializer.data
+        response_data = []
+        for item in data:
+            wholeseller_name = item['cart_items'][0]['wholeseller_data']['wholeseller_name']
+            payment_type = item['payment_type']
+            payment_amount = item['payment_amount']
+            total_items = item['total_items']
+
+            response_data.append({
+                'wholeseller_name': wholeseller_name,
+                'payment_type': payment_type,
+                'payment_amount': payment_amount,
+                'total_items': total_items,
+            })
+
+        return Response(response_data)
 
 
 class my_transactions(viewsets.ModelViewSet):
