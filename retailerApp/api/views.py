@@ -1005,8 +1005,22 @@ class my_performance_order(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         serializer = self.get_serializer(queryset, many=True)
-        serializer_data = serializer.data
-        return Response(serializer_data)
+        data = serializer.data
+        response_data = []
+        for item in data:
+            wholeseller_name = item['cart_items'][0]['wholeseller_data']['wholeseller_name']
+            payment_type = item['payment_type']
+            payment_amount = item['payment_amount']
+            total_items = item['total_items']
+
+            response_data.append({
+                'wholeseller_name': wholeseller_name,
+                'payment_type': payment_type,
+                'payment_amount': payment_amount,
+                'total_items': total_items,
+            })
+
+        return Response(response_data)
 
 
 class my_transactions(viewsets.ModelViewSet):
