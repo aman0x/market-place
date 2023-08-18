@@ -1102,6 +1102,31 @@ class credit_orders_details(viewsets.ModelViewSet):
         queryset = queryset.distinct()
         return queryset
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        response_data = []
+        data = serializer.data
+        for item in data:
+            order_id = item['order_id']
+            order_created_at = item['order_created_at']
+            payment_status = item['payment_status']
+            payment_amount = item['payment_amount']
+            total_items = item['total_items']
+            order_status = item['order_status']
+            cart_product_details = item['cart_product_details']
+
+            response_data.append({
+                'order_id': order_id,
+                'order_created_at': order_created_at,
+                'order_status': order_status,
+                'payment_amount': payment_amount,
+                'total_items': total_items,
+                'payment_status': payment_status,
+                'cart_product_details': cart_product_details
+                })
+        return Response(response_data)
+
 
 class WholesellerOrders(viewsets.ModelViewSet):
     serializer_class = CartSerializer
