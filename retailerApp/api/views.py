@@ -522,19 +522,19 @@ class nav_notification(viewsets.ModelViewSet):
             wholeseller_firm_name = item['cart_product_details'][0]['wholeseller_data']['wholeseller_firm_name']
             order_status = item['order_status']
 
-            order_status_change_at_str = item['order_status_change_at']
-            order_status_change_at = datetime.strptime(order_status_change_at_str, '%Y-%m-%dT%H:%M:%S.%f').replace(
-                tzinfo=timezone.utc)
+            order_status_change_at = item['order_status_change_at']
+            # order_status_change_at = datetime.strptime(order_status_change_at_str, '%Y-%m-%dT%H:%M:%S.%f').replace(
+            #     tzinfo=timezone.utc)
 
-            current_time = datetime.now(timezone.utc)
-            time_difference = current_time - order_status_change_at
+            # current_time = datetime.now(timezone.utc)
+            # time_difference = current_time - order_status_change_at
 
             response_data.append({
                 'order_id': order_id,
                 'wholeseller_firm_name': wholeseller_firm_name,
                 'order_status': order_status,
                 'order_status_change_at': order_status_change_at,
-                'time_difference_seconds': time_difference.total_seconds()
+                # 'time_difference_seconds': time_difference.total_seconds()
             })
 
         return Response(response_data)
