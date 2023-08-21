@@ -523,11 +523,6 @@ class nav_notification(viewsets.ModelViewSet):
             order_status = item['order_status']
 
             order_status_change_at = item['order_status_change_at']
-            # order_status_change_at = datetime.strptime(order_status_change_at_str, '%Y-%m-%dT%H:%M:%S.%f').replace(
-            #     tzinfo=timezone.utc)
-
-            # current_time = datetime.now(timezone.utc)
-            # time_difference = current_time - order_status_change_at
 
             response_data.append({
                 'order_id': order_id,
@@ -1137,6 +1132,12 @@ class WholesellerOrders(viewsets.ModelViewSet):
         queryset = Cart.objects.filter(cart_items__wholeseller_id=wholeseller_id).distinct()
         return queryset
 
+    def list(self, request, *args, **kwargs):
+        querryset = self.get_queryset()
+        data = querryset.values()
+
+        return Response(data, status=status.HTTP_200_OK)
+
 
 class OutForDeliveryViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
@@ -1157,9 +1158,10 @@ class OutForDeliveryViewSet(viewsets.ModelViewSet):
         if retailer_id and wholeseller_id:
             queryset = OutForDelivery.objects.filter(wholeseller_id=wholeseller_id, retailer_id=retailer_id).distinct()
 
-        if queryset:
+        if not queryset:
+            return Response({"data": "no data found"})
+        else:
             return queryset
-        else: return Response({data:"no data found"})
 
 
 class OrderStatusViewSet(viewsets.ModelViewSet):
@@ -1169,6 +1171,7 @@ class OrderStatusViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         wholeseller_id = self.kwargs.get('wholeseller_id')
         retailer_id = self.kwargs.get('retailer_id')
+        order_id = self.kwargs.get('order_id')
 
         queryset = OrderStatus.objects.all().order_by('id')
         if retailer_id and not wholeseller_id:

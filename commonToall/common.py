@@ -44,5 +44,6 @@ ORDER_STATUS = (
     ("APPROVED", 'Approved'),
     ('REJECTED', 'Rejected'),
     ('INPROGRESS', 'InProgress'),
-    ('SUCCESS', 'Success')
+    ('SUCCESS', 'Success'),
+    ('OUTFORDELIVERY', 'Out for Delivery')
 )
