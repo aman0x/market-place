@@ -154,10 +154,12 @@ class SubCartViewSet(viewsets.ModelViewSet):
         product_id = request.data.get("product")
         qty = int(request.data.get("qty"))
         retailer_id = request.data.get("retailer")
+        wholeseller_id = request.data.get("wholeseller")
 
         try:
             product = Product.objects.get(pk=product_id)
             retailer = Retailer.objects.get(pk=retailer_id)
+            wholeseller = Wholeseller.objects.get(pk=wholeseller_id)
 
             # Check if the SubCart has already been used in a cart
             existing_subcart = SubCart.objects.filter(
@@ -175,6 +177,7 @@ class SubCartViewSet(viewsets.ModelViewSet):
                 subcart_item, created = SubCart.objects.get_or_create(
                     product=product,
                     retailer=retailer,
+                    wholeseller=wholeseller,
                     defaults={"qty": qty, "used_in_cart": False},
                 )
 
