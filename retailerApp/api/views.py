@@ -912,11 +912,15 @@ class report_payment(viewsets.ModelViewSet):
 
         # Calculate total amounts for cash and credit payments
         cash_total = queryset.filter(payment_type__in = ['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'], order_status='SUCCESS', payment_status='COMPLETED').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        total_cash_orders = queryset.filter(payment_type__in = ['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'], order_status='SUCCESS', payment_status='COMPLETED').count() or 0
         credit_total = queryset.filter(payment_type='CREDIT', order_status='SUCCESS', payment_status='COMPLETED').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        total_credit_orders = queryset.filter(payment_type='CREDIT', order_status='SUCCESS', payment_status='COMPLETED').count() or 0
 
         # Calculate total amounts for pending cash and credit payments
         pending_cash_total = queryset.filter(payment_type__in=['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'], order_status='PENDING').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        total_pending_cash_orders = queryset.filter(payment_type__in=['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'], order_status='PENDING').count() or 0
         pending_credit_total = queryset.filter(payment_type='CREDIT', order_status='PENDING').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        total_pending_credit_orders = queryset.filter(payment_type='CREDIT', order_status='PENDING').count() or 0
 
         # Calculate total amount paid (cash + credit) and total amount pending (pending cash + pending credit)
         total_paid = cash_total + credit_total
@@ -934,6 +938,10 @@ class report_payment(viewsets.ModelViewSet):
             'total_pending': total_pending,
             'pending_cash_total': pending_cash_total,
             'pending_credit_total': pending_credit_total,
+            'total_cash_orders': total_cash_orders,
+            'total_credit_orders': total_credit_orders,
+            'total_pending_cash_orders': total_pending_cash_orders,
+            'total_pending_credit_orders': total_pending_credit_orders,
             'successful_payments': successful_payments,
         }
 
