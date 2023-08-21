@@ -522,19 +522,14 @@ class nav_notification(viewsets.ModelViewSet):
             wholeseller_firm_name = item['cart_product_details'][0]['wholeseller_data']['wholeseller_firm_name']
             order_status = item['order_status']
 
-            order_status_change_at_str = item['order_status_change_at']
-            order_status_change_at = datetime.strptime(order_status_change_at_str, '%Y-%m-%dT%H:%M:%S.%f').replace(
-                tzinfo=timezone.utc)
-
-            current_time = datetime.now(timezone.utc)
-            time_difference = current_time - order_status_change_at
+            order_status_change_at = item['order_status_change_at']
 
             response_data.append({
                 'order_id': order_id,
                 'wholeseller_firm_name': wholeseller_firm_name,
                 'order_status': order_status,
                 'order_status_change_at': order_status_change_at,
-                'time_difference_seconds': time_difference.total_seconds()
+                # 'time_difference_seconds': time_difference.total_seconds()
             })
 
         return Response(response_data)
@@ -1102,6 +1097,31 @@ class credit_orders_details(viewsets.ModelViewSet):
         queryset = queryset.distinct()
         return queryset
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+        response_data = []
+        data = serializer.data
+        for item in data:
+            order_id = item['order_id']
+            order_created_at = item['order_created_at']
+            payment_status = item['payment_status']
+            payment_amount = item['payment_amount']
+            total_items = item['total_items']
+            order_status = item['order_status']
+            cart_product_details = item['cart_product_details']
+
+            response_data.append({
+                'order_id': order_id,
+                'order_created_at': order_created_at,
+                'order_status': order_status,
+                'payment_amount': payment_amount,
+                'total_items': total_items,
+                'payment_status': payment_status,
+                'cart_product_details': cart_product_details
+                })
+        return Response(response_data)
+
 
 class WholesellerOrders(viewsets.ModelViewSet):
     serializer_class = CartSerializer
@@ -1111,6 +1131,12 @@ class WholesellerOrders(viewsets.ModelViewSet):
         wholeseller_id = self.kwargs.get('wholeseller_id')
         queryset = Cart.objects.filter(cart_items__wholeseller_id=wholeseller_id).distinct()
         return queryset
+
+    def list(self, request, *args, **kwargs):
+        querryset = self.get_queryset()
+        data = querryset.values()
+
+        return Response(data, status=status.HTTP_200_OK)
 
 
 class OutForDeliveryViewSet(viewsets.ModelViewSet):
@@ -1132,9 +1158,10 @@ class OutForDeliveryViewSet(viewsets.ModelViewSet):
         if retailer_id and wholeseller_id:
             queryset = OutForDelivery.objects.filter(wholeseller_id=wholeseller_id, retailer_id=retailer_id).distinct()
 
-        if queryset:
+        if not queryset:
+            return Response({"data": "no data found"})
+        else:
             return queryset
-        else: return Response({data:"no data found"})
 
 
 class OrderStatusViewSet(viewsets.ModelViewSet):
@@ -1144,6 +1171,7 @@ class OrderStatusViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         wholeseller_id = self.kwargs.get('wholeseller_id')
         retailer_id = self.kwargs.get('retailer_id')
+        order_id = self.kwargs.get('order_id')
 
         queryset = OrderStatus.objects.all().order_by('id')
         if retailer_id and not wholeseller_id:
