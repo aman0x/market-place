@@ -380,16 +380,17 @@ class FilterProductByCategory(views.APIView):
 class ClickPhotoOrderView(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = PhotoOrderSerializer
-    queryset = PhotoOrder.objects.all().order_by("id")
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['wholeseller_id']
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    def get_queryset(self):
+        retailer_id = self.request.query_params.get('retailer_id')
+        queryset = PhotoOrder.objects.all().order_by("id")
+        if retailer_id:
+            queryset = queryset.filter(retailer_id=retailer_id)
+        queryset = queryset.distinct()
+        return queryset
+
 
 
 # class AllProductByWholesellerId(viewsets.ModelViewSet):
@@ -412,9 +413,18 @@ class ProductFilterAPIView(viewsets.ModelViewSet):
 
 
 class FavoritesViewSet(viewsets.ModelViewSet):
-    queryset = Favorites.objects.all()
+    # queryset = Favorites.objects.all()
     serializer_class = FavoritesSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        retailer_id = self.request.query_params.get('retailer_id')
+        queryset = Favorites.objects.all().order_by('id')
+
+        if retailer_id:
+            queryset = queryset.filter(retailer_id=retailer_id)
+
+        return queryset.distinct()
 
     def perform_create(self, serializer):
         serializer.save()
