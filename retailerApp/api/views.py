@@ -413,7 +413,6 @@ class ProductFilterAPIView(viewsets.ModelViewSet):
 
 
 class FavoritesViewSet(viewsets.ModelViewSet):
-    # queryset = Favorites.objects.all()
     serializer_class = FavoritesSerializer
     permission_classes = [permissions.IsAuthenticated]
 
