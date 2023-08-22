@@ -20,7 +20,8 @@ from django.http import Http404
 from django.db.models import Sum, F, ExpressionWrapper, FloatField, Count
 from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
-from datetime import datetime, timezone
+from datetime import datetime
+from django.utils import timezone
 common_status = settings.COMMON_STATUS
 
 
@@ -935,12 +936,27 @@ class report_payment(viewsets.ModelViewSet):
         total_paid = cash_total + credit_total
         total_pending = pending_cash_total + pending_credit_total
 
+        total_payment_amount = total_paid
         successful_payments = queryset.filter(payment_status='COMPLETED', order_status='SUCCESS').values('payment_date', 'payment_type', 'payment_amount')
+        payment_percentage_data = []
+        for payment in successful_payments:
+            payment_date = payment['payment_date']
+            payment_type = payment['payment_type']
+            payment_amount = payment['payment_amount']
+            if total_payment_amount > 0:
+                payment_percentage = (payment_amount / total_payment_amount) * 100
+            else:
+                payment_percentage = 0.00
+            payment_percentage_data.append({'payment_date': payment_date, 'payment_type': payment_type, 'payment_amount': payment_amount,
+                                            'payment_percentage': round(payment_percentage, 2)})
 
-        order_frequency_by_payment_type = queryset.filter(payment_status='COMPLETED', order_status='SUCCESS') \
-            .values('payment_type').annotate(order_count=Count('id'))
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        order_frequency_last_30_days = Cart.objects.filter(payment_status='COMPLETED', order_status='SUCCESS', order_created_at__gte=thirty_days_ago).count()
+        payment_frequency_last_30_days = Cart.objects.filter(payment_status='COMPLETED', order_status='SUCCESS', payment_date__gte=thirty_days_ago).count()
+
         data = {
-            'order_frequency_by_payment_type': order_frequency_by_payment_type,
+            'order_frequency_last_30_days': order_frequency_last_30_days,
+            'payment_frequency_last_30_days': payment_frequency_last_30_days,
             'total_paid': total_paid,
             'cash_total': cash_total,
             'credit_total': credit_total,
@@ -951,7 +967,7 @@ class report_payment(viewsets.ModelViewSet):
             'total_credit_orders': total_credit_orders,
             'total_pending_cash_orders': total_pending_cash_orders,
             'total_pending_credit_orders': total_pending_credit_orders,
-            'successful_payments': successful_payments,
+            'payment_data': payment_percentage_data,
         }
 
         return Response(data, status=status.HTTP_200_OK)
