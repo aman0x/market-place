@@ -555,11 +555,16 @@ class WholesellerBranchViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows groups to be viewed or edited.
     """
-
-    queryset = Branch.objects.all().order_by("id")
     serializer_class = WholesellerBranchSerializer
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter]
+
+    def get_queryset(self):
+        queryset = Branch.objects.all().order_by("id")
+        branch_wholeseller = self.request.query_params.get("branch_wholeseller")
+        if branch_wholeseller:
+            queryset = queryset.filter(branch_wholeseller=branch_wholeseller)
+        return queryset.distinct()
 
 
 class WholesellerBazaarProductViewSet(viewsets.ModelViewSet):
