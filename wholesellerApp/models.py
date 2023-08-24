@@ -14,6 +14,7 @@ from subCategoryApp.models import SubCategory, Category, ParentCategory, Bazaar
 from productApp.models import Product
 from masterApp.models import RetailerType
 from agentApp.models import Agent
+from commonToall.common import *
 
 # from offerApp.models import Offers
 
@@ -22,14 +23,6 @@ from agentApp.models import Agent
 #     ("WHOLESELLER", "Wholeseller"),
 #     ("SEMIWHOLESELLER","SemiWholeseller")
 # )
-
-WHOLESELLER_STATUS = (
-    ("CREATED", "Created"),
-    ("PENDING", "Pending Approval"),
-    ("KYCAPPROVED", "KYC Approved"),
-    ("KYCREJECTED", "KYC Rejected"),
-    ("APPROVED", "Approved"),
-)
 
 
 class Wholeseller(models.Model):
@@ -120,10 +113,7 @@ class Branch(models.Model):
                 self.wholeseller_branch_user = user
         super().save(*args, **kwargs)
 
-BRANCH_PLAN = {
-    ("PERCENTAGE", "percentage"),
-    ("RUPEE", "rupee")
-}
+
 
 class Branch_Product(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, null=True, related_name='branch_products')
@@ -189,31 +179,6 @@ class Branch_Product_Pricing(models.Model):
 
 
 # -----------------------------Wholeseller agent ------------------
-WHOLESELLER_AGENT_TYPE = (
-    ("WHOLESELLER_AGENT", "Wholeseller Agent"),
-)
-
-WHOLESELLER_AGENT_STATUS = (
-    ("CREATED", "Created"),
-    ("PENDING", "Pending Approval"),
-    ("KYCAPPROVED", "KYC Approved"),
-    ("KYCREJECTED", "KYC Rejected"),
-)
-
-WHOLESELLER_AGENT_COMMISSION_TYPE = (
-    ("PERCUSTOMER", "Percustomer"),
-    ("PERPLAN", "Perplan")
-)
-
-WHOLESELLER_AGENT_COMMISSION_VALUE_TYPE = (
-    ("PERCENTAGE", "Percentage"),
-    ("AMOUNT", "Amount")
-)
-
-WHOLESELLER_AGENT_GENDER = (
-    ("MALE", "Male"),
-    ("FEMALE", "Female")
-)
 
 
 class WholesellerAgent(models.Model):
@@ -222,7 +187,7 @@ class WholesellerAgent(models.Model):
     agency = models.ForeignKey(Agency, on_delete=models.CASCADE, null=True, related_name="wholeseller_agent_agency")
     wholeseller_agent_description = models.TextField(blank=True, null=True)
     wholeseller_agent_name = models.CharField(max_length=200)
-    wholeseller_agent_type = models.CharField(max_length=17, choices=WHOLESELLER_AGENT_TYPE,default="WHOLESELLER_AGENT")
+    wholeseller_agent_type = models.CharField(max_length=170, choices=WHOLESELLER_AGENT_TYPE,default="WHOLESELLER_AGENT")
     wholeseller_agent_number = PhoneNumberField(unique=True, blank=True, null=True)
     wholeseller_agent_altranate_mobile_number = PhoneNumberField(blank=True, null=True)
     wholeseller_agent_email = models.EmailField(null=True)
