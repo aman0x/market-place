@@ -22,6 +22,7 @@ from rest_framework.decorators import action
 from django_filters.rest_framework import DjangoFilterBackend
 from datetime import datetime
 from django.utils import timezone
+
 common_status = settings.COMMON_STATUS
 
 
@@ -170,7 +171,8 @@ class SubCartViewSet(viewsets.ModelViewSet):
             if existing_subcart:
                 subcart_item = SubCart.objects.filter(product=product, retailer=retailer, used_in_cart=False).first()
                 if not subcart_item:
-                    subcart_item = SubCart.objects.create(product=product, retailer=retailer, qty=qty, used_in_cart=False)
+                    subcart_item = SubCart.objects.create(product=product, retailer=retailer, qty=qty,
+                                                          used_in_cart=False)
                 else:
                     subcart_item.qty = qty
                     subcart_item.save()
@@ -233,6 +235,7 @@ class UpdateSubCartUsedInCartView(views.APIView):
 class cart_retailer(viewsets.ModelViewSet):
     serializer_class = CartSerializer
     permission_classes = [permissions.IsAuthenticated]
+
     def get_queryset(self):
         retailer_id = self.kwargs.get('retailer_id')
         queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id).distinct()
@@ -275,7 +278,8 @@ class RetailerNotification(viewsets.ModelViewSet):
     serializer_class = RetailerSerializer
 
     def get_queryset(self):
-        if self.request.query_params.get('retailer_number') and not self.request.query_params.get('retailer_wholeseller'):
+        if self.request.query_params.get('retailer_number') and not self.request.query_params.get(
+                'retailer_wholeseller'):
             retailer_number = None
             try:
                 retailer_number = self.request.query_params.get('retailer_number')
@@ -288,11 +292,12 @@ class RetailerNotification(viewsets.ModelViewSet):
             return queryset
 
         elif self.request.query_params.get('retailer_number') and self.request.query_params.get('retailer_wholeseller'):
-                retailer_number = self.request.query_params.get('retailer_number')
-                retailer_number = '+' + retailer_number
-                retailer_wholeseller = self.request.query_params.get('retailer_wholeseller')
-                queryset = Retailer.objects.filter(retailer_number__retailer_number=retailer_number, retailer_wholeseller=retailer_wholeseller)
-                return queryset
+            retailer_number = self.request.query_params.get('retailer_number')
+            retailer_number = '+' + retailer_number
+            retailer_wholeseller = self.request.query_params.get('retailer_wholeseller')
+            queryset = Retailer.objects.filter(retailer_number__retailer_number=retailer_number,
+                                               retailer_wholeseller=retailer_wholeseller)
+            return queryset
 
 
 class RetailerNumberViewSet(viewsets.ModelViewSet):
@@ -313,7 +318,7 @@ class RetailerNumberViewSet(viewsets.ModelViewSet):
             return Response({
                 "id": existing_retailer.id,
                 "retailer_number": retailer_number
-            } , status=status.HTTP_200_OK)
+            }, status=status.HTTP_200_OK)
 
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -393,24 +398,17 @@ class ClickPhotoOrderView(viewsets.ModelViewSet):
         return queryset
 
 
-
-# class AllProductByWholesellerId(viewsets.ModelViewSet):
-#     serializer_class = ProductWithOfferSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-#
-#     def get_queryset(self):
-#         wholeseller_id = self.kwargs.get('wholeseller_id')
-#         wholeseller = get_object_or_404(Wholeseller, pk=wholeseller_id)
-#         bazaar_id = wholeseller.wholeseller_bazaar.first().id
-#         return Product.objects.filter(bazaar_id=bazaar_id)
-
-
 class ProductFilterAPIView(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     queryset = Product.objects.all()
     serializer_class = ProductWithOfferSerializer
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['bazaar','category_group','category','subcategory']
+
+    def get_queryset(self):
+        barcode = self.request.query_params.get('barcode')
+        queryset = Product.objects.all()
+        if barcode:
+            queryset = queryset.filter(product_barcode_number=barcode)
+        return queryset.distinct()
 
 
 class FavoritesViewSet(viewsets.ModelViewSet):
@@ -456,6 +454,7 @@ class RetailerOffer(viewsets.ModelViewSet):
             raise Response(f"No offers found for the given wholeseller.")
 
         return queryset
+
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
@@ -468,7 +467,8 @@ class RetailerOffer(viewsets.ModelViewSet):
             product_selling_price = float(product_details['product_selling_price'])
 
             # Calculate the discount percentage
-            discount_percentage = round(((product_selling_price - offer_discounted_price) / product_selling_price) * 100)
+            discount_percentage = round(
+                ((product_selling_price - offer_discounted_price) / product_selling_price) * 100)
 
             modified_offer = {
                 **offer,  # Include all original fields from the serializer data
@@ -500,7 +500,8 @@ class completed_order(viewsets.ModelViewSet):
 
     def get_queryset(self):
         retailer_id = self.kwargs.get('retailer_id')
-        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status='SUCCESS',payment_status = 'COMPLETED' ).distinct()
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status='SUCCESS',
+                                       payment_status='COMPLETED').distinct()
         return queryset
 
 
@@ -510,7 +511,8 @@ class pending_order(viewsets.ModelViewSet):
 
     def get_queryset(self):
         retailer_id = self.kwargs.get('retailer_id')
-        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status='SUCCESS',payment_status = 'PENDING' ).distinct()
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status='SUCCESS',
+                                       payment_status='PENDING').distinct()
         return queryset
 
 
@@ -520,7 +522,7 @@ class nav_notification(viewsets.ModelViewSet):
 
     def get_queryset(self):
         retailer_id = self.kwargs.get('retailer_id')
-        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status= "SUCCESS" ).distinct()
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS").distinct()
         return queryset
 
     def list(self, request, *args, **kwargs):
@@ -599,7 +601,8 @@ class report_orders_cart(viewsets.ModelViewSet):
         payment_type = self.request.query_params.get('payment_type', '').upper()
         year_filter = self.request.query_params.get('year', None)
 
-        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id,payment_status='COMPLETED',order_status='SUCCESS')
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, payment_status='COMPLETED',
+                                       order_status='SUCCESS')
         queryset = queryset.distinct()
 
         if year_filter:
@@ -609,7 +612,7 @@ class report_orders_cart(viewsets.ModelViewSet):
             queryset = queryset.filter(payment_type='CREDIT')
 
         elif payment_type == 'CASH':
-            queryset = queryset.filter(payment_type__in=['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'])
+            queryset = queryset.filter(payment_type__in=['CASH', 'UPI', 'CHEQUE', 'NEFT/RTGS'])
         else:
             return queryset
 
@@ -854,7 +857,8 @@ class report_products_top_offer_based_product(viewsets.ModelViewSet):
         if year_filter:
             queryset = queryset.filter(carts__order_created_at__year=year_filter)
 
-        product_ids_with_offers = Offers.objects.filter(product_id__in=queryset.values_list('product', flat=True)).values_list('product_id', flat=True)
+        product_ids_with_offers = Offers.objects.filter(
+            product_id__in=queryset.values_list('product', flat=True)).values_list('product_id', flat=True)
         queryset = queryset.filter(product__in=product_ids_with_offers).distinct()
         return queryset
 
@@ -901,7 +905,7 @@ class report_payment(viewsets.ModelViewSet):
     def get_queryset(self):
         retailer_id = self.kwargs.get('retailer_id')
         year_filter = self.request.query_params.get('year', None)
-        payment_type = self.request.query_params.get('payment_type','').upper()
+        payment_type = self.request.query_params.get('payment_type', '').upper()
 
         queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id)
 
@@ -921,15 +925,26 @@ class report_payment(viewsets.ModelViewSet):
         queryset = self.get_queryset()
 
         # Calculate total amounts for cash and credit payments
-        cash_total = queryset.filter(payment_type__in = ['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'], order_status='SUCCESS', payment_status='COMPLETED').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
-        total_cash_orders = queryset.filter(payment_type__in = ['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'], order_status='SUCCESS', payment_status='COMPLETED').count() or 0
-        credit_total = queryset.filter(payment_type='CREDIT', order_status='SUCCESS', payment_status='COMPLETED').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
-        total_credit_orders = queryset.filter(payment_type='CREDIT', order_status='SUCCESS', payment_status='COMPLETED').count() or 0
+        cash_total = queryset.filter(payment_type__in=['CASH', 'UPI', 'CHEQUE', 'NEFT/RTGS'], order_status='SUCCESS',
+                                     payment_status='COMPLETED').aggregate(Sum('payment_amount'))[
+                         'payment_amount__sum'] or 0
+        total_cash_orders = queryset.filter(payment_type__in=['CASH', 'UPI', 'CHEQUE', 'NEFT/RTGS'],
+                                            order_status='SUCCESS', payment_status='COMPLETED').count() or 0
+        credit_total = \
+        queryset.filter(payment_type='CREDIT', order_status='SUCCESS', payment_status='COMPLETED').aggregate(
+            Sum('payment_amount'))['payment_amount__sum'] or 0
+        total_credit_orders = queryset.filter(payment_type='CREDIT', order_status='SUCCESS',
+                                              payment_status='COMPLETED').count() or 0
 
         # Calculate total amounts for pending cash and credit payments
-        pending_cash_total = queryset.filter(payment_type__in=['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'], order_status='PENDING').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
-        total_pending_cash_orders = queryset.filter(payment_type__in=['CASH','UPI', 'CHEQUE', 'NEFT/RTGS'], order_status='PENDING').count() or 0
-        pending_credit_total = queryset.filter(payment_type='CREDIT', order_status='PENDING').aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
+        pending_cash_total = \
+        queryset.filter(payment_type__in=['CASH', 'UPI', 'CHEQUE', 'NEFT/RTGS'], order_status='PENDING').aggregate(
+            Sum('payment_amount'))['payment_amount__sum'] or 0
+        total_pending_cash_orders = queryset.filter(payment_type__in=['CASH', 'UPI', 'CHEQUE', 'NEFT/RTGS'],
+                                                    order_status='PENDING').count() or 0
+        pending_credit_total = \
+        queryset.filter(payment_type='CREDIT', order_status='PENDING').aggregate(Sum('payment_amount'))[
+            'payment_amount__sum'] or 0
         total_pending_credit_orders = queryset.filter(payment_type='CREDIT', order_status='PENDING').count() or 0
 
         # Calculate total amount paid (cash + credit) and total amount pending (pending cash + pending credit)
@@ -937,7 +952,9 @@ class report_payment(viewsets.ModelViewSet):
         total_pending = pending_cash_total + pending_credit_total
 
         total_payment_amount = total_paid
-        successful_payments = queryset.filter(payment_status='COMPLETED', order_status='SUCCESS').values('payment_date', 'payment_type', 'payment_amount')
+        successful_payments = queryset.filter(payment_status='COMPLETED', order_status='SUCCESS').values('payment_date',
+                                                                                                         'payment_type',
+                                                                                                         'payment_amount')
         payment_percentage_data = []
         for payment in successful_payments:
             payment_date = payment['payment_date']
@@ -947,12 +964,15 @@ class report_payment(viewsets.ModelViewSet):
                 payment_percentage = (payment_amount / total_payment_amount) * 100
             else:
                 payment_percentage = 0.00
-            payment_percentage_data.append({'payment_date': payment_date, 'payment_type': payment_type, 'payment_amount': payment_amount,
-                                            'payment_percentage': round(payment_percentage, 2)})
+            payment_percentage_data.append(
+                {'payment_date': payment_date, 'payment_type': payment_type, 'payment_amount': payment_amount,
+                 'payment_percentage': round(payment_percentage, 2)})
 
         thirty_days_ago = timezone.now() - timedelta(days=30)
-        order_frequency_last_30_days = Cart.objects.filter(payment_status='COMPLETED', order_status='SUCCESS', order_created_at__gte=thirty_days_ago).count()
-        payment_frequency_last_30_days = Cart.objects.filter(payment_status='COMPLETED', order_status='SUCCESS', payment_date__gte=thirty_days_ago).count()
+        order_frequency_last_30_days = Cart.objects.filter(payment_status='COMPLETED', order_status='SUCCESS',
+                                                           order_created_at__gte=thirty_days_ago).count()
+        payment_frequency_last_30_days = Cart.objects.filter(payment_status='COMPLETED', order_status='SUCCESS',
+                                                             payment_date__gte=thirty_days_ago).count()
 
         data = {
             'order_frequency_last_30_days': order_frequency_last_30_days,
@@ -989,11 +1009,13 @@ class my_performance(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         retailer_qsets = Retailer.objects.filter(id=self.kwargs.get('retailer_id')).distinct()
-        cart_qsets = Cart.objects.filter(cart_items__retailer_id=self.kwargs.get('retailer_id'), order_status="SUCCESS",payment_type="CREDIT").distinct()
+        cart_qsets = Cart.objects.filter(cart_items__retailer_id=self.kwargs.get('retailer_id'), order_status="SUCCESS",
+                                         payment_type="CREDIT").distinct()
 
         num_orders = queryset.count()
         total_amount_spent = queryset.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
-        credit_allowed_bills = retailer_qsets.aggregate(Sum('retailer_no_of_bills_allowed'))['retailer_no_of_bills_allowed__sum'] or 0
+        credit_allowed_bills = retailer_qsets.aggregate(Sum('retailer_no_of_bills_allowed'))[
+                                   'retailer_no_of_bills_allowed__sum'] or 0
         credit_limit = retailer_qsets.aggregate(Sum('retailer_credit_limit'))['retailer_credit_limit__sum'] or 0
         credit_amount = retailer_qsets.aggregate(Sum('retailer_credit_amount'))['retailer_credit_amount__sum'] or 0
         used_credit_amount = cart_qsets.aggregate(Sum('payment_amount'))['payment_amount__sum'] or 0
@@ -1067,8 +1089,6 @@ class my_transactions(viewsets.ModelViewSet):
         queryset = queryset.distinct()
         return queryset
 
-
-
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
 
@@ -1103,7 +1123,8 @@ class my_transactions(viewsets.ModelViewSet):
                 'payment_type': cart.payment_type,
                 'payment_date': cart.payment_date,
                 'order_id': cart.order_id,
-                'advanced_paid_amount': cart.payment_amount - cart_total_value if (cart.payment_amount - cart_total_value) > 0 else 0,
+                'advanced_paid_amount': cart.payment_amount - cart_total_value if (
+                                                                                              cart.payment_amount - cart_total_value) > 0 else 0,
                 'total_value': cart_total_value,
 
                 # Include any other relevant fields here
@@ -1127,7 +1148,8 @@ class credit_orders_details(viewsets.ModelViewSet):
     def get_queryset(self):
         retailer_id = self.kwargs.get('retailer_id')
         year_filter = self.request.query_params.get('year', None)
-        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS", payment_type="CREDIT")
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS",
+                                       payment_type="CREDIT")
         if year_filter:
             queryset = queryset.filter(order_created_at__year=year_filter)
         queryset = queryset.distinct()
@@ -1155,7 +1177,7 @@ class credit_orders_details(viewsets.ModelViewSet):
                 'total_items': total_items,
                 'payment_status': payment_status,
                 'cart_product_details': cart_product_details
-                })
+            })
         return Response(response_data)
 
 
@@ -1233,9 +1255,8 @@ class PaymentDetailsView(viewsets.ModelViewSet):
     def get_queryset(self):
         retailer_id = self.kwargs.get('retailer_id')
         payment_status = self.request.query_params.get('payment_status', 'PENDING').upper()
-        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS",)
+        queryset = Cart.objects.filter(cart_items__retailer_id=retailer_id, order_status="SUCCESS", )
         if payment_status:
             queryset = queryset.filter(payment_status=payment_status)
         queryset = queryset.distinct()
         return queryset
-
