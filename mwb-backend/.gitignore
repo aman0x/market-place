@@ -1,0 +1,16 @@
+.DS_Store
+*.log
+*.pot
+*.pyc
+__pycache__/
+mwb/local_settings.py
+db.sqlite3
+venv
+/.vscode
+/myenv
+/static
+/media
+/image
+/images
+migrations/
+.idea
